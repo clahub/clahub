@@ -6,6 +6,8 @@ gem 'pg'
 gem 'jquery-rails'
 gem 'thin'
 gem 'bootstrap-sass'
+gem 'omniauth'
+gem 'omniauth-github'
 
 group :development do
   gem 'pry'
