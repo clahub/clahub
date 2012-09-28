@@ -5,6 +5,7 @@ gem 'rails', '3.2.8'
 gem 'pg'
 gem 'jquery-rails'
 gem 'thin'
+gem 'bootstrap-sass'
 
 group :development do
   gem 'pry'
