@@ -13,3 +13,14 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
+
+public/system
+*.DS_Store
+coverage/*
+*.swp
+*.swo
+rerun.txt
+tags
+!.keep
+vendor/bundler_gems
+public/assets/*
