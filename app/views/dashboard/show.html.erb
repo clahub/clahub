@@ -1,1 +1,5 @@
-Dash show view for user <%= current_user.inspect %>
+<p>Choose a repo to add a license to:</p>
+
+<% @repos.each do |repo| %>
+  <p><%= repo.name %></p>
+<% end %>

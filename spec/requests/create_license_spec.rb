@@ -2,11 +2,15 @@ require 'spec_helper'
 
 describe "creating a license for a repo" do
   it "lets you create a license for a public repo you own" do
-    mock_github_oauth
-    mock_user_repos([
-      { "name" => "alpha", "id" => 123 },
-      { "name" => "beta",  "id" => 456 }
-    ])
+    token = 'abc123'
+    mock_github_oauth(credentials: { token: token })
+    mock_user_repos(
+      :oauth_token => token,
+      :repos => [
+        { "name" => "alpha", "id" => 123 },
+        { "name" => "beta",  "id" => 456 }
+      ]
+    )
 
     visit '/'
     click_link 'Sign in with GitHub to get started'
