@@ -1,5 +1,11 @@
-<p>Choose a repo to add a license to:</p>
+<h2>Choose a repo to add a license to:</h2>
 
-<% @repos.each do |repo| %>
-  <p><%= repo.name %></p>
-<% end %>
+<ul class="nav nav-pills nav-stacked">
+  <% @repos.each do |repo| %>
+    <li>
+      <a href="#">
+        <%= repo.name %>
+      </a>
+    </li>
+  <% end %>
+</ul>

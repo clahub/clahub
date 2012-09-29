@@ -8,14 +8,21 @@
 </head>
 <body>
 
-<%= render partial: 'shared/flashes' %>
-<%= yield %>
+<div class="container">
+  <%= render partial: 'shared/flashes' %>
+  <%= yield %>
 
-<% if signed_in? %>
-  <section>
-    <a href="/sign_out">Sign Out</a>
-  </section>
-<% end %>
+  <hr>
+
+  <footer>
+    <p>&copy; Jason Morrison 2012</p>
+    <% if signed_in? %>
+      <section>
+      <a href="/sign_out">Sign Out</a>
+      </section>
+    <% end %>
+  </footer>
+</div>
 
 </body>
 </html>
