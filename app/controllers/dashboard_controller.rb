@@ -1,5 +1,9 @@
 class DashboardController < ApplicationController
   def show
-    render 'splash'
+    if signed_in?
+      render 'show'
+    else
+      render 'splash'
+    end
   end
 end

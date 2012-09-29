@@ -8,6 +8,7 @@ gem 'thin'
 gem 'bootstrap-sass'
 gem 'omniauth'
 gem 'omniauth-github'
+gem 'github_api'
 
 group :development do
   gem 'pry'
@@ -18,6 +19,8 @@ end
 
 group :test do
   gem 'capybara'
+  gem 'shoulda-matchers'
+  gem 'factory_girl_rails'
 end
 
 group :test, :development do
