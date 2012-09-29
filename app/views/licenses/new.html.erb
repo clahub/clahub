@@ -1,0 +1,9 @@
+<%= form_for(@license) do |form| %>
+  <legend>License for <%= @license.repo_name %>:</legend>
+  <%= form.label :text %>
+  <%= form.text_area :text, placeholder: 'I, the contributor, agree to...', class: "span12" %>
+
+  <div class='form-actions'>
+    <%= form.button 'Create license', :class => 'btn btn-primary' %>
+  </div>
+<% end %>

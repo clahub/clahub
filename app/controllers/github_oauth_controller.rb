@@ -4,7 +4,7 @@ class GithubOauthController < ApplicationController
     user = user_for_auth(auth)
     sign_in(user)
 
-    redirect_to dashboard_url, notice: welcome(user)
+    redirect_to repos_url, notice: welcome(user)
   end
 
   private

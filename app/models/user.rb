@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  has_many :licenses
+
   def self.find_or_create_for_github_oauth(oauth)
     attributes_to_update = [:name, :nickname, :oauth_token, :email]
 

@@ -11,14 +11,28 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120929160349) do
+ActiveRecord::Schema.define(:version => 20120929184023) do
+
+  create_table "licenses", :force => true do |t|
+    t.string   "user_name"
+    t.string   "repo_name"
+    t.text     "text"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "licenses", ["user_id"], :name => "index_licenses_on_user_id"
+  add_index "licenses", ["user_name", "repo_name"], :name => "index_licenses_on_user_name_and_repo_name"
 
   create_table "users", :force => true do |t|
-    t.integer "uid"
-    t.string  "oauth_token"
-    t.string  "nickname"
-    t.string  "email"
-    t.string  "name"
+    t.integer  "uid"
+    t.string   "oauth_token"
+    t.string   "nickname"
+    t.string   "email"
+    t.string   "name"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   add_index "users", ["uid"], :name => "index_users_on_uid"
