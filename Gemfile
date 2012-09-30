@@ -9,6 +9,7 @@ gem 'bootstrap-sass'
 gem 'omniauth'
 gem 'omniauth-github'
 gem 'github_api'
+gem 'dynamic_form'
 
 group :development do
   gem 'pry'

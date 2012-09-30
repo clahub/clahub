@@ -3,7 +3,7 @@
 <ul class="nav nav-pills nav-stacked">
   <% @repos.each do |repo| %>
     <li>
-      <%= link_to repo.name, new_license_path(repo_name: repo.name, user_name: repo.owner.login) %>
+      <%= link_to "#{repo.owner.login}/#{repo.name}", new_license_path(repo_name: repo.name, user_name: repo.owner.login) %>
     </li>
   <% end %>
 </ul>

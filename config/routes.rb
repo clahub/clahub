@@ -5,4 +5,6 @@ Clahub::Application.routes.draw do
 
   resources :repos, only: [:index]
   resources :licenses, only: [:new, :create]
+
+  get 'licenses/:user_name/:repo_name' => 'licenses#show', :as => :license
 end
