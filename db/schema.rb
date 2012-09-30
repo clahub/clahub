@@ -11,7 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120929184023) do
+ActiveRecord::Schema.define(:version => 20120930064136) do
+
+  create_table "agreements", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "license_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "agreements", ["user_id", "license_id"], :name => "index_agreements_on_user_id_and_license_id"
 
   create_table "licenses", :force => true do |t|
     t.string   "user_name"

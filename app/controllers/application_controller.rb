@@ -17,6 +17,10 @@ class ApplicationController < ActionController::Base
   end
   helper_method :signed_in?
 
+  def signed_out?
+    !signed_in?
+  end
+
   def sign_out
     session[:user_id] = nil
   end

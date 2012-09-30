@@ -4,10 +4,14 @@ class GithubOauthController < ApplicationController
     user = user_for_auth(auth)
     sign_in(user)
 
-    redirect_to repos_url, notice: welcome(user)
+    redirect_to redirect_url_after_callback, notice: welcome(user)
   end
 
   private
+
+  def redirect_url_after_callback
+    session.delete(:redirect_after_github_oauth_url) || repos_url
+  end
 
   def welcome(user)
     "Welcome, #{user.name} (#{user.nickname} - #{user.uid})!"

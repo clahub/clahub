@@ -7,4 +7,5 @@ Clahub::Application.routes.draw do
   resources :licenses, only: [:new, :create]
 
   get 'licenses/:user_name/:repo_name' => 'licenses#show', :as => :license
+  post 'licenses/:user_name/:repo_name/agreements' => 'agreements#create', :as => :license_agreement
 end

@@ -14,5 +14,9 @@ class LicensesController < ApplicationController
 
   def show
     @license = License.find_by_user_name_and_repo_name(params[:user_name], params[:repo_name])
+
+    if signed_out?
+      session[:redirect_after_github_oauth_url] = request.url
+    end
   end
 end

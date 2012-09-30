@@ -5,6 +5,17 @@ describe License do
   it { should validate_presence_of :repo_name }
   it { should validate_presence_of :text }
   it { should belong_to :user }
+  it { should have_many :agreements }
+
+  it "has many agreeing users through agreements" do
+    user = create(:user)
+    user2 = create(:user)
+    license = create(:license)
+    create(:agreement, user: user, license: license)
+    create(:agreement, user: user2, license: license)
+
+    expect(license.agreeing_users).to eq([user, user2])
+  end
 
   it { should allow_mass_assignment_of(:repo_name) }
   it { should allow_mass_assignment_of(:text) }
