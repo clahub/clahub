@@ -37,4 +37,6 @@ describe "agreeing to a CLA for a repo" do
     page.should have_content('have agreed to the CLA')
     page.should have_content('jasonm')
   end
+
+  it "does not allow me to agree twice"
 end

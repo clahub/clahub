@@ -67,6 +67,21 @@ describe "creating a license for a repo" do
     a_request(:post, "https://api.github.com/repos/jasonm/beta/hooks?access_token=#{token}").with(body: inputs.to_json).should have_been_made
   end
 
+  context "error handling" do
+    it "requires license text to be entered" do
+      visit '/'
+      click_link 'Sign in with GitHub to get started'
+      click_link 'jasonm/beta'
+      fill_in :license, with: ''
+      click_button 'Create license'
+
+      page.should have_content("Text can't be blank")
+    end
+
+    it "only lets you create one license per repo"
+    it "handles gracefully if you decline github oauth"
+    it "handles gracefully if github returns an error response for repos"
+    it "handles gracefully if github returns an error response for creating a repo hook"
   end
 
   it "encourages you to include a link to this CLA from your CONTRIBUTING file"
