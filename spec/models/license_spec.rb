@@ -22,7 +22,6 @@ describe License do
   it { should_not allow_mass_assignment_of(:user_name) }
   it { should_not allow_mass_assignment_of(:user_id) }
 
-
   it "sets user_name" do
     user = build(:user, nickname: "jimbo")
     license = build(:license, user: user)
@@ -31,5 +30,24 @@ describe License do
 
     expect(license.user_name).to eq("jimbo")
     expect(license.reload.user_name).to eq("jimbo")
+  end
+
+  it "create a github repo hook" do
+    license = build(:license)
+
+    hook_inputs = {
+      'name' => 'web',
+      'config' => {
+        'url' => "#{HOST}/repo_hook"
+      }
+    }
+
+    github = double(repos: double('repos', hooks: double('hooks', create: true)))
+    github.repos.hooks.should_receive(:create).with(license.user_name, license.repo_name, hook_inputs)
+
+    Github.stub(new: github)
+    Github.should_receive(:new).with(oauth_token: license.user.oauth_token)
+
+    license.create_github_repo_hook
   end
 end

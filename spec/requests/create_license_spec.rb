@@ -1,21 +1,26 @@
 require 'spec_helper'
 
 describe "creating a license for a repo" do
+  let(:token) { 'abc123' }
+  let(:resulting_github_repo_hook_id) { 2345 }
+
   before do
-    token = 'abc123'
     mock_github_oauth(
       credentials: { token: token },
       info: { nickname: 'jasonm' }
     )
 
-    mock_user_repos(
+    mock_github_user_repos(
       oauth_token: token,
       repos: [
         { name: 'alpha', id: 123, owner: { login: 'jasonm' } },
         { name: 'beta',  id: 456, owner: { login: 'jasonm' } }
       ]
     )
+
+    mock_github_repo_hook('jasonm', 'beta', token, resulting_github_repo_hook_id)
   end
+
 
   it "lets you create a license for a public repo you own" do
     visit '/'
@@ -44,14 +49,24 @@ describe "creating a license for a repo" do
     page.should have_content('As a contributor, I assign copyright to the organization.')
   end
 
-  it "requires license text to be entered" do
+  it "signs up for commit notifications when a license is created" do
+
     visit '/'
     click_link 'Sign in with GitHub to get started'
     click_link 'jasonm/beta'
-    fill_in :license, with: ''
+    fill_in :license, with: 'As a contributor, I assign copyright to the organization.'
     click_button 'Create license'
 
-    page.should have_content("Text can't be blank")
+    inputs = {
+      'name' => 'web',
+      'config' => {
+        'url' => "#{HOST}/repo_hook"
+      }
+    }
+
+    a_request(:post, "https://api.github.com/repos/jasonm/beta/hooks?access_token=#{token}").with(body: inputs.to_json).should have_been_made
+  end
+
   end
 
   it "encourages you to include a link to this CLA from your CONTRIBUTING file"

@@ -6,6 +6,7 @@ class LicensesController < ApplicationController
   def create
     @license = current_user.licenses.new(params[:license].slice(:repo_name, :text))
     if @license.save
+      @license.create_github_repo_hook
       redirect_to license_path(user_name: @license.user_name, repo_name: @license.repo_name), notice: "Your Contributor License Ageement for beta is ready."
     else
       render 'new'

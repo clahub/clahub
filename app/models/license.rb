@@ -11,6 +11,18 @@ class License < ActiveRecord::Base
 
   before_validation :set_user_name_from_user_nickname
 
+  def create_github_repo_hook
+    hook_inputs = {
+      'name' => 'web',
+      'config' => {
+        'url' => "#{HOST}/repo_hook"
+      }
+    }
+
+    github = Github.new(oauth_token: self.user.oauth_token)
+    github.repos.hooks.create(user_name, repo_name, hook_inputs)
+  end
+
   private
 
   def set_user_name_from_user_nickname
