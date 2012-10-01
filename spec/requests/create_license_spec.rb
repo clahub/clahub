@@ -65,6 +65,8 @@ describe "creating a license for a repo" do
     }
 
     a_request(:post, "https://api.github.com/repos/jasonm/beta/hooks?access_token=#{token}").with(body: inputs.to_json).should have_been_made
+
+    expect(License.last.github_repo_hook_id).to eq(resulting_github_repo_hook_id)
   end
 
   context "error handling" do

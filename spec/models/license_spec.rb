@@ -43,11 +43,13 @@ describe License do
     }
 
     github = double(repos: double('repos', hooks: double('hooks', create: true)))
-    github.repos.hooks.should_receive(:create).with(license.user_name, license.repo_name, hook_inputs)
+    github.repos.hooks.should_receive(:create).with(license.user_name, license.repo_name, hook_inputs).and_return('id' => 12345)
 
     Github.stub(new: github)
     Github.should_receive(:new).with(oauth_token: license.user.oauth_token)
 
     license.create_github_repo_hook
+
+    expect(license.github_repo_hook_id).to eq(12345)
   end
 end

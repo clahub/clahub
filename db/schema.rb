@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120930064136) do
+ActiveRecord::Schema.define(:version => 20121001233925) do
 
   create_table "agreements", :force => true do |t|
     t.integer  "user_id"
@@ -27,8 +27,9 @@ ActiveRecord::Schema.define(:version => 20120930064136) do
     t.string   "repo_name"
     t.text     "text"
     t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+    t.integer  "github_repo_hook_id"
   end
 
   add_index "licenses", ["user_id"], :name => "index_licenses_on_user_id"
