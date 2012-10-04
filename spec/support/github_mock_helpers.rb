@@ -20,10 +20,14 @@ module GithubMockHelpers
     stub_request(:get, "https://api.github.com/user/repos?access_token=#{options[:oauth_token]}&per_page=1000").to_return(status: 200, body: json_response)
   end
 
-  # TODO: Refactor to accept options
-  def mock_github_repo_hook(user_name, repo_name, token, result_hook_id)
-    json_response = { url: 'http://something', id: result_hook_id }.to_json
-    stub_request(:post, "https://api.github.com/repos/#{user_name}/#{repo_name}/hooks?access_token=#{token}").
+  def mock_github_repo_hook(options={})
+    raise "must include :oauth_token" unless options[:oauth_token]
+    raise "must include :user_name" unless options[:user_name]
+    raise "must include :repo_name" unless options[:repo_name]
+    raise "must include :resulting_hook_id" unless options[:resulting_hook_id]
+
+    json_response = { url: 'http://something', id: options[:resulting_hook_id] }.to_json
+    stub_request(:post, "https://api.github.com/repos/#{options[:user_name]}/#{options[:repo_name]}/hooks?access_token=#{options[:oauth_token]}").
       to_return(status: 201, body: json_response)
   end
 

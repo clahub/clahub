@@ -18,7 +18,12 @@ describe "creating a license for a repo" do
       ]
     )
 
-    mock_github_repo_hook('jasonm', 'beta', token, resulting_github_repo_hook_id)
+    mock_github_repo_hook({
+      user_name: 'jasonm',
+      repo_name: 'beta',
+      oauth_token: token,
+      resulting_hook_id: resulting_github_repo_hook_id
+    })
   end
 
 
