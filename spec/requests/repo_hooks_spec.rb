@@ -65,4 +65,6 @@ describe 'receiving github repo webhook callbacks' do
   it 'gets a push with many commits, where the single author has agreed, and marks all commits as success'
   it 'gets a push with many commits, where multiple authors all agreed, and marks the commit as success'
   it 'gets a push with many commits, where some authors agreed and others did not, and marks each commit correctly'
+
+  it 'updates applicable "failure" commit statuses to "success" when a user agrees to a new license'
 end
