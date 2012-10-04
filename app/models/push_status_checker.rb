@@ -21,7 +21,7 @@ class PushStatusChecker
       mark_commit(commit, {
         state: 'success',
         target_url: "#{HOST}/licenses/#{@push.user_name}/#{@push.repo_name}",
-        description: 'They signed the Contributor License Agreement.'
+        description: 'All contributors have signed the Contributor License Agreement.'
       })
     end
   end
@@ -31,7 +31,7 @@ class PushStatusChecker
       mark_commit(commit, {
         state: 'failure',
         target_url: "#{HOST}/licenses/#{@push.user_name}/#{@push.repo_name}",
-        description: 'They have not signed the Contributor License Agreement.'
+        description: 'Not all contributors have signed the Contributor License Agreement.'
       })
     end
   end

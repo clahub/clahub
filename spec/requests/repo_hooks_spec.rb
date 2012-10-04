@@ -37,7 +37,7 @@ describe 'receiving github repo webhook callbacks' do
     status_params = {
       state: 'success',
       target_url: "#{HOST}/licenses/jasonm/mangostickyrice",
-      description: 'They signed the Contributor License Agreement.'
+      description: 'All contributors have signed the Contributor License Agreement.'
     }
     expect(a_request(:post, status_url).with(body: status_params.to_json)).to have_been_made
   end
@@ -56,7 +56,7 @@ describe 'receiving github repo webhook callbacks' do
     status_params = {
       state: 'failure',
       target_url: "#{HOST}/licenses/jasonm/mangostickyrice",
-      description: 'They have not signed the Contributor License Agreement.'
+      description: 'Not all contributors have signed the Contributor License Agreement.'
     }
     expect(a_request(:post, status_url).with(body: status_params.to_json)).to have_been_made
   end
