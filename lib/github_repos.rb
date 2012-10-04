@@ -12,4 +12,8 @@ class GithubRepos
   def create_hook(user_name, repo_name, hook_inputs)
     @github.repos.hooks.create(user_name, repo_name, hook_inputs)
   end
+
+  def delete_hook(user_name, repo_name, hook_id)
+    @github.repos.hooks.delete(user_name, repo_name, hook_id)
+  end
 end

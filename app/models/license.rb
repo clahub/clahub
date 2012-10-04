@@ -24,6 +24,13 @@ class License < ActiveRecord::Base
     self.update_attribute(:github_repo_hook_id, response['id'])
   end
 
+  def delete_github_repo_hook
+    if github_repo_hook_id
+      GithubRepos.new(self.user).delete_hook(user_name, repo_name, github_repo_hook_id)
+      self.update_attribute(:github_repo_hook_id, nil)
+    end
+  end
+
   private
 
   def set_user_name_from_user_nickname

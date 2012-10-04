@@ -52,4 +52,24 @@ describe License do
 
     expect(license.github_repo_hook_id).to eq(12345)
   end
+
+  it "can delete its github repo hook" do
+    license = build(:license, github_repo_hook_id: 7890)
+
+    hook_inputs = {
+      'name' => 'web',
+      'config' => {
+        'url' => "#{HOST}/repo_hook"
+      }
+    }
+
+    github_repos = double(delete_hook: nil) # on not-found, raises Github::Error::NotFound
+    GithubRepos.stub(new: github_repos)
+
+    github_repos.should_receive(:delete_hook).with(license.user_name, license.repo_name, license.github_repo_hook_id)
+    GithubRepos.should_receive(:new).with(license.user)
+
+    license.delete_github_repo_hook
+    expect(license.github_repo_hook_id).to be_nil
+  end
 end

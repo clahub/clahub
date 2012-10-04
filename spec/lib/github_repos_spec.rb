@@ -34,4 +34,19 @@ describe GithubRepos do
     response = GithubRepos.new(user).create_hook(user_name, repo_name, hook_inputs)
     expect(response).to eq({ 'id' => 12345 })
   end
+
+  it 'wraps Github to delete a hook' do
+    user_name = 'username'
+    repo_name = 'reponame'
+    hook_id = 6789
+
+    github = double(repos: double('repos', hooks: double('hooks', delete: nil)))
+    github.repos.hooks.should_receive(:delete).with(user_name, repo_name, hook_id).and_return(nil)
+
+    Github.stub(new: github)
+    Github.should_receive(:new).with(oauth_token: user.oauth_token)
+
+    response = GithubRepos.new(user).delete_hook(user_name, repo_name, hook_id)
+    expect(response).to eq(nil)
+  end
 end
