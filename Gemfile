@@ -12,10 +12,6 @@ gem 'github_api'
 gem 'dynamic_form'
 
 group :development do
-  gem 'pry'
-  gem 'pry-rails'
-  gem 'pry-debugger'
-  gem 'pry-remote'
   gem 'localtunnel'
 end
 
@@ -28,6 +24,10 @@ end
 
 group :test, :development do
   gem 'rspec-rails', '~> 2.0'
+  gem 'pry'
+  gem 'pry-rails'
+  gem 'pry-debugger'
+  gem 'pry-remote'
 end
 
 # Gems used only for assets and not required
