@@ -16,4 +16,8 @@ class GithubRepos
   def delete_hook(user_name, repo_name, hook_id)
     @github.repos.hooks.delete(user_name, repo_name, hook_id)
   end
+
+  def set_status(user_name, repo_name, sha, params)
+    @github.repos.statuses.create(user_name, repo_name, sha, params)
+  end
 end

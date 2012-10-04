@@ -10,4 +10,6 @@ Clahub::Application.routes.draw do
     get 'licenses/:user_name/:repo_name' => 'licenses#show', :as => :license
     post 'licenses/:user_name/:repo_name/agreements' => 'agreements#create', :as => :license_agreement
   end
+
+  post 'repo_hook' => 'github_webhooks#repo_hook'
 end
