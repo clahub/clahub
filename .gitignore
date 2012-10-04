@@ -26,3 +26,4 @@ vendor/bundler_gems
 public/assets/*
 .env
 .rvmrc
+.localtunnel_host

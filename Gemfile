@@ -16,6 +16,7 @@ group :development do
   gem 'pry-rails'
   gem 'pry-debugger'
   gem 'pry-remote'
+  gem 'localtunnel'
 end
 
 group :test do
