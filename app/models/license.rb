@@ -19,8 +19,7 @@ class License < ActiveRecord::Base
       }
     }
 
-    github = Github.new(oauth_token: self.user.oauth_token)
-    response = github.repos.hooks.create(user_name, repo_name, hook_inputs)
+    response = GithubRepos.new(self.user).create_hook(user_name, repo_name, hook_inputs)
 
     self.update_attribute(:github_repo_hook_id, response['id'])
   end

@@ -17,7 +17,7 @@ module GithubMockHelpers
     raise "must include :repos" unless options[:repos]
 
     json_response = options[:repos].to_json
-    stub_request(:get, "https://api.github.com/user/repos?access_token=#{options[:oauth_token]}").to_return(status: 200, body: json_response)
+    stub_request(:get, "https://api.github.com/user/repos?access_token=#{options[:oauth_token]}&per_page=1000").to_return(status: 200, body: json_response)
   end
 
   def mock_github_repo_hook(user_name, repo_name, token, result_hook_id)
