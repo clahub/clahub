@@ -43,5 +43,9 @@ RSpec.configure do |config|
 
   config.include GithubMockHelpers
   config.include FactoryGirl::Syntax::Methods
+
+  config.before do
+    CheckOpenPullsJob.enabled = false
+  end
 end
 

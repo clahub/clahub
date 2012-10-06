@@ -30,7 +30,8 @@ module GithubMockHelpers
   end
 
   def mock_github_set_commit_status(options={})
-    assert_options(options, :oauth_token, :user_name, :repo_name, :sha)
+    assert_options(options, :user_name, :repo_name, :sha)
+    options[:oauth_token] ||= oauth_token_for(options[:user_name])
 
     json_response = options[:json_response] || { whatever: 'yeah' }.to_json
     url = "https://api.github.com/repos/#{options[:user_name]}/#{options[:repo_name]}/statuses/#{options[:sha]}?access_token=#{options[:oauth_token]}"

@@ -9,4 +9,13 @@ describe Signature do
 
   it { should allow_mass_assignment_of(:user) }
   it { should allow_mass_assignment_of(:agreement) }
+
+  it "tells its agreement to re-check open pulls" do
+    agreement = create(:agreement, user_name: 'the_owner', repo_name: 'the_repo')
+    agreement.stub(check_open_pulls: true)
+
+    agreement.should_receive(:check_open_pulls).with()
+
+    create(:signature, agreement: agreement)
+  end
 end

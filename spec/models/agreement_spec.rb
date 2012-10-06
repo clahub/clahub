@@ -91,4 +91,16 @@ describe Agreement do
     expect(agreement.signed_by?(signee)).to be_true
     expect(agreement.signed_by?(non_signee)).to be_false
   end
+
+  it "checks on open pull reqs for its repo when told" do
+    owner = create(:user, nickname: 'the_owner')
+    job = stub('update commit status on open pull requests job', run: true)
+    CheckOpenPullsJob.stub(:new => job)
+
+    CheckOpenPullsJob.should_receive(:new).with(owner: owner, repo_name: 'the_repo')
+    job.should_receive(:run).with()
+
+    agreement = build(:agreement, user: owner, repo_name: 'the_repo')
+    agreement.check_open_pulls
+  end
 end

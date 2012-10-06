@@ -43,6 +43,8 @@ feature "Agreeing to a CLA" do
 
   # this should go in some other spec
   scenario "Signing the agreement updates commit statuses for pull requests I've issued" do
+    CheckOpenPullsJob.enabled = true
+
     create(:agreement, user: owner, user_name: 'the_owner', repo_name: 'alpha')
     create(:agreement, user: owner, user_name: 'the_owner', repo_name: 'beta')
 
@@ -54,46 +56,45 @@ feature "Agreeing to a CLA" do
     )
 
     mock_github_open_pulls(owner: 'the_owner', repo: 'alpha', pull_ids: [1, 2])
-    mock_github_open_pulls(owner: 'the_owner', repo: 'beta',  pull_ids: [1, 2])
+    mock_github_open_pulls(owner: 'the_owner', repo: 'beta',  pull_ids: [1])
 
     mock_github_pull_commits(
       owner: 'the_owner', repo: 'alpha', pull_id: '1',
       commits: [
-        { author: 'carlisle_contributor', sha: 'aaa111' }
+        { author: { login: 'carlisle_contributor' }, sha: 'aaa111' }
+        # TODO: wtf is up with this nested structure, :commit key inside a commit?? cmon github
+        # { author: { login: 'carlisle_contributor' }, commit: { author: { email: 'carlisle@contributors.com' } }, sha: 'aaa111 }
       ]
     )
 
     mock_github_pull_commits(
       owner: 'the_owner', repo: 'alpha', pull_id: '2',
       commits: [
-        { author: 'carlisle_contributor', sha: 'bbb222' },
-        { author: 'nancy_no_signature', sha: 'ccc333' },
+        { author: { login: 'carlisle_contributor' }, sha: 'bbb222' },
+        { author: { login: 'nancy_no_signature' }, sha: 'ccc333' },
       ]
     )
 
     mock_github_pull_commits(
       owner: 'the_owner', repo: 'beta', pull_id: '1',
       commits: [
-        { author: 'nancy_no_signature', sha: 'ddd444' }
+        { author: { login: 'nancy_no_signature' }, sha: 'ddd444' }
       ]
     )
 
-    mock_github_pull_commits(
-      owner: 'the_owner', repo: 'beta', pull_id: '2',
-      commits: [
-        { author: 'carlisle_contributor', sha: 'eee555' }
-      ]
-    )
+    mock_github_set_commit_status({ user_name: 'the_owner', repo_name: 'alpha', sha: 'aaa111' })
+    mock_github_set_commit_status({ user_name: 'the_owner', repo_name: 'alpha', sha: 'bbb222' })
+    mock_github_set_commit_status({ user_name: 'the_owner', repo_name: 'alpha', sha: 'ccc333' })
+    mock_github_set_commit_status({ user_name: 'the_owner', repo_name: 'beta',  sha: 'ddd444' })
+    mock_github_set_commit_status({ user_name: 'the_owner', repo_name: 'beta',  sha: 'eee555' })
 
     sign_agreement('the_owner', 'alpha', 'carlisle_contributor')
+    sign_agreement('the_owner', 'beta', 'carlisle_contributor')
 
     expect_commit_status_to_be_set('the_owner', 'alpha', 'aaa111', 'success')
     expect_commit_status_to_be_set('the_owner', 'alpha', 'bbb222', 'success')
     expect_commit_status_to_be_set('the_owner', 'alpha', 'ccc333', 'failure')
     expect_commit_status_to_be_set('the_owner', 'beta',  'ddd444', 'failure')
-
-    # carlisle_contributor only signed agreement for the_owner/alpha
-    expect_commit_status_to_be_set('the_owner', 'beta',  'eee555', 'failure')
   end
 
   def expect_commit_status_to_be_set(user_name, repo_name, sha, status)

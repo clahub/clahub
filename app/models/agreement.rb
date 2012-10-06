@@ -39,6 +39,10 @@ class Agreement < ActiveRecord::Base
     signing_users.include?(candidate)
   end
 
+  def check_open_pulls
+    CheckOpenPullsJob.new(owner: user, repo_name: repo_name).run
+  end
+
   private
 
   def set_user_name_from_user_nickname

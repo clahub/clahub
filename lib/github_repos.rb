@@ -20,4 +20,12 @@ class GithubRepos
   def set_status(user_name, repo_name, sha, params)
     @github.repos.statuses.create(user_name, repo_name, sha, params)
   end
+
+  def get_pulls(user_name, repo_name)
+    @github.pull_requests.list(user_name, repo_name)
+  end
+
+  def get_pull_commits(user_name, repo_name, pull_id)
+    @github.pull_requests.commits(user_name, repo_name, pull_id)
+  end
 end

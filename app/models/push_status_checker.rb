@@ -12,47 +12,32 @@ class PushStatusChecker
     Rails.logger.info("PushStatusChecker#check_and_update for push #{@push.user_name}/#{@push.repo_name}:#{@push.commits.map(&:id).join(',')}")
     return unless repo_agreement
 
-    if all_contributors_have_signed_agreement?
-      mark_commits_as_successful
-    else
-      mark_commits_as_failed
+    @push.commits.each do |commit|
+      check_commit(commit)
     end
   end
 
   private
 
-  def mark_commits_as_successful
-    @push.commits.each do |commit|
-      mark_commit(commit, {
-        state: 'success',
-        target_url: "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}",
-        description: STATUS_DESCRIPTIONS['success']
-      })
+  def check_commit(commit)
+    contributors = commit_contributors(commit)
+    all_contributors_signed = contributors.all? { |contributor| signed_agreement?(contributor) }
+
+    if all_contributors_signed
+      mark(commit, 'success')
+    else
+      mark(commit, 'failure')
     end
   end
 
-  def mark_commits_as_failed
-    @push.commits.each do |commit|
-      mark_commit(commit, {
-        state: 'failure',
-        target_url: "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}",
-        description: STATUS_DESCRIPTIONS['failure']
-      })
-    end
-  end
+  def mark(commit, state)
+    target_url = "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}"
 
-  def mark_commit(commit, params)
-    GithubRepos.new(repo_agreement.user).set_status(@push.user_name, @push.repo_name, sha = commit.id, params)
-  end
-
-  def all_contributors_have_signed_agreement?
-    contributors = @push.commits.map { |commit|
-      commit_contributors(commit)
-    }.flatten
-
-    contributors.all? { |contributor|
-      signed_agreement?(contributor)
-    }
+    GithubRepos.new(repo_agreement.user).set_status(@push.user_name, @push.repo_name, sha = commit.id, {
+      state: state,
+      target_url: target_url,
+      description: STATUS_DESCRIPTIONS[state]
+    })
   end
 
   def commit_contributors(commit)
