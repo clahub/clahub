@@ -43,9 +43,4 @@ feature 'Viewing signatures for an agreement' do
     visit '/agreements/oswald_owner/the_project'
     click_link 'Sign in with GitHub to agree to this CLA'
   end
-
-  def github_uid_for_nickname(nickname)
-    # consistent and unique-enough string-to-4-byte-integer mapping
-    User.find_by_nickname(nickname).try(:uid) || nickname.hash.abs.to_s[0..8].to_i
-  end
 end
