@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe User do
-  it { should have_many :licenses }
+  it { should have_many :agreements }
 
   context "when looked up with a GitHub OAuth callback hash" do
     it "can be found by uid" do

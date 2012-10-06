@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :signature do
     association :user
-    association :license
+    association :agreement
   end
 end

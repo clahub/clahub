@@ -5,7 +5,7 @@ class PushStatusChecker
 
   def check_and_update
     Rails.logger.info("PushStatusChecker#check_and_update for push #{@push.user_name}/#{@push.repo_name}:#{@push.commits.map(&:id).join(',')}")
-    return unless repo_license
+    return unless repo_agreement
 
     if all_contributors_have_signed_agreement?
       mark_commits_as_successful
@@ -20,7 +20,7 @@ class PushStatusChecker
     @push.commits.each do |commit|
       mark_commit(commit, {
         state: 'success',
-        target_url: "#{HOST}/licenses/#{@push.user_name}/#{@push.repo_name}",
+        target_url: "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}",
         description: 'All contributors have signed the Contributor License Agreement.'
       })
     end
@@ -30,14 +30,14 @@ class PushStatusChecker
     @push.commits.each do |commit|
       mark_commit(commit, {
         state: 'failure',
-        target_url: "#{HOST}/licenses/#{@push.user_name}/#{@push.repo_name}",
+        target_url: "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}",
         description: 'Not all contributors have signed the Contributor License Agreement.'
       })
     end
   end
 
   def mark_commit(commit, params)
-    GithubRepos.new(repo_license.user).set_status(@push.user_name, @push.repo_name, sha = commit.id, params)
+    GithubRepos.new(repo_agreement.user).set_status(@push.user_name, @push.repo_name, sha = commit.id, params)
   end
 
   def all_contributors_have_signed_agreement?
@@ -63,12 +63,12 @@ class PushStatusChecker
 
     Signature.exists?({
       user_id: candidate.id,
-      license_id: repo_license.id
+      agreement_id: repo_agreement.id
     })
   end
 
-  def repo_license
-    @repo_license ||= License.where({
+  def repo_agreement
+    @repo_agreement ||= Agreement.where({
       user_name: @push.user_name,
       repo_name: @push.repo_name
     }).first

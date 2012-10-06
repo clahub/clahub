@@ -15,7 +15,7 @@ describe 'receiving github repo webhook callbacks' do
     expect(response.body).to eq("OK")
   end
 
-  it 'gets a push to an unlicensed repo, responds with 200 OK' do
+  it 'gets a push to a repo without an agreement, responds with 200 OK' do
     payload = { repository: { name: 'no-cla-here', owner: { name: 'wyattearp', email: 'codeslinger@gmail.com' } } }
     post '/repo_hook', { payload: payload.to_json }, 'HTTP_X_GITHUB_EVENT' => 'push'
     expect(response.code).to eq("200")
@@ -24,8 +24,8 @@ describe 'receiving github repo webhook callbacks' do
 
   it 'gets a push with 1 commit, where the author has agreed, and marks the commit as success' do
     user = create(:user, email: 'jason@gmail.com', nickname: 'jasonm', oauth_token: token)
-    license = create(:license, user: user, repo_name: 'mangostickyrice')
-    create(:signature, user: user, license: license)
+    agreement = create(:agreement, user: user, repo_name: 'mangostickyrice')
+    create(:signature, user: user, agreement: agreement)
 
     payload = {
       repository: { name: 'mangostickyrice', owner: { name: 'jasonm', email: 'jason@gmail.com' } },
@@ -36,7 +36,7 @@ describe 'receiving github repo webhook callbacks' do
     status_url = "https://api.github.com/repos/jasonm/mangostickyrice/statuses/aaa111?access_token=#{token}"
     status_params = {
       state: 'success',
-      target_url: "#{HOST}/licenses/jasonm/mangostickyrice",
+      target_url: "#{HOST}/agreements/jasonm/mangostickyrice",
       description: 'All contributors have signed the Contributor License Agreement.'
     }
     expect(a_request(:post, status_url).with(body: status_params.to_json)).to have_been_made
@@ -44,7 +44,7 @@ describe 'receiving github repo webhook callbacks' do
 
   it 'gets a push with 1 commit, where the author has NOT agreed, and marks the commit as failure' do
     user = create(:user, email: 'jason@gmail.com', nickname: 'jasonm', oauth_token: token)
-    license = create(:license, user: user, repo_name: 'mangostickyrice')
+    agreement = create(:agreement, user: user, repo_name: 'mangostickyrice')
 
     payload = {
       repository: { name: 'mangostickyrice', owner: { name: 'jasonm', email: 'jason@gmail.com' } },
@@ -55,7 +55,7 @@ describe 'receiving github repo webhook callbacks' do
     status_url = "https://api.github.com/repos/jasonm/mangostickyrice/statuses/aaa111?access_token=#{token}"
     status_params = {
       state: 'failure',
-      target_url: "#{HOST}/licenses/jasonm/mangostickyrice",
+      target_url: "#{HOST}/agreements/jasonm/mangostickyrice",
       description: 'Not all contributors have signed the Contributor License Agreement.'
     }
     expect(a_request(:post, status_url).with(body: status_params.to_json)).to have_been_made
@@ -66,5 +66,5 @@ describe 'receiving github repo webhook callbacks' do
   it 'gets a push with many commits, where multiple authors all agreed, and marks the commit as success'
   it 'gets a push with many commits, where some authors agreed and others did not, and marks each commit correctly'
 
-  it 'updates applicable "failure" commit statuses to "success" when a user agrees to a new license'
+  it 'updates applicable "failure" commit statuses to "success" when a user agrees to a new agreement'
 end

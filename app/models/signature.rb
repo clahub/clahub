@@ -1,9 +1,9 @@
 class Signature < ActiveRecord::Base
   belongs_to :user
-  belongs_to :license
+  belongs_to :agreement
 
   validates :user_id, presence: true
-  validates :license_id, presence: true
+  validates :agreement_id, presence: true
 
-  attr_accessible :user, :license
+  attr_accessible :user, :agreement
 end

@@ -1,4 +1,4 @@
-class License < ActiveRecord::Base
+class Agreement < ActiveRecord::Base
   belongs_to :user
   has_many :signatures
   has_many :signing_users, through: :signatures, source: :user
