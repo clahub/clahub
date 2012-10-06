@@ -93,4 +93,5 @@ feature "Creating a CLA for a repo" do
   scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING file"
   scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING.md file"
   scenario "Create an agreement for a repo you admin but do not directly own"
+  scenario "Creating an agreement updates commit statuses open for pull requests"
 end
