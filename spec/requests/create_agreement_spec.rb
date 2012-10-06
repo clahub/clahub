@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe "creating an agreement for a repo" do
+feature "Creating a CLA for a repo" do
   let(:token) { 'abc123' }
   let(:resulting_github_repo_hook_id) { 2345 }
 
-  before do
+  background do
     mock_github_oauth(
       credentials: { token: token },
       info: { nickname: 'jasonm' }
@@ -27,7 +27,7 @@ describe "creating an agreement for a repo" do
   end
 
 
-  it "lets you create an agreement for a public repo you own" do
+  scenario "Create an agreement for a public repo you own" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
     page.should have_content('Welcome, Jason Morrison (jasonm - 12345)!')
@@ -54,8 +54,7 @@ describe "creating an agreement for a repo" do
     page.should have_content('As a contributor, I assign copyright to the organization.')
   end
 
-  it "signs up for commit notifications when an agreement is created" do
-
+  scenario "Sign up for commit notifications when an agreement is created" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
     click_link 'jasonm/beta'
@@ -75,7 +74,7 @@ describe "creating an agreement for a repo" do
   end
 
   context "error handling" do
-    it "requires agreement text to be entered" do
+    scenario "Require agreement text to be entered" do
       visit '/'
       click_link 'Sign in with GitHub to get started'
       click_link 'jasonm/beta'
@@ -85,13 +84,13 @@ describe "creating an agreement for a repo" do
       page.should have_content("Text can't be blank")
     end
 
-    it "only lets you create one agreement per repo"
-    it "handles gracefully if you decline github oauth"
-    it "handles gracefully if github returns an error response for repos"
-    it "handles gracefully if github returns an error response for creating a repo hook"
+    scenario "only lets you create one agreement per repo"
+    scenario "handles gracefully if you decline github oauth"
+    scenario "handles gracefully if github returns an error response for repos"
+    scenario "handles gracefully if github returns an error response for creating a repo hook"
   end
 
-  it "encourages you to include a link to this CLA from your CONTRIBUTING file"
-  it "encourages you to include a link to this CLA from your CONTRIBUTING.md file"
-  it "lets you create an agreement for a repo you admin but are not the direct owner of"
+  scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING file"
+  scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING.md file"
+  scenario "Create an agreement for a repo you admin but do not directly own"
 end

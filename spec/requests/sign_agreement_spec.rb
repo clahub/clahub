@@ -1,20 +1,20 @@
 require 'spec_helper'
 
-describe "agreeing to a CLA for a repo" do
-  before do
+feature "Agreeing to a CLA" do
+  background do
     mock_github_oauth(info: { nickname: 'jasonm' })
     owner = create(:user, nickname: 'the_owner')
     agreement = create(:agreement, user: owner, repo_name: 'the_project', text: "The CLA text")
   end
 
-  it "prompts a user to log in via GitHub to agree to a CLA" do
+  scenario "Prompt a user to log in via GitHub to agree to a CLA" do
     visit '/agreements/the_owner/the_project'
     page.should have_content('The CLA text')
     page.should have_content('Sign in with GitHub to agree to this CLA')
     page.should have_no_content('I agree')
   end
 
-  it "allows a user to sign in with GitHub and agree to a CLA" do
+  scenario "Allow a user to sign in with GitHub and agree to a CLA" do
     visit '/agreements/the_owner/the_project'
     click_link 'Sign in with GitHub to agree to this CLA'
 
@@ -26,5 +26,5 @@ describe "agreeing to a CLA for a repo" do
     page.should have_content('You have agreed to the CLA for the_owner/the_project.')
   end
 
-  it "does not allow me to agree twice"
+  scenario "Do not allow me to agree twice"
 end

@@ -1,5 +1,5 @@
 require 'spec_helper'
 
-describe "listing my agreements" do
-  it 'shows my repos I own that I have added CLAs to'
+feature 'Listing my agreements' do
+  scenario 'See which repos I added CLAs for'
 end
