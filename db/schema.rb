@@ -11,16 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121001233925) do
-
-  create_table "agreements", :force => true do |t|
-    t.integer  "user_id"
-    t.integer  "license_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
-  add_index "agreements", ["user_id", "license_id"], :name => "index_agreements_on_user_id_and_license_id"
+ActiveRecord::Schema.define(:version => 20121006080717) do
 
   create_table "licenses", :force => true do |t|
     t.string   "user_name"
@@ -34,6 +25,15 @@ ActiveRecord::Schema.define(:version => 20121001233925) do
 
   add_index "licenses", ["user_id"], :name => "index_licenses_on_user_id"
   add_index "licenses", ["user_name", "repo_name"], :name => "index_licenses_on_user_name_and_repo_name"
+
+  create_table "signatures", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "license_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "signatures", ["user_id", "license_id"], :name => "index_agreements_on_user_id_and_license_id"
 
   create_table "users", :force => true do |t|
     t.integer  "uid"

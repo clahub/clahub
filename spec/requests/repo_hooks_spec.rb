@@ -25,7 +25,7 @@ describe 'receiving github repo webhook callbacks' do
   it 'gets a push with 1 commit, where the author has agreed, and marks the commit as success' do
     user = create(:user, email: 'jason@gmail.com', nickname: 'jasonm', oauth_token: token)
     license = create(:license, user: user, repo_name: 'mangostickyrice')
-    create(:agreement, user: user, license: license)
+    create(:signature, user: user, license: license)
 
     payload = {
       repository: { name: 'mangostickyrice', owner: { name: 'jasonm', email: 'jason@gmail.com' } },

@@ -34,7 +34,7 @@ describe "agreeing to a CLA for a repo" do
     visit '/sign_out'
 
     visit '/licenses/the_owner/the_project'
-    page.should have_content('have agreed to the CLA')
+    page.should have_content('have signed the CLA')
     page.should have_content('jasonm')
   end
 

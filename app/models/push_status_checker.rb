@@ -61,7 +61,7 @@ class PushStatusChecker
   def signed_agreement?(candidate)
     return false if candidate.nil?
 
-    Agreement.exists?({
+    Signature.exists?({
       user_id: candidate.id,
       license_id: repo_license.id
     })

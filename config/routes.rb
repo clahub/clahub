@@ -8,7 +8,7 @@ Clahub::Application.routes.draw do
 
   constraints :repo_name => /[^\/]+/ do
     get 'licenses/:user_name/:repo_name' => 'licenses#show', :as => :license
-    post 'licenses/:user_name/:repo_name/agreements' => 'agreements#create', :as => :license_agreement
+    post 'licenses/:user_name/:repo_name/signatures' => 'signatures#create', :as => :license_signature
   end
 
   post 'repo_hook' => 'github_webhooks#repo_hook'

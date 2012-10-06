@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :agreement do
+  factory :signature do
     association :user
     association :license
   end

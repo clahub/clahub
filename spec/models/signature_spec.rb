@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Agreement do
+describe Signature do
   it { should belong_to :user }
   it { should belong_to :license }
 
