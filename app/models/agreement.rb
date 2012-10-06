@@ -31,6 +31,14 @@ class Agreement < ActiveRecord::Base
     end
   end
 
+  def owned_by?(candidate)
+    candidate == self.user
+  end
+
+  def signed_by?(candidate)
+    signing_users.include?(candidate)
+  end
+
   private
 
   def set_user_name_from_user_nickname

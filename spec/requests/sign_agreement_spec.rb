@@ -26,17 +26,5 @@ describe "agreeing to a CLA for a repo" do
     page.should have_content('You have agreed to the CLA for the_owner/the_project.')
   end
 
-  it "shows me who has agreed to the agreement" do
-    visit '/agreements/the_owner/the_project'
-    click_link 'Sign in with GitHub to agree to this CLA'
-    click_link 'I agree'
-
-    visit '/sign_out'
-
-    visit '/agreements/the_owner/the_project'
-    page.should have_content('have signed the CLA')
-    page.should have_content('jasonm')
-  end
-
   it "does not allow me to agree twice"
 end

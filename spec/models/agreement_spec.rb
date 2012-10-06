@@ -72,4 +72,23 @@ describe Agreement do
     agreement.delete_github_repo_hook
     expect(agreement.github_repo_hook_id).to be_nil
   end
+
+  it "knows who owns it" do
+    owner = build(:user)
+    non_owner = build(:user)
+    agreement = build(:agreement, user: owner)
+
+    expect(agreement.owned_by?(owner)).to be_true
+    expect(agreement.owned_by?(non_owner)).to be_false
+  end
+
+  it "knows who signed it" do
+    signee = create(:user)
+    non_signee = create(:user)
+    agreement = create(:agreement)
+    create(:signature, agreement: agreement, user: signee)
+
+    expect(agreement.signed_by?(signee)).to be_true
+    expect(agreement.signed_by?(non_signee)).to be_false
+  end
 end
