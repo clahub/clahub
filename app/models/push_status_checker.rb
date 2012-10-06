@@ -1,4 +1,9 @@
 class PushStatusChecker
+  STATUS_DESCRIPTIONS = {
+    'success' => 'All contributors have signed the Contributor License Agreement.',
+    'failure' => 'Not all contributors have signed the Contributor License Agreement.'
+  }
+
   def initialize(push)
     @push = push
   end
@@ -21,7 +26,7 @@ class PushStatusChecker
       mark_commit(commit, {
         state: 'success',
         target_url: "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}",
-        description: 'All contributors have signed the Contributor License Agreement.'
+        description: STATUS_DESCRIPTIONS['success']
       })
     end
   end
@@ -31,7 +36,7 @@ class PushStatusChecker
       mark_commit(commit, {
         state: 'failure',
         target_url: "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}",
-        description: 'Not all contributors have signed the Contributor License Agreement.'
+        description: STATUS_DESCRIPTIONS['failure']
       })
     end
   end
