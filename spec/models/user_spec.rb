@@ -34,4 +34,12 @@ describe User do
       expect(existing_user.email).to eq('jason@example.com')
     end
   end
+
+  it "finds a user by email or nickname" do
+    alice = create(:user, email: 'alice@email.com', nickname: 'alpha')
+
+    expect(User.find_by_email_or_nickname(nil, 'alpha')).to eq(alice)
+    expect(User.find_by_email_or_nickname('alice@email.com', nil)).to eq(alice)
+    expect(User.find_by_email_or_nickname(nil, 'nunchuks')).to eq(nil)
+  end
 end
