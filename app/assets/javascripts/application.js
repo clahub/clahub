@@ -14,5 +14,6 @@
 //= require jquery_ujs
 //= require bootstrap-transition
 //= require bootstrap-carousel
+//= require chosen-jquery
 //= require_tree .
 //

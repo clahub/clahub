@@ -1,5 +1,8 @@
 // $btnPrimaryBackground: #f00;
 
+@import "chosen";
+
+
 @import "bootstrap";
 
 // h1 { color: blue; }
@@ -27,4 +30,8 @@ div#how-it-works.carousel {
       @extend .img-rounded;
     }
   }
+}
+
+div#user_name_repo_name_chzn {
+  margin-bottom: 27px;
 }

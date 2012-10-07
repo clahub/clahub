@@ -1,9 +1,0 @@
-<h2>Choose a repo to add an agreement to:</h2>
-
-<ul class="nav nav-pills nav-stacked">
-  <% @repos.each do |repo| %>
-    <li>
-      <%= link_to "#{repo.owner.login}/#{repo.name}", new_agreement_path(repo_name: repo.name, user_name: repo.owner.login) %>
-    </li>
-  <% end %>
-</ul>

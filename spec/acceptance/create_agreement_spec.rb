@@ -31,13 +31,11 @@ feature "Creating a CLA for a repo" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
     page.should have_content('Welcome, Jason Morrison (jasonm - 12345)!')
-    page.should have_content("Choose a repo to add an agreement to")
+    page.should have_content("Choose a project and your agreement")
     page.should have_content("jasonm/alpha")
     page.should have_content("jasonm/beta")
 
-    click_link 'jasonm/beta'
-    page.should have_content('Choose a Contributor License Agreement for beta')
-
+    select 'jasonm/beta', from: 'user-name-repo-name'
     fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
     click_button 'Create agreement'
 
@@ -57,7 +55,8 @@ feature "Creating a CLA for a repo" do
   scenario "Sign up for commit notifications when an agreement is created" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
-    click_link 'jasonm/beta'
+
+    select 'jasonm/beta', from: 'user-name-repo-name'
     fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
     click_button 'Create agreement'
 
@@ -74,14 +73,24 @@ feature "Creating a CLA for a repo" do
   end
 
   context "error handling" do
-    scenario "Require agreement text to be entered" do
+    background do
       visit '/'
       click_link 'Sign in with GitHub to get started'
-      click_link 'jasonm/beta'
+    end
+
+    scenario "Require agreement text to be entered" do
+      select 'jasonm/beta', from: 'user-name-repo-name'
       fill_in :agreement, with: ''
       click_button 'Create agreement'
 
       page.should have_content("Text can't be blank")
+    end
+
+    scenario 'Require repo to be chosen' do
+      fill_in :agreement, with: ''
+      click_button 'Create agreement'
+
+      page.should have_content("Repo name can't be blank")
     end
 
     scenario "only lets you create one agreement per repo"

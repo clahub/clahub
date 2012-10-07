@@ -1,14 +1,36 @@
 <%= form_for(@agreement) do |form| %>
   <%= form.error_messages %>
 
-  <legend>Agreement for <%= @agreement.repo_name %>:</legend>
-  <%= form.label :text, "Choose a Contributor License Agreement for #{@agreement.repo_name}:" %>
+  <legend>Choose a project and your agreement</legend>
+
+  <%= form.label :user_name_repo_name, "Choose a repo:" %>
+  <select name="agreement[user_name_repo_name]" id="user-name-repo-name" class="select-chosen" data-placeholder="GitHub repositories for <%= current_user.nickname %>" style="width:350px;" tabindex="1">
+    <option value=""></option>
+    <% @repos.each do |repo| %>
+      <option value="<%= owner_slash_name(repo) %>">
+        <%= owner_slash_name(repo) %>
+      </option>
+    <% end %>
+  </select>
+
+  <%= form.label :text, "Enter your agreement text:" %>
   <span class="help-block"></span>
   <%= form.text_area :text, placeholder: 'I, the contributor, agree to...', class: "span12" %>
-
-  <%= form.hidden_field :repo_name %>
 
   <div class='form-actions'>
     <%= form.button 'Create agreement', :class => 'btn btn-primary' %>
   </div>
+<% end %>
+
+<% content_for :javascript do %>
+  <script type="text/javascript">
+    //<![CDATA[
+      $(function() {
+        $('select.select-chosen').chosen({ search_contains: true });
+        // .change(function() {
+        // });
+
+      });
+    //]]>
+  </script>
 <% end %>

@@ -10,7 +10,7 @@ class GithubOauthController < ApplicationController
   private
 
   def redirect_url_after_callback
-    session.delete(:redirect_after_github_oauth_url) || repos_url
+    session.delete(:redirect_after_github_oauth_url) || new_agreement_url
   end
 
   def welcome(user)
