@@ -5,7 +5,7 @@
   <%= stylesheet_link_tag    "application", :media => "all" %>
   <%= csrf_meta_tags %>
 </head>
-<body>
+<body class="<%= body_class %>">
 
 <div class="container">
   <%= render partial: 'shared/flashes' %>

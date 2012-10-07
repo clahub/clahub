@@ -13,7 +13,7 @@ feature 'Viewing signatures for an agreement' do
     view_license_as('oswald_owner')
 
     expect(page).to have_content('The CLA text')
-    expect(page).to have_content('Users who have signed the CLA')
+    expect(page).to have_content('Users who have signed')
     expect(page).to have_content('sally_signee')
   end
 
@@ -21,7 +21,7 @@ feature 'Viewing signatures for an agreement' do
     view_license_as('sally_signee')
 
     expect(page).to have_content('The CLA text')
-    expect(page).to have_no_content('Users who have signed the CLA')
+    expect(page).to have_no_content('Users who have signed')
     expect(page).to have_content('You have signed this CLA')
   end
 
@@ -29,7 +29,7 @@ feature 'Viewing signatures for an agreement' do
     view_license_as('bobby_bubblegum')
 
     expect(page).to have_content('The CLA text')
-    expect(page).to have_no_content('Users who have signed the CLA')
+    expect(page).to have_no_content('Users who have signed')
     expect(page).to have_no_content('You have signed this CLA')
   end
 

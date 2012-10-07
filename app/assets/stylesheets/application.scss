@@ -1,11 +1,5 @@
-// $btnPrimaryBackground: #f00;
-
 @import "chosen";
-
-
 @import "bootstrap";
-
-// h1 { color: blue; }
 
 body {
   padding-top: 60px;
@@ -34,4 +28,28 @@ div#how-it-works.carousel {
 
 div#user_name_repo_name_chzn {
   margin-bottom: 27px;
+}
+
+body.agreements-show {
+  header {
+    @extend .row;
+  }
+
+  div#agreement-text {
+    @extend .well;
+    margin-top: 27px;
+  }
+
+  a#agree-link {
+    @extend .btn, .btn-primary, .btn-large;
+    @extend .span2;
+  }
+
+  div#signing-users {
+    margin-top: 27px;
+
+    h2 {
+      @extend .row;
+    }
+  }
 }
