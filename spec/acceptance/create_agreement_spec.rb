@@ -93,7 +93,19 @@ feature "Creating a CLA for a repo" do
       page.should have_content("Repo name can't be blank")
     end
 
-    scenario "only lets you create one agreement per repo"
+    scenario "only lets you create one agreement per repo" do
+      select 'jasonm/beta', from: 'user-name-repo-name'
+      fill_in :agreement, with: 'Be awesome'
+      click_button 'Create agreement'
+
+      visit '/agreements/new'
+      select 'jasonm/beta', from: 'user-name-repo-name'
+      fill_in :agreement, with: 'Be awesome'
+      click_button 'Create agreement'
+
+      page.should have_content("An agreement already exists for jasonm/beta")
+    end
+
     scenario "handles gracefully if you decline github oauth"
     scenario "handles gracefully if github returns an error response for repos"
     scenario "handles gracefully if github returns an error response for creating a repo hook"

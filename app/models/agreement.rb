@@ -6,6 +6,7 @@ class Agreement < ActiveRecord::Base
   validates :repo_name, presence: true
   validates :user_name, presence: true
   validates :text, presence: true
+  validate :one_agreement_per_user_repo
 
   attr_accessible :repo_name, :text
 
@@ -47,5 +48,11 @@ class Agreement < ActiveRecord::Base
 
   def set_user_name_from_user_nickname
     self.user_name = user.try(:nickname)
+  end
+
+  def one_agreement_per_user_repo
+    if Agreement.exists?(user_name: user_name, repo_name: repo_name)
+      errors[:base] << "An agreement already exists for #{user_name}/#{repo_name}"
+    end
   end
 end

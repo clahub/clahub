@@ -7,6 +7,15 @@ describe Agreement do
   it { should belong_to :user }
   it { should have_many :signatures }
 
+  it "validates one agreement per user/repo" do
+    user = create(:user, nickname: 'alice')
+    first = create(:agreement, user: user, repo_name: 'alpha')
+    second = build(:agreement, user: user, repo_name: 'alpha')
+
+    expect(second).to_not be_valid
+    expect(second.errors[:base]).to include('An agreement already exists for alice/alpha')
+  end
+
   it "has many signing_users through signatures" do
     user = create(:user)
     user2 = create(:user)
