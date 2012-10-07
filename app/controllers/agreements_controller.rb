@@ -29,7 +29,9 @@ class AgreementsController < ApplicationController
   private
 
   def repos_for_current_user
-    GithubRepos.new(current_user).repos
+    DevModeCache.cache("repos-for-#{current_user.uid}") do
+      GithubRepos.new(current_user).repos
+    end
   end
 
   def split_user_name_repo_name
