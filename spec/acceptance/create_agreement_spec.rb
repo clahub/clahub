@@ -106,7 +106,6 @@ feature "Creating a CLA for a repo" do
       page.should have_content("An agreement already exists for jasonm/beta")
     end
 
-    scenario "handles gracefully if you decline github oauth"
     scenario "handles gracefully if github returns an error response for repos"
     scenario "handles gracefully if github returns an error response for creating a repo hook"
   end
@@ -115,4 +114,14 @@ feature "Creating a CLA for a repo" do
   scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING.md file"
   scenario "Create an agreement for a repo you admin but do not directly own"
   scenario "Creating an agreement updates commit statuses open for pull requests"
+end
+
+feature "Failing GitHub OAuth" do
+  scenario "It gracefully fails if you decline GitHub OAuth" do
+    mock_github_oauth_failure
+    visit '/'
+    click_link 'Sign in with GitHub to get started'
+
+    page.should have_content("You'll need to sign into GitHub.")
+  end
 end

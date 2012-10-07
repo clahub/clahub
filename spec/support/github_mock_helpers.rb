@@ -14,6 +14,11 @@ module GithubMockHelpers
     OmniAuth.config.test_mode = true
   end
 
+  def mock_github_oauth_failure(failure_message = :access_denied)
+    OmniAuth.config.mock_auth[:github] = failure_message
+    OmniAuth.config.test_mode = true
+  end
+
   def mock_github_user_repos(options={})
     assert_options(options, :oauth_token, :repos)
 

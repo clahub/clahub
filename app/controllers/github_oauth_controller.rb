@@ -7,6 +7,10 @@ class GithubOauthController < ApplicationController
     redirect_to redirect_url_after_callback, notice: welcome(user)
   end
 
+  def failure
+    redirect_to dashboard_url, alert: "You'll need to sign into GitHub.  Maybe next time?"
+  end
+
   private
 
   def redirect_url_after_callback
