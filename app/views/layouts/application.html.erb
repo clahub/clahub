@@ -12,9 +12,9 @@
   <%= render partial: 'shared/flashes' %>
   <%= yield %>
 
-  <hr>
 
-  <footer>
+  <footer class="row">
+  <hr>
     <p>&copy; Jason Morrison 2012</p>
     <% if signed_in? %>
       <section>
@@ -23,6 +23,8 @@
     <% end %>
   </footer>
 </div>
+
+<%= yield :javascript %>
 
 </body>
 </html>

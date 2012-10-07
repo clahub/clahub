@@ -1,0 +1,48 @@
+<div id="how-it-works" class="carousel slide">
+  <h2>How does it work?  Four easy steps:</h2>
+  <div class="carousel-inner">
+    <div class="item active">
+      <img src="/images/bootstrap-mdo-sfmoma-01.jpg" alt="" class="img-rounded">
+      <div class="carousel-caption">
+        <h4>First Thumbnail label</h4>
+        <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+      </div>
+    </div>
+    <div class="item">
+      <img src="/images/bootstrap-mdo-sfmoma-02.jpg" alt="">
+      <h3>then another thign</h3>
+      <div class="carousel-caption">
+        <h4>Second Thumbnail label</h4>
+        <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+      </div>
+    </div>
+    <div class="item">
+      <img src="/images/bootstrap-mdo-sfmoma-03.jpg" alt="">
+      <div class="carousel-caption">
+        <h4>Third Thumbnail label</h4>
+        <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+      </div>
+    </div>
+    <div class="item">
+      <img src="/images/bootstrap-mdo-sfmoma-04.jpg" alt="">
+      <div class="carousel-caption">
+        <h4>Fourth Thumbnail label</h4>
+        <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+      </div>
+    </div>
+  </div>
+  <a class="left carousel-control" href="#how-it-works" data-slide="prev">‹</a>
+  <a class="right carousel-control" href="#how-it-works" data-slide="next">›</a>
+</div>
+
+<% content_for :javascript do %>
+  <script type="text/javascript">
+    //<![CDATA[
+      $(function() {
+        $('.carousel').carousel({
+          interval: 4000
+        });
+      });
+    //]]>
+  </script>
+<% end %>
