@@ -45,11 +45,24 @@ body.agreements-show {
     @extend .span2;
   }
 
+  a#already-agreed {
+    @extend .btn, .btn-success, .btn-large, .disabled;
+  }
+
   div#signing-users {
     margin-top: 27px;
 
     h2 {
       @extend .row;
     }
+  }
+
+  div#contributing-guidelines {
+    @extend .row;
+    margin-bottom: 20px;
+  }
+
+  code#contributing-markup {
+    @extend .well, .row;
   }
 }

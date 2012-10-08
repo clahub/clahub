@@ -11,7 +11,9 @@
 <div class="row">
   <% if signed_in? %>
     <% if @agreement.signed_by?(current_user) %>
-      <p>You have signed this CLA.</p>
+      <a id="already-agreed">
+        <i class="icon-ok"></i> You have signed this CLA.
+      </a>
     <% else %>
       <%= link_to 'I agree',
                   agreement_signature_path(
@@ -26,5 +28,6 @@
 </div>
 
 <% if @agreement.owned_by?(current_user) %>
+  <%= render partial: 'agreements/contributing_file_link' %>
   <%= render partial: 'agreements/signing_users' %>
 <% end %>

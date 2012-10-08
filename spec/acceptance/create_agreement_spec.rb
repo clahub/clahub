@@ -72,6 +72,17 @@ feature "Creating a CLA for a repo" do
     expect(Agreement.last.github_repo_hook_id).to eq(resulting_github_repo_hook_id)
   end
 
+  scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING file" do
+    visit '/'
+    click_link 'Sign in with GitHub to get started'
+
+    select 'jasonm/beta', from: 'user-name-repo-name'
+    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    click_button 'Create agreement'
+
+    page.should have_content("Link from your contributing guidelines")
+  end
+
   context "error handling" do
     background do
       visit '/'
@@ -110,8 +121,8 @@ feature "Creating a CLA for a repo" do
     scenario "handles gracefully if github returns an error response for creating a repo hook"
   end
 
-  scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING file"
-  scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING.md file"
+
+  scenario "Detect when owner has included link to CLA from CONTRIBUTING/CONTRIBUTING.md file"
   scenario "Create an agreement for a repo you admin but do not directly own"
   scenario "Creating an agreement updates commit statuses open for pull requests"
 end
