@@ -6,6 +6,20 @@ body {
   padding-bottom: 40px;
 }
 
+body.dashboard-show div.hero-unit {
+  padding: 60px 60px 60px 360px;
+
+  img.logo {
+    width: 360px;
+    height: 360px;
+    margin-top: -360px;
+
+    position: relative;
+    top: 300px;
+    left: -360px;
+  }
+}
+
 
 div#how-it-works {
   margin-top: 75px;
