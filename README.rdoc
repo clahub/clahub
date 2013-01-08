@@ -18,3 +18,7 @@ Server:
 Console:
 
   foreman run rails console
+
+== License
+
+See LICENSE for the project license.
