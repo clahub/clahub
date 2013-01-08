@@ -11,7 +11,7 @@ class AgreementsController < ApplicationController
 
     if @agreement.save
       @agreement.create_github_repo_hook
-      redirect_to agreement_path(user_name: @agreement.user_name, repo_name: @agreement.repo_name), notice: "Your Contributor License Ageement for beta is ready."
+      redirect_to agreement_path(user_name: @agreement.user_name, repo_name: @agreement.repo_name), notice: "Your Contributor License Ageement for #{@agreement.user_name}/#{@agreement.repo_name} is ready."
     else
       @repos = repos_for_current_user
       render 'new'

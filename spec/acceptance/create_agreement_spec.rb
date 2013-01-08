@@ -39,7 +39,7 @@ feature "Creating a CLA for a repo" do
     fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
     click_button 'Create agreement'
 
-    page.should have_content('Your Contributor License Ageement for beta is ready.')
+    page.should have_content('Your Contributor License Ageement for jasonm/beta is ready.')
     page.should have_content('jasonm')
     page.should have_content('beta')
     page.should have_content('As a contributor, I assign copyright to the organization.')
