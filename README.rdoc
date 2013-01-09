@@ -1,3 +1,9 @@
+= Overview
+
+This project is a work-in-progress.  Any feedback is welcome!
+
+It currently works, but could use UI and functionality improvement.
+
 == Environment variables
 
 Set up a .env file with your GITHUB_KEY and GITHUB_SECRET:
@@ -18,6 +24,12 @@ Server:
 Console:
 
   foreman run rails console
+
+== Coverage
+
+Use SimpleCov to build code coverage:
+
+  COVERAGE=true rake
 
 == License
 
