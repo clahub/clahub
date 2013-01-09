@@ -106,7 +106,7 @@ licensed from iStockPhoto.com:
 <http://www.istockphoto.com/stock-illustration-16006726-clipboard-and-pencil.php>
 
 The graphic is licensed for a single-seat install and is in use at
-http://www.clahub.com.  It is not licensed for multi-seat use, so any
+http://clahub.herokuapp.com.  It is not licensed for multi-seat use, so any
 other installations should purchase a separate license or use a different
 image.
 
