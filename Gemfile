@@ -30,6 +30,7 @@ group :test, :development do
   gem 'pry-debugger'
   gem 'pry-remote'
   gem 'simplecov', require: false
+  gem 'dotenv'
 end
 
 # Gems used only for assets and not required
