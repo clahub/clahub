@@ -41,6 +41,7 @@ class Agreement < ActiveRecord::Base
   end
 
   def check_open_pulls
+    # TODO: async this so that creating a signature doesn't take so long.
     CheckOpenPullsJob.new(owner: user, repo_name: repo_name).run
   end
 

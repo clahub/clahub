@@ -19,6 +19,7 @@ class PushStatusChecker
 
   private
 
+  # TODO: extract a CommitStatusChecker
   def check_commit(commit)
     contributors = commit_contributors(commit)
     all_contributors_signed = contributors.all? { |contributor| signed_agreement?(contributor) }
