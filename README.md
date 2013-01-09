@@ -55,12 +55,12 @@ https://github.com/settings/applications/new
 
 Set up a .env file with your GITHUB_KEY and GITHUB_SECRET:
 
-  GITHUB_KEY=abc123
-  GITHUB_SECRET=234897239872394832478
+    GITHUB_KEY=abc123
+    GITHUB_SECRET=234897239872394832478
 
 This file is .gitignored so it's private.
 
-We use the dotenv gem to provide these variables to the test environment as
+We use the `dotenv` gem to provide these variables to the test environment as
 well.
 
 Getting set up
@@ -68,32 +68,32 @@ Getting set up
 
 Install gems and initialize databases:
 
-  bundle
-  rake db:create db:migrate db:test:prepare
+    bundle
+    rake db:create db:migrate db:test:prepare
 
 Run the tests to make sure things are working:
 
-  rake
+    rake
 
 Running the app
 ----------------
 
 Run with Foreman if you like:
 
-  foreman start
-  foreman run rails console
+    foreman start
+    foreman run rails console
 
-Or as normal (.env is loaded by dotenv gem):
+Or as normal (.env is loaded by `dotenv` gem):
 
-  rails server
-  rails console
+    rails server
+    rails console
 
 Coverage
 ----------------
 
 Use SimpleCov to build code coverage:
 
-  COVERAGE=true rake
+    COVERAGE=true rake
 
 License
 ================
@@ -103,11 +103,11 @@ See LICENSE for the project license.
 The "Clipboard and pencil" graphic used in the homepage logo is
 licensed from iStockPhoto.com:
 
-http://www.istockphoto.com/stock-illustration-16006726-clipboard-and-pencil.php
+<http://www.istockphoto.com/stock-illustration-16006726-clipboard-and-pencil.php>
 
 The graphic is licensed for a single-seat install and is in use at
 http://www.clahub.com.  It is not licensed for multi-seat use, so any
 other installations should purchase a separate license or use a different
 image.
 
-http://www.istockphoto.com/help/licenses
+<http://www.istockphoto.com/help/licenses>
