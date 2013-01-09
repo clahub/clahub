@@ -98,7 +98,7 @@ Use SimpleCov to build code coverage:
 License
 ================
 
-See LICENSE for the project license.
+See [LICENSE](https://raw.github.com/jasonm/blob/master/LICENSE) for the project license.
 
 The "Clipboard and pencil" graphic used in the homepage logo is
 licensed from iStockPhoto.com:
