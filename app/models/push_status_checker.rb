@@ -44,8 +44,16 @@ class PushStatusChecker
     author_email = commit.author.try(:email)
     author_username = commit.author.try(:username)
     author = User.find_by_email_or_nickname(author_email, author_username)
+    contributors = [author]
 
-    [author]
+    if commit.committer
+      committer_email = commit.committer.try(:email)
+      committer_username = commit.committer.try(:username)
+      committer = User.find_by_email_or_nickname(committer_email, committer_username)
+      contributors << committer
+    end
+
+    contributors
   end
 
   def signed_agreement?(candidate)
