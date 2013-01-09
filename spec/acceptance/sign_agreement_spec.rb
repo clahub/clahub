@@ -62,8 +62,6 @@ feature "Agreeing to a CLA" do
       owner: 'the_owner', repo: 'alpha', pull_id: '1',
       commits: [
         { author: { login: 'carlisle_contributor' }, sha: 'aaa111' }
-        # TODO: wtf is up with this nested structure, :commit key inside a commit?? cmon github
-        # { author: { login: 'carlisle_contributor' }, commit: { author: { email: 'carlisle@contributors.com' } }, sha: 'aaa111 }
       ]
     )
 
@@ -78,7 +76,8 @@ feature "Agreeing to a CLA" do
     mock_github_pull_commits(
       owner: 'the_owner', repo: 'beta', pull_id: '1',
       commits: [
-        { author: { login: 'nancy_no_signature' }, sha: 'ddd444' }
+        { author: { login: 'nancy_no_signature' }, sha: 'ddd444' },
+        { author: { login: 'carlisle_contributor' }, committer: { login: 'caterina_committer' }, sha: 'eee555' }
       ]
     )
 
@@ -95,6 +94,10 @@ feature "Agreeing to a CLA" do
     expect_commit_status_to_be_set('the_owner', 'alpha', 'bbb222', 'success')
     expect_commit_status_to_be_set('the_owner', 'alpha', 'ccc333', 'failure')
     expect_commit_status_to_be_set('the_owner', 'beta',  'ddd444', 'failure')
+    expect_commit_status_to_be_set('the_owner', 'beta',  'eee555', 'failure')
+
+    sign_agreement('the_owner', 'beta', 'caterina_committer')
+    expect_commit_status_to_be_set('the_owner', 'beta',  'eee555', 'success')
   end
 
   def expect_commit_status_to_be_set(user_name, repo_name, sha, status)

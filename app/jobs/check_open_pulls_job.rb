@@ -31,14 +31,13 @@ class CheckOpenPullsJob
         },
         commits: commit_mashes.map { |mash|
           {
-            # TODO { ..., email: mash.commit.author.email }
-            # ...but why nested in the commit?
             author: { username: mash.author.login },
-
-            # TODO :comitter as well
-
             id: mash.sha
-          }
+          }.tap do |commit_hash|
+            if mash.committer
+              commit_hash[:committer] = { username: mash.committer.login }
+            end
+          end
         }
       }.to_json)
     end
