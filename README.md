@@ -53,10 +53,12 @@ Register a new app at GitHub to get an OAuth key and secret:
 
 https://github.com/settings/applications/new
 
-Set up a .env file with your GITHUB_KEY and GITHUB_SECRET:
+Set up a .env file with your GITHUB_KEY and GITHUB_SECRET.
+You can also specify an HTTP port for local foreman:
 
     GITHUB_KEY=abc123
     GITHUB_SECRET=234897239872394832478
+    PORT=3000
 
 This file is .gitignored so it's private.
 
@@ -94,6 +96,10 @@ Coverage
 Use SimpleCov to build code coverage:
 
     COVERAGE=true rake
+
+Deployment
+================
+See DEPLOY.md for information on deploying.
 
 License
 ================
