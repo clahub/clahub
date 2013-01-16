@@ -11,18 +11,6 @@
   <%= render partial: 'shared/flashes' %>
   <%= yield %>
 
-
-  <footer class="row">
-  <hr>
-    <p>&copy; Jason Morrison 2012</p>
-    <% if signed_in? %>
-      <section>
-      <a href="/sign_out">Sign Out</a>
-      </section>
-    <% end %>
-  </footer>
-</div>
-
 <%= javascript_include_tag "application" %>
 <%= yield :javascript %>
 
