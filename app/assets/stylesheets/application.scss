@@ -59,7 +59,7 @@ body.agreements-show {
 
   a#agree-link {
     @extend .btn, .btn-primary, .btn-large;
-    @extend .span2;
+    @extend .span4;
   }
 
   a#already-agreed {
