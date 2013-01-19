@@ -9,8 +9,9 @@
 
 <div class="container">
   <%= render partial: 'shared/flashes' %>
-  <%= yield %>
+  <%= render partial: 'shared/announcements' %>
 
+  <%= yield %>
 
   <footer class="row">
   <hr>
@@ -24,6 +25,7 @@
 </div>
 
 <%= javascript_include_tag "application" %>
+<%= javascript_include_tag 'announcements' %>
 <%= yield :javascript %>
 
 </body>

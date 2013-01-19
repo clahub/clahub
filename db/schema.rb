@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121006081809) do
+ActiveRecord::Schema.define(:version => 20130118225809) do
 
   create_table "agreements", :force => true do |t|
     t.string   "user_name"
@@ -25,6 +25,12 @@ ActiveRecord::Schema.define(:version => 20121006081809) do
 
   add_index "agreements", ["user_id"], :name => "index_licenses_on_user_id"
   add_index "agreements", ["user_name", "repo_name"], :name => "index_licenses_on_user_name_and_repo_name"
+
+  create_table "announcements", :force => true do |t|
+    t.text     "body"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "signatures", :force => true do |t|
     t.integer  "user_id"

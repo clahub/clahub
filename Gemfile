@@ -12,6 +12,7 @@ gem 'omniauth-github'
 gem 'github_api'
 gem 'dynamic_form'
 gem 'rack-canonical-host'
+gem 'paul_revere'
 
 group :development do
   gem 'localtunnel'

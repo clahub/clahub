@@ -123,6 +123,8 @@ GEM
     omniauth-oauth2 (1.0.0)
       oauth2 (~> 0.5.0)
       omniauth (~> 1.0)
+    paul_revere (1.1)
+      rails (~> 3.0)
     pg (0.14.1)
     polyglot (0.3.3)
     pry (0.9.10)
@@ -236,6 +238,7 @@ DEPENDENCIES
   localtunnel
   omniauth
   omniauth-github
+  paul_revere
   pg
   pry
   pry-debugger

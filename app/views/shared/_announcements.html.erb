@@ -1,0 +1,8 @@
+<% if current_announcement.exists? && !announcement_hidden?(current_announcement) %>
+  <div id="announcement" class="alert alert-success alert-announcement">
+    <%= link_to_function "&#215;".html_safe,
+          "hideAnnouncement('announcement_#{current_announcement.created_at}')",
+          :class => 'close' %>
+    <div><%= current_announcement.body.html_safe %></div>
+  </div>
+<% end %>
