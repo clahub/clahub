@@ -33,6 +33,11 @@ group :test, :development do
   gem 'pry-remote'
   gem 'simplecov', require: false
   gem 'dotenv'
+  gem 'guard-livereload'
+end
+
+group :development, :darwin do
+  gem 'rb-fsevent', '~> 0.9.1'
 end
 
 # Gems used only for assets and not required

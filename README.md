@@ -97,6 +97,19 @@ Use SimpleCov to build code coverage:
 
     COVERAGE=true rake
 
+LiveReload
+----------------
+
+When working on display-heavy features, [LiveReload](http://livereload.com/)
+saves valuable keystrokes and time.  We use
+[guard-livereload](https://github.com/guard/guard-livereload) to watch
+templates and assets and reload when they change.
+
+To take advantage of this:
+
+* Install a [LiveReload browser extension](http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-)
+* Run `guard` on the command line.
+
 Deployment
 ================
 See DEPLOY.md for information on deploying.
