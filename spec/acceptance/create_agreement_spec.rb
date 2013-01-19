@@ -44,6 +44,9 @@ feature "Creating a CLA for a repo" do
     page.should have_content('beta')
     page.should have_content('As a contributor, I assign copyright to the organization.')
 
+    suggested_content_for_contributing_file = %[<a href="#{HOST}/agreements/jasonm/beta">sign the Contributor License Agreement</a>.]
+    page.should have_content(suggested_content_for_contributing_file)
+
     visit '/agreements/jasonm/beta'
     page.should have_content('As a contributor, I assign copyright to the organization.')
 

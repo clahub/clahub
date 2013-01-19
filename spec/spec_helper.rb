@@ -50,5 +50,8 @@ RSpec.configure do |config|
   config.before do
     CheckOpenPullsJob.enabled = false
   end
-end
 
+  config.before do
+    Capybara.default_host = HOST
+  end
+end

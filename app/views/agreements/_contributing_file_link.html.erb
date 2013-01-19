@@ -10,5 +10,5 @@
 </div>
 
 <code id="contributing-markup">
-  To get started, &lt;a href=&quot;<%= agreement_url(@agreement) %>&quot;&gt;sign the Contributor License Agreement&lt;/a&gt;.
+  To get started, &lt;a href=&quot;<%= agreement_url(@agreement.user_name, @agreement.repo_name) %>&quot;&gt;sign the Contributor License Agreement&lt;/a&gt;.
 </code>
