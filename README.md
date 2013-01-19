@@ -6,7 +6,7 @@ your open source project that's hosted on GitHub.  Contributors digitally sign
 your CLA by signing in with GitHub.  Then, it automatically marks up your pull
 requests based on whether the contributors have all signed your CLA.
 
-Right now it's running at <http://clahub.herokuapp.com>
+Right now it's running at <http://www.clahub.com>
 
 I don't intend for this to lead to a proliferation of CLAs.  But when they're
 appropriate, I hope it can reduce the friction of contribution.
@@ -112,7 +112,7 @@ licensed from iStockPhoto.com:
 <http://www.istockphoto.com/stock-illustration-16006726-clipboard-and-pencil.php>
 
 The graphic is licensed for a single-seat install and is in use at
-http://clahub.herokuapp.com.  It is not licensed for multi-seat use, so any
+http://www.clahub.com.  It is not licensed for multi-seat use, so any
 other installations should purchase a separate license or use a different
 image.
 
