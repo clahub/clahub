@@ -65,6 +65,12 @@ This file is .gitignored so it's private.
 We use the `dotenv` gem to provide these variables to the test environment as
 well.
 
+JavaScript acceptance tests use
+[poltergeist](https://github.com/jonleighton/poltergeist) which requires
+installing [PhantomJS](http://phantomjs.org).  Follow the PhantomJS
+installation instructions on the [poltergeist
+README](https://github.com/jonleighton/poltergeist).
+
 Getting set up
 ----------------
 

@@ -25,6 +25,8 @@ group :test do
   gem 'shoulda-matchers'
   gem 'factory_girl_rails'
   gem 'webmock'
+  gem 'poltergeist'
+  gem 'database_cleaner'
 end
 
 group :test, :development do
