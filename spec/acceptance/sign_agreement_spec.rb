@@ -4,7 +4,7 @@ feature "Agreeing to a CLA" do
   let(:owner) { create(:user, nickname: 'the_owner') }
 
   background do
-    create(:agreement, user: owner, repo_name: 'the_project', text: "The CLA text")
+    create(:agreement, user: owner, repo_name: 'the_project', text: "The CLA *text*")
   end
 
   scenario "Prompt a user to log in via GitHub to agree to a CLA" do
@@ -12,6 +12,11 @@ feature "Agreeing to a CLA" do
     page.should have_content('The CLA text')
     page.should have_content('Sign in with GitHub to agree to this CLA')
     page.should have_no_content('I agree')
+  end
+
+  scenario "Agreement text is rendered as markdown" do
+    visit '/agreements/the_owner/the_project'
+    page.body.should include("The CLA <em>text</em>")
   end
 
   scenario "Allow a user to sign in with GitHub and agree to a CLA" do

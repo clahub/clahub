@@ -20,6 +20,7 @@ class AgreementsController < ApplicationController
 
   def show
     @agreement = Agreement.find_by_user_name_and_repo_name!(params[:user_name], params[:repo_name])
+    @rendered_agreement_html = Kramdown::Document.new(@agreement.text).to_html
 
     if signed_out?
       session[:redirect_after_github_oauth_url] = request.url
