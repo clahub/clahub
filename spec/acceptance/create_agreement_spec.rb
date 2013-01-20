@@ -86,6 +86,25 @@ feature "Creating a CLA for a repo" do
     page.should have_content("Link from your contributing guidelines")
   end
 
+  scenario "Preview markdown formatting for your agreement text", js: true do
+    visit '/'
+    click_link 'Sign in with GitHub to get started'
+
+    select 'jasonm/beta', from: 'user-name-repo-name'
+    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+
+    markdown_source = '![](http://images.com/img.jpg) _markdown test_'
+    expected_html = '<p><img src="http://images.com/img.jpg" alt=""> <em>markdown test</em></p>'
+
+    page.first("div#preview-agreement div.preview", visible: true).should be_nil
+
+    fill_in :agreement, with: markdown_source
+    click_link "Preview"
+
+    page.find("div#preview-agreement div.preview", visible: true).should be_present
+    page.body.should include(expected_html)
+  end
+
   context "error handling" do
     background do
       visit '/'

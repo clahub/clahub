@@ -13,4 +13,6 @@ Clahub::Application.routes.draw do
   end
 
   post 'repo_hook' => 'github_webhooks#repo_hook'
+
+  resource :markdown_preview
 end

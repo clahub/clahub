@@ -108,6 +108,7 @@ GEM
       thor (~> 0.14)
     jruby-pageant (1.1.1)
     json (1.7.6)
+    kramdown (0.14.1)
     libwebsocket (0.1.7.1)
       addressable
       websocket
@@ -262,6 +263,7 @@ DEPENDENCIES
   github_api
   guard-livereload
   jquery-rails
+  kramdown
   localtunnel
   omniauth
   omniauth-github

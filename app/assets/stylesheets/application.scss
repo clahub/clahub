@@ -47,6 +47,17 @@ div#user_name_repo_name_chzn {
   margin-bottom: 27px;
 }
 
+body.agreements-new {
+  div#agreement-editor-content {
+    min-height: 240px;
+
+    textarea {
+      resize: vertical;
+      height: 220px;
+    }
+  }
+}
+
 body.agreements-show {
   header {
     @extend .row;

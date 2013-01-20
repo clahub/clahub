@@ -14,6 +14,7 @@
 //= require jquery_ujs
 //= require bootstrap-transition
 //= require bootstrap-carousel
+//= require bootstrap-tab
 //= require chosen-jquery
 //= require announcements
 //= require_tree .

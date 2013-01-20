@@ -15,7 +15,24 @@
 
   <%= form.label :text, "Enter your agreement text:" %>
   <span class="help-block"></span>
-  <%= form.text_area :text, placeholder: 'I, the contributor, agree to...', class: "span12" %>
+
+  <ul id="agreement-editor-tabs" class="nav nav-tabs">
+    <li class="active"><a class="tab-edit" href="#edit-agreement" data-toggle="tab">Edit</a></li>
+    <li><a class="tab-preview" href="#preview-agreement" data-toggle="tab">Preview</a></li>
+  </ul>
+
+  <div id="agreement-editor-content" class="tab-content">
+    <div class="tab-pane active" id="edit-agreement">
+      <%= form.text_area :text, placeholder: 'I, the contributor, agree to...', class: "span12", rows: 10 %>
+    </div>
+    <div class="tab-pane" id="preview-agreement">
+      <div class="preview-spinner progress progress-striped active">
+        <div class="bar" style="width: 100%;"></div>
+      </div>
+      <div class="preview well">
+      </div>
+    </div>
+  </div>
 
   <div class='form-actions'>
     <%= form.button 'Create agreement', :class => 'btn btn-primary' %>
@@ -27,9 +44,29 @@
     //<![CDATA[
       $(function() {
         $('select.select-chosen').chosen({ search_contains: true });
-        // .change(function() {
-        // });
 
+        (function() {
+          var previewTab = $('ul#agreement-editor-tabs a.tab-preview'),
+              source     = $('div#agreement-editor-content textarea'),
+              preview    = $('div#preview-agreement div.preview'),
+              spinner    = $('div#preview-agreement div.preview-spinner');
+
+          previewTab.on('shown', function (e) {
+            preview.hide();
+            spinner.show();
+
+            $.ajax({
+              url: '/markdown_preview',
+              type: 'POST',
+              data: { source: source.val() },
+              dataType: 'html',
+              accepts: { html: 'application/json' }
+            }).success(function(newHtml, _, xhr) {
+              preview.html(newHtml).show();
+              spinner.hide();
+            });
+          })
+        })();
       });
     //]]>
   </script>
