@@ -19,6 +19,10 @@ gem 'kramdown'
 
 group :development do
   gem 'localtunnel'
+  gem 'pry'
+  gem 'pry-rails'
+  gem 'pry-debugger'
+  gem 'pry-remote'
 end
 
 group :test do
@@ -32,10 +36,6 @@ end
 
 group :test, :development do
   gem 'rspec-rails', '~> 2.0'
-  gem 'pry'
-  gem 'pry-rails'
-  gem 'pry-debugger'
-  gem 'pry-remote'
   gem 'simplecov', require: false
   gem 'dotenv'
   gem 'guard-livereload'
