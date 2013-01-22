@@ -16,6 +16,10 @@ This project is a work-in-progress.  Any and all feedback is welcome!
 It currently works, but could use UI and functionality improvement.  Find
 such discussion in [GitHub issues](https://github.com/jasonm/clahub/issues).
 
+Build status
+------------
+[![Build Status](https://secure.travis-ci.org/jasonm/clahub.png)](http://travis-ci.org/jasonm/clahub)
+
 What's a CLA?
 -------------
 Contributor Agreements are a way to prove intellectual property (IP) provenance
