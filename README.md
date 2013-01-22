@@ -116,6 +116,31 @@ To take advantage of this:
 * Install a [LiveReload browser extension](http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-)
 * Run `guard` on the command line.
 
+LocalTunnel
+------------------
+
+As part of the app, we sign up to receive GitHub webhooks (HTTP requests to
+`/repo_hook`) to be notified when stuff happens to repos we care about.  (In
+particular, we want to know about new pushes so we can assess whether their
+contributors have agreed to the relevant CLA.)
+
+When you're developing locally, GitHub can't send webhook events
+to you at `localhost:3000`, so use [localtunnel](http://localtunnel.com) to get a
+public proxy to `localhost`:
+
+    $ START_LOCALTUNNEL=1 foreman start
+
+This will create a new localtunnel via their API and cache the hostname into
+`.localtunnel_host`.  When you create new `Agreement`s locally, this hostname
+will be send to GitHub as the webhook receive endpoint.
+
+If you kill your server and restart, you'd get a new host, and those webhook
+endpoint URLs stored on GitHub need to be updated.  Currently there's no
+automated fixup, but you can try to keep ahold of the previously cached
+hostname with:
+
+    $ READ_LOCALTUNNEL=1 foreman run rails console
+
 Deployment
 ================
 See DEPLOY.md for information on deploying.
