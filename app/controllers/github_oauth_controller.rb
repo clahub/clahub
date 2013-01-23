@@ -18,7 +18,7 @@ class GithubOauthController < ApplicationController
   end
 
   def welcome(user)
-    "Welcome, #{user.name} (#{user.nickname} - #{user.uid})!"
+    "Welcome, #{user.name} (#{user.nickname})!"
   end
 
   def user_for_auth(auth)
