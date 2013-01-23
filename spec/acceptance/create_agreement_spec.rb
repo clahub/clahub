@@ -30,7 +30,7 @@ feature "Creating a CLA for a repo" do
   scenario "Create an agreement for a public repo you own" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
-    page.should have_content('Welcome, Jason Morrison (jasonm - 12345)!')
+    page.should have_content('Welcome, Jason Morrison (jasonm)!')
     page.should have_content("Choose a project and your agreement")
     page.should have_content("jasonm/alpha")
     page.should have_content("jasonm/beta")
