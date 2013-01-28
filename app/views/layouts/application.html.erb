@@ -7,6 +7,10 @@
 </head>
 <body class="<%= body_class %>">
 
+<% unless @suppress_navbar %>
+  <%= render partial: 'shared/navbar' %>
+<% end %>
+
 <div class="container">
   <%= render partial: 'shared/flashes' %>
   <%= render partial: 'shared/announcements' %>

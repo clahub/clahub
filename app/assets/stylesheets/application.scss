@@ -92,3 +92,13 @@ body.agreements-show {
     @extend .well, .row;
   }
 }
+
+div.navbar {
+  a.brand {
+    margin-left: 8px;
+    padding-left: 36px;
+    background-image: image-url('icon.png');
+    background-repeat: no-repeat;
+    background-position: left center;
+  }
+}
