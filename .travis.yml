@@ -6,6 +6,3 @@ env:
 notifications:
   email: false
 bundler_args: --without development
-branches:
-  only:
-    - master
