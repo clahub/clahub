@@ -1,5 +1,6 @@
 Clahub::Application.routes.draw do
   root to: "dashboard#show", :as => :dashboard
+  match '/why_cla' => 'dashboard#why_cla'
   match 'auth/github/callback' => 'github_oauth#callback', :as => :github_oauth_callback
   match 'auth/failure' => 'github_oauth#failure'
   match 'sign_out' => 'sessions#destroy', :as => :sign_out
