@@ -8,7 +8,7 @@ class GithubOauthController < ApplicationController
   end
 
   def failure
-    redirect_to dashboard_url, alert: "You'll need to sign into GitHub.  Maybe next time?"
+    redirect_to home_url, alert: "You'll need to sign into GitHub.  Maybe next time?"
   end
 
   private

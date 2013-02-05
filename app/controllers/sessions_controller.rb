@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   def destroy
     sign_out
-    redirect_to dashboard_url
+    redirect_to home_url
   end
 end

@@ -6,7 +6,7 @@ body {
   padding-bottom: 40px;
 }
 
-body.dashboard-show div.hero-unit {
+body.pages-show div.hero-unit {
   padding: 60px 60px 60px 360px;
 
   img.logo {
@@ -93,12 +93,21 @@ body.agreements-show {
   }
 }
 
-div.navbar {
+div.navbar.navbar-fixed-top {
   a.brand {
     margin-left: 8px;
     padding-left: 36px;
     background-image: image-url('icon.png');
     background-repeat: no-repeat;
     background-position: left center;
+  }
+}
+
+footer {
+  margin-top: 100px;
+  text-align: center;
+
+  ul.footer-links {
+    @extend .breadcrumb;
   }
 }
