@@ -6,7 +6,7 @@ class GithubRepos
   end
 
   def repos
-    @github.repos.list(per_page: REPOS_PER_PAGE).sort_by(&:name)
+    [user_repos, org_repos].flatten
   end
 
   def create_hook(user_name, repo_name, hook_inputs)
@@ -27,5 +27,22 @@ class GithubRepos
 
   def get_pull_commits(user_name, repo_name, pull_id)
     @github.pull_requests.commits(user_name, repo_name, pull_id)
+  end
+  private
+
+  def user_repos
+    @github.repos.list(per_page: REPOS_PER_PAGE).sort_by(&:name)
+  end
+
+  def org_repos
+    repos = []
+    @github.orgs.list.each do |org|
+      @github.repos.list(org: org.login, per_page: 200).each do |repo|
+        if repo.permissions.admin
+          repos.push(repo)
+        end
+      end
+    end
+    repos
   end
 end
