@@ -85,6 +85,13 @@ feature "Creating a CLA for a repo" do
       ]
     )
 
+    mock_github_repo_hook({
+      user_name: 'my-adminned-org',
+      repo_name: 'chi',
+      oauth_token: token,
+      resulting_hook_id: resulting_github_repo_hook_id
+    })
+
     visit '/'
     click_link 'Sign in with GitHub to get started'
     page.should have_content('Welcome, Jason Morrison (jasonm)!')
@@ -92,6 +99,21 @@ feature "Creating a CLA for a repo" do
     page.should have_content("my-adminned-org/chi")
     page.should have_content("my-adminned-org/delta")
     page.should have_no_content("someone-elses-org/epsilon")
+
+    select 'my-adminned-org/chi', from: 'user-name-repo-name'
+    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    click_button 'Create agreement'
+
+    inputs = {
+      'name' => 'web',
+      'config' => {
+        'url' => "#{HOST}/repo_hook"
+      }
+    }
+
+    a_request(:post, "https://api.github.com/repos/my-adminned-org/chi/hooks?access_token=#{token}").with(body: inputs.to_json).should have_been_made
+
+    expect(Agreement.last.github_repo_hook_id).to eq(resulting_github_repo_hook_id)
   end
 
   scenario "Sign up for commit notifications when an agreement is created" do

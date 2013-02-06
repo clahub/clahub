@@ -5,6 +5,7 @@ class CheckOpenPullsJob
 
   def initialize(options)
     @owner = options[:owner]
+    @user_name = options[:user_name]
     @repo_name = options[:repo_name]
   end
 
@@ -21,12 +22,12 @@ class CheckOpenPullsJob
   def pushes
     pull_mashes.map do |pull_mash|
       commit_mashes = github_repos.get_pull_commits(
-        @owner.nickname, @repo_name, pull_mash.number)
+        @user_name, @repo_name, pull_mash.number)
 
       # TODO this is a weird adapter, unweird it
       GithubPush.new({
         repository: {
-          owner: { name: @owner.nickname },
+          owner: { name: @user_name },
           name: @repo_name
         },
         commits: commit_mashes.map { |mash|
@@ -44,7 +45,7 @@ class CheckOpenPullsJob
   end
 
   def pull_mashes
-    github_repos.get_pulls(@owner.nickname, @repo_name)
+    github_repos.get_pulls(@user_name, @repo_name)
   end
 
   def github_repos
