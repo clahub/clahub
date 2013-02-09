@@ -152,7 +152,7 @@ See DEPLOY.md for information on deploying.
 License
 ================
 
-See [LICENSE](https://raw.github.com/jasonm/blob/master/LICENSE) for the project license.
+See [LICENSE](https://github.com/jasonm/clahub/blob/master/LICENSE) for the project license.
 
 The "Clipboard and pencil" graphic used in the homepage logo is
 licensed from iStockPhoto.com:
