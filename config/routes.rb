@@ -5,7 +5,6 @@ Clahub::Application.routes.draw do
   match 'auth/github/callback' => 'github_oauth#callback', :as => :github_oauth_callback
   match 'auth/failure' => 'github_oauth#failure'
   match 'sign_out' => 'sessions#destroy', :as => :sign_out
-  match '/why_cla', :controller => 'dashboard', :action => 'why_cla'
 
   resources :repos, only: [:index]
   resources :agreements, only: [:new, :create]
