@@ -8,9 +8,7 @@ class Agreement < ActiveRecord::Base
   validates :text, presence: true
   validate :one_agreement_per_user_repo
 
-  attr_accessible :repo_name, :text
-
-  before_validation :set_user_name_from_user_nickname
+  attr_accessible :user_name, :repo_name, :text
 
   def create_github_repo_hook
     hook_inputs = {
@@ -42,14 +40,10 @@ class Agreement < ActiveRecord::Base
 
   def check_open_pulls
     # TODO: async this so that creating a signature doesn't take so long.
-    CheckOpenPullsJob.new(owner: user, repo_name: repo_name).run
+    CheckOpenPullsJob.new(owner: user, user_name: user_name, repo_name: repo_name).run
   end
 
   private
-
-  def set_user_name_from_user_nickname
-    self.user_name = user.try(:nickname)
-  end
 
   def one_agreement_per_user_repo
     if Agreement.exists?(user_name: user_name, repo_name: repo_name)

@@ -1,0 +1,8 @@
+language: ruby
+script: 'rake db:create db:test:load default'
+rvm:
+  - 1.9.3
+env:
+notifications:
+  email: false
+bundler_args: --without development

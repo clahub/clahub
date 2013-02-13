@@ -69,6 +69,24 @@ module GithubMockHelpers
     stub_request(:get, url).to_return(status: 200, body: json_response)
   end
 
+  def mock_github_user_orgs(options = {})
+    assert_options(options, :oauth_token, :orgs)
+    assert_options_array(options[:orgs], :login)
+
+    json_response = options[:orgs].to_json
+    url = "https://api.github.com/user/orgs?access_token=#{options[:oauth_token]}"
+    stub_request(:get, url).to_return(status: 200, body: json_response)
+  end
+
+  def mock_github_org_repos(options = {})
+    assert_options(options, :oauth_token, :org, :repos)
+    assert_options_array(options[:repos], :name, :permissions)
+
+    json_response = options[:repos].to_json
+    url = "https://api.github.com/orgs/#{options[:org]}/repos?access_token=#{options[:oauth_token]}&per_page=200"
+    stub_request(:get, url).to_return(status: 200, body: json_response)
+  end
+
   def github_uid_for_nickname(nickname)
     # consistent and unique-enough string-to-4-byte-integer mapping
     User.find_by_nickname(nickname).try(:uid) || nickname.hash.abs.to_s[0..8].to_i

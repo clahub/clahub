@@ -24,8 +24,12 @@ feature "Creating a CLA for a repo" do
       oauth_token: token,
       resulting_hook_id: resulting_github_repo_hook_id
     })
-  end
 
+    mock_github_user_orgs(
+      oauth_token: token,
+      orgs: []
+    )
+  end
 
   scenario "Create an agreement for a public repo you own" do
     visit '/'
@@ -53,6 +57,63 @@ feature "Creating a CLA for a repo" do
     visit '/sign_out'
     visit '/agreements/jasonm/beta'
     page.should have_content('As a contributor, I assign copyright to the organization.')
+  end
+
+  scenario "Create an agreement for a public repo in an organization you admin" do
+    mock_github_user_orgs(
+      oauth_token: token,
+      orgs: [
+        { login: 'my-adminned-org' },
+        { login: 'someone-elses-org' }
+      ]
+    )
+
+    mock_github_org_repos(
+      oauth_token: token,
+      org: 'my-adminned-org',
+      repos: [
+        { name: 'chi',   id: 333, owner: { login: 'my-adminned-org' }, permissions: { admin: true, push: true, pull: true } },
+        { name: 'delta', id: 444, owner: { login: 'my-adminned-org' }, permissions: { admin: true, push: true, pull: true } }
+      ]
+    )
+
+    mock_github_org_repos(
+      oauth_token: token,
+      org: 'someone-elses-org',
+      repos: [
+        { name: 'epsilon', id: 555, owner: { login: 'someone-elses-org' }, permissions: { admin: false, push: true, pull: true } }
+      ]
+    )
+
+    mock_github_repo_hook({
+      user_name: 'my-adminned-org',
+      repo_name: 'chi',
+      oauth_token: token,
+      resulting_hook_id: resulting_github_repo_hook_id
+    })
+
+    visit '/'
+    click_link 'Sign in with GitHub to get started'
+    page.should have_content('Welcome, Jason Morrison (jasonm)!')
+    page.should have_content("Choose a project and your agreement")
+    page.should have_content("my-adminned-org/chi")
+    page.should have_content("my-adminned-org/delta")
+    page.should have_no_content("someone-elses-org/epsilon")
+
+    select 'my-adminned-org/chi', from: 'user-name-repo-name'
+    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    click_button 'Create agreement'
+
+    inputs = {
+      'name' => 'web',
+      'config' => {
+        'url' => "#{HOST}/repo_hook"
+      }
+    }
+
+    a_request(:post, "https://api.github.com/repos/my-adminned-org/chi/hooks?access_token=#{token}").with(body: inputs.to_json).should have_been_made
+
+    expect(Agreement.last.github_repo_hook_id).to eq(resulting_github_repo_hook_id)
   end
 
   scenario "Sign up for commit notifications when an agreement is created" do

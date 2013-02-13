@@ -28,7 +28,7 @@ describe Agreement do
 
   it { should allow_mass_assignment_of(:repo_name) }
   it { should allow_mass_assignment_of(:text) }
-  it { should_not allow_mass_assignment_of(:user_name) }
+  it { should allow_mass_assignment_of(:user_name) }
   it { should_not allow_mass_assignment_of(:user_id) }
 
   it "sets user_name" do
@@ -106,7 +106,7 @@ describe Agreement do
     job = stub('update commit status on open pull requests job', run: true)
     CheckOpenPullsJob.stub(:new => job)
 
-    CheckOpenPullsJob.should_receive(:new).with(owner: owner, repo_name: 'the_repo')
+    CheckOpenPullsJob.should_receive(:new).with(owner: owner, repo_name: 'the_repo', user_name: 'the_owner')
     job.should_receive(:run).with()
 
     agreement = build(:agreement, user: owner, repo_name: 'the_repo')

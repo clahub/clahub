@@ -7,6 +7,10 @@
 </head>
 <body class="<%= body_class %>">
 
+<% unless @suppress_navbar %>
+  <%= render partial: 'shared/navbar' %>
+<% end %>
+
 <div class="container">
   <%= render partial: 'shared/flashes' %>
   <%= render partial: 'shared/announcements' %>
@@ -14,13 +18,20 @@
   <%= yield %>
 
   <footer class="row">
-  <hr>
-    <p>&copy; Jason Morrison 2012</p>
-    <% if signed_in? %>
-      <section>
-      <a href="/sign_out">Sign Out</a>
-      </section>
-    <% end %>
+    <ul class="footer-links">
+      <li>&copy; Jason Morrison 2012.  All Rights Reserved.  CLAHub is a trademark of Jason Morrison.</li>
+      <span class="divider">&bullet;</span>
+      <li><a href="https://github.com/jasonm/clahub">Source Code and Issues</a></li>
+      <span class="divider">&bullet;</span>
+      <%= nav_link_to 'Privacy Policy', page_path('privacy') %>
+      <span class="divider">&bullet;</span>
+      <%= nav_link_to 'Terms of Service', page_path('terms') %>
+      <% if signed_in? %>
+        <span class="divider">&bullet;</span>
+        <%= nav_link_to 'Sign Out', sign_out_path %>
+      <% end %>
+    </ul>
+    </div>
   </footer>
 </div>
 
