@@ -8,5 +8,6 @@
         <li><a href="https://github.com/<%= user.nickname %>"><%= user.nickname %></a></li>
       <% end %>
     </ul>
+    <p><%= link_to 'Download CSV', agreement_path(@agreement.user_name, @agreement.repo_name, format: 'csv') %>.</p>
   <% end %>
 </div>
