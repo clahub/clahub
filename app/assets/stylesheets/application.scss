@@ -109,5 +109,9 @@ footer {
 
   ul.footer-links {
     @extend .breadcrumb;
+
+    li.block {
+      display: block;
+    }
   }
 }
