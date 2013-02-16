@@ -26,6 +26,21 @@ class AgreementsController < ApplicationController
     if signed_out?
       session[:redirect_after_github_oauth_url] = request.url
     end
+
+    respond_to do |format|
+      format.html
+
+      format.csv do
+        if @agreement.owned_by?(current_user)
+          filename = "#{@agreement.repo_name}-contributor-agreement-signatures-#{Time.now.strftime("%Y%m%d-%H%M%S")}.csv"
+          headers["Content-Type"] ||= 'text/csv'
+          headers["Content-Disposition"] = "attachment; filename=\"#{filename}\""
+          render text: AgreementCsvPresenter.new(@agreement).to_csv
+        else
+          render nothing: true, status: 404
+        end
+      end
+    end
   end
 
   private
