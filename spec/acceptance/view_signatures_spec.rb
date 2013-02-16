@@ -5,7 +5,7 @@ feature 'Viewing signatures for an agreement' do
     owner = create(:user, nickname: 'oswald_owner', uid: 1)
     agreement = create(:agreement, user: owner, repo_name: 'the_project', text: "The CLA text")
 
-    signee = create(:user, nickname: 'sally_signee', uid: 2)
+    signee = create(:user, nickname: 'sally_signee', name: 'Sally Signee', uid: 2)
     signature = create(:signature, user: signee, agreement: agreement)
   end
 
@@ -15,6 +15,20 @@ feature 'Viewing signatures for an agreement' do
     expect(page).to have_content('The CLA text')
     expect(page).to have_content('Users who have signed')
     expect(page).to have_content('sally_signee')
+  end
+
+  scenario 'The repo owner may download a CSV of signatures' do
+    view_license_as('oswald_owner')
+    click_link 'Download CSV'
+    expect(page).to have_content('sally_signee')
+    expect(page).to have_content('Sally Signee')
+  end
+
+  scenario 'A non-owner may not download a CSV of signatures' do
+    view_license_as('sally_signee')
+    expect(page).to have_no_content('Download CSV')
+    visit '/agreements/oswald_owner/the_project.csv'
+    page.status_code.should == 404
   end
 
   scenario 'A signee can see that they have signed an agreement' do
