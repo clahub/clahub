@@ -118,21 +118,30 @@ describe Agreement do
     agreement.check_open_pulls
   end
 
-  it "creates default fields" do
-    agreement = create(:agreement)
-    agreement.fields.length.should == 0
-
+  it "build default fields" do
     number_of_fields = Field.all.length
     number_of_fields.should be > 0
 
-    agreement.create_default_fields
+    agreement = create(:agreement)
+    agreement.fields.length.should == 0
+
+    agreement.build_default_fields
+    agreement.agreement_fields.length.should == number_of_fields
+
+    agreement.build_default_fields
+    agreement.agreement_fields.length.should == number_of_fields
+
     agreement.reload
-    agreement.fields.length.should == number_of_fields
+    agreement.agreement_fields.length.should == 0
   end
 
   it "has some enabled agreement fields and some disabled" do
-    agreement = create(:agreement)
-    agreement.create_default_fields
+    agreement = build(:agreement)
+    agreement.build_default_fields
+
+    agreement.save
+    agreement.reload
+
     agreement.enabled_agreement_fields.should be
     agreement.enabled_agreement_fields.length.should be < agreement.fields.length
   end

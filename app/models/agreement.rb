@@ -47,9 +47,11 @@ class Agreement < ActiveRecord::Base
     CheckOpenPullsJob.new(owner: user, user_name: user_name, repo_name: repo_name).run
   end
 
-  def create_default_fields
+  def build_default_fields
+    self.agreement_fields = []
     Field.all.each do |field|
-      self.agreement_fields.create({
+      self.agreement_fields.build({
+        agreement: self,
         field: field,
         enabled: field.enabled_by_default
       })
