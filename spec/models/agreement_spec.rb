@@ -33,6 +33,7 @@ describe Agreement do
   it { should allow_mass_assignment_of(:repo_name) }
   it { should allow_mass_assignment_of(:text) }
   it { should allow_mass_assignment_of(:user_name) }
+  it { should allow_mass_assignment_of(:agreement_fields_attributes) }
   it { should_not allow_mass_assignment_of(:user_id) }
 
   it "sets user_name" do
@@ -115,5 +116,24 @@ describe Agreement do
 
     agreement = build(:agreement, user: owner, repo_name: 'the_repo')
     agreement.check_open_pulls
+  end
+
+  it "creates default fields" do
+    agreement = create(:agreement)
+    agreement.fields.length.should == 0
+
+    number_of_fields = Field.all.length
+    number_of_fields.should be > 0
+
+    agreement.create_default_fields
+    agreement.reload
+    agreement.fields.length.should == number_of_fields
+  end
+
+  it "has some enabled agreement fields and some disabled" do
+    agreement = create(:agreement)
+    agreement.create_default_fields
+    agreement.enabled_agreement_fields.should be
+    agreement.enabled_agreement_fields.length.should be < agreement.fields.length
   end
 end

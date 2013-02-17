@@ -10,7 +10,9 @@ class Agreement < ActiveRecord::Base
   validates :text, presence: true
   validate :one_agreement_per_user_repo
 
-  attr_accessible :user_name, :repo_name, :text
+  attr_accessible :user_name, :repo_name, :text, :agreement_fields_attributes
+
+  accepts_nested_attributes_for :agreement_fields
 
   def create_github_repo_hook
     hook_inputs = {
@@ -43,6 +45,19 @@ class Agreement < ActiveRecord::Base
   def check_open_pulls
     # TODO: async this so that creating a signature doesn't take so long.
     CheckOpenPullsJob.new(owner: user, user_name: user_name, repo_name: repo_name).run
+  end
+
+  def create_default_fields
+    Field.all.each do |field|
+      self.agreement_fields.create({
+        field: field,
+        enabled: field.enabled_by_default
+      })
+    end
+  end
+
+  def enabled_agreement_fields
+    agreement_fields.enabled
   end
 
   private
