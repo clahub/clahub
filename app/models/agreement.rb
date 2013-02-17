@@ -2,7 +2,7 @@ class Agreement < ActiveRecord::Base
   belongs_to :user
   has_many :signatures
   has_many :signing_users, through: :signatures, source: :user
-  has_many :agreement_fields
+  has_many :agreement_fields, inverse_of: :agreement
   has_many :fields, through: :agreement_fields
 
   validates :repo_name, presence: true

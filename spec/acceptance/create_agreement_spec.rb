@@ -216,6 +216,8 @@ feature "Creating a CLA for a repo" do
     select 'jasonm/beta', from: 'user-name-repo-name'
     fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
 
+    expect(page).to have_content('Choose any extra fields to require on your agreement:')
+
     expect(page).to have_content('Email')
     expect(page).to have_content('Name')
     expect(page).to have_content('Mailing address')
@@ -224,7 +226,23 @@ feature "Creating a CLA for a repo" do
     expect(page).to have_content('Type "I AGREE"')
     expect(page).to have_content('Type your initials')
 
+    find_field("Email").should be_checked
+    find_field("Name").should be_checked
+    find_field("Mailing address").should be_checked
+    find_field("Country").should be_checked
+    find_field("Phone or Skype").should be_checked
+    find_field('Type "I AGREE"').should be_checked
+    find_field("Type your initials").should_not be_checked
+
     click_button 'Create agreement'
+
+    expect(page).to have_content('Email')
+    expect(page).to have_content('Name')
+    expect(page).to have_content('Mailing address')
+    expect(page).to have_content('Country')
+    expect(page).to have_content('Phone or Skype')
+    expect(page).to have_content('Type "I AGREE"')
+    expect(page).to have_no_content('Type your initials')
   end
 end
 

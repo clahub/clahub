@@ -34,6 +34,20 @@
     </div>
   </div>
 
+  <div class="field-selection-group">
+    <label>Choose any extra fields to require on your agreement:</label>
+    <ul class="unstyled">
+      <%= form.fields_for :agreement_fields do |f| %>
+        <li>
+          <%= f.hidden_field :field_id %>
+          <%= f.check_box :enabled %>
+          <%= f.label :enabled, f.object.field.label %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+
   <div class='form-actions'>
     <%= form.button 'Create agreement', :class => 'btn btn-primary' %>
   </div>
