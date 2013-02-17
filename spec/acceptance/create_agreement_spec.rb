@@ -208,6 +208,24 @@ feature "Creating a CLA for a repo" do
   scenario "Detect when owner has included link to CLA from CONTRIBUTING/CONTRIBUTING.md file"
   scenario "Create an agreement for a repo you admin but do not directly own"
   scenario "Creating an agreement updates commit statuses open for pull requests"
+
+  scenario "Adding fields to an agreement during creation" do
+    visit '/'
+    click_link 'Sign in with GitHub to get started'
+
+    select 'jasonm/beta', from: 'user-name-repo-name'
+    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+
+    expect(page).to have_content('Email')
+    expect(page).to have_content('Name')
+    expect(page).to have_content('Mailing address')
+    expect(page).to have_content('Country')
+    expect(page).to have_content('Phone or Skype')
+    expect(page).to have_content('Type "I AGREE"')
+    expect(page).to have_content('Type your initials')
+
+    click_button 'Create agreement'
+  end
 end
 
 feature "Failing GitHub OAuth" do
