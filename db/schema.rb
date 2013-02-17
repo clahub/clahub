@@ -11,7 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130118225809) do
+ActiveRecord::Schema.define(:version => 20130217002936) do
+
+  create_table "agreement_fields", :force => true do |t|
+    t.integer  "agreement_id"
+    t.integer  "field_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "agreement_fields", ["agreement_id", "field_id"], :name => "index_agreement_fields_on_agreement_id_and_field_id"
 
   create_table "agreements", :force => true do |t|
     t.string   "user_name"
@@ -28,6 +37,13 @@ ActiveRecord::Schema.define(:version => 20130118225809) do
 
   create_table "announcements", :force => true do |t|
     t.text     "body"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "fields", :force => true do |t|
+    t.string   "label"
+    t.string   "data_type"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end

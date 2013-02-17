@@ -6,6 +6,8 @@ describe Agreement do
   it { should validate_presence_of :text }
   it { should belong_to :user }
   it { should have_many :signatures }
+  it { should have_many :agreement_fields }
+  it { should have_many :fields }
 
   it "validates one agreement per user/repo" do
     user = create(:user, nickname: 'alice')
