@@ -16,6 +16,8 @@ describe Agreement do
 
     expect(second).to_not be_valid
     expect(second.errors[:base]).to include('An agreement already exists for alice/alpha')
+
+    expect(first).to be_valid
   end
 
   it "has many signing_users through signatures" do

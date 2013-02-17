@@ -48,7 +48,8 @@ class Agreement < ActiveRecord::Base
   private
 
   def one_agreement_per_user_repo
-    if Agreement.exists?(user_name: user_name, repo_name: repo_name)
+    existing = Agreement.find_by_user_name_and_repo_name(user_name, repo_name)
+    if existing && (existing != self)
       errors[:base] << "An agreement already exists for #{user_name}/#{repo_name}"
     end
   end
