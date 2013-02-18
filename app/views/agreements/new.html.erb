@@ -42,6 +42,15 @@
           <%= f.hidden_field :field_id %>
           <%= f.check_box :enabled %>
           <%= f.label :enabled, f.object.field.label %>
+          <% if description = f.object.field.description %>
+            <span class="expansion-container">
+              <div class="expansion-content" style="display: none;">
+                <p>When signing your agreement, the person signing will see helper text for this field:</p>
+                <blockquote><%= description %></blockquote>
+              </div>
+              <a href="#">What's this?</a>
+            </span>
+          <% end %>
         </li>
       <% end %>
     </ul>
@@ -57,6 +66,9 @@
   <script type="text/javascript">
     //<![CDATA[
       $(function() {
+        $('.expansion-container>a').click(function(e) {
+          $(e.target).closest('span.expansion-container').find('>*').toggle();
+        });
         $('select.select-chosen').chosen({ search_contains: true });
 
         (function() {

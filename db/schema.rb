@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130217211731) do
+ActiveRecord::Schema.define(:version => 20130218033834) do
 
   create_table "agreement_fields", :force => true do |t|
     t.integer  "agreement_id"
@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20130217211731) do
     t.datetime "created_at",                           :null => false
     t.datetime "updated_at",                           :null => false
     t.boolean  "enabled_by_default", :default => true, :null => false
+    t.text     "description"
   end
 
   create_table "signatures", :force => true do |t|

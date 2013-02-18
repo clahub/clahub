@@ -226,6 +226,10 @@ feature "Creating a CLA for a repo" do
     expect(page).to have_content('Phone or Skype')
     expect(page).to have_content('Type "I AGREE"')
     expect(page).to have_content('Type your initials')
+    expect(page).to have_content('Corporate Contributor Information')
+
+    expect(page).to have_content("Please type the exact text")
+    expect(page).to have_content("If you are employed as a software engineer")
 
     find_field("Email").should be_checked
     find_field("Name").should be_checked
@@ -234,6 +238,7 @@ feature "Creating a CLA for a repo" do
     find_field("Phone or Skype").should be_checked
     find_field('Type "I AGREE"').should be_checked
     find_field("Type your initials").should_not be_checked
+    find_field("Corporate Contributor Information").should be_checked
 
     click_button 'Create agreement'
 
@@ -244,6 +249,7 @@ feature "Creating a CLA for a repo" do
     expect(page).to have_content('Phone or Skype')
     expect(page).to have_content('Type "I AGREE"')
     expect(page).to have_no_content('Type your initials')
+    expect(page).to have_content('Corporate Contributor Information')
   end
 end
 

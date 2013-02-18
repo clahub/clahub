@@ -25,6 +25,9 @@
             <div class="controls">
               <%= agreement_field_input(f) %>
               <span class="help-inline"><%= error_message_on f.object, :value %></span>
+              <% if description = f.object.agreement_field.field.description %>
+                <span class="help-block"><%= description %></span>
+              <% end %>
             </div>
           </div>
         <% end %>
