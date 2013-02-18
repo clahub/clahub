@@ -2,11 +2,17 @@ require 'spec_helper'
 
 feature 'Viewing signatures for an agreement' do
   background do
+    Field.create({ label: 'Email', enabled_by_default: true, data_type: 'string' })
+
     owner = create(:user, nickname: 'oswald_owner', uid: 1)
-    agreement = create(:agreement, user: owner, repo_name: 'the_project', text: "The CLA text")
+    agreement = build(:agreement, user: owner, repo_name: 'the_project', text: "The CLA text")
+    agreement.build_default_fields
+    agreement.save!
 
     signee = create(:user, nickname: 'sally_signee', name: 'Sally Signee', uid: 2)
-    signature = create(:signature, user: signee, agreement: agreement)
+    signature = build(:signature, user: signee, agreement: agreement)
+    signature.field_entries.build({ signature: signature, agreement_field: agreement.agreement_fields.first, value: "a@b.com" })
+    signature.save!
   end
 
   scenario 'The repo owner may view signatures for an agreement' do
@@ -22,6 +28,7 @@ feature 'Viewing signatures for an agreement' do
     click_link 'Download CSV'
     expect(page).to have_content('sally_signee')
     expect(page).to have_content('Sally Signee')
+    expect(page).to have_content('a@b.com')
   end
 
   scenario 'A non-owner may not download a CSV of signatures' do
