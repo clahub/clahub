@@ -6,6 +6,8 @@ describe Agreement do
   it { should validate_presence_of :text }
   it { should belong_to :user }
   it { should have_many :signatures }
+  it { should have_many :agreement_fields }
+  it { should have_many :fields }
 
   it "validates one agreement per user/repo" do
     user = create(:user, nickname: 'alice')
@@ -14,6 +16,8 @@ describe Agreement do
 
     expect(second).to_not be_valid
     expect(second.errors[:base]).to include('An agreement already exists for alice/alpha')
+
+    expect(first).to be_valid
   end
 
   it "has many signing_users through signatures" do
@@ -29,6 +33,7 @@ describe Agreement do
   it { should allow_mass_assignment_of(:repo_name) }
   it { should allow_mass_assignment_of(:text) }
   it { should allow_mass_assignment_of(:user_name) }
+  it { should allow_mass_assignment_of(:agreement_fields_attributes) }
   it { should_not allow_mass_assignment_of(:user_id) }
 
   it "sets user_name" do
@@ -111,5 +116,37 @@ describe Agreement do
 
     agreement = build(:agreement, user: owner, repo_name: 'the_repo')
     agreement.check_open_pulls
+  end
+
+  context "with some fields" do
+    before do
+      Field.create({ label: 'Email', enabled_by_default: true, data_type: 'string' })
+      Field.create({ label: 'Name', enabled_by_default: true, data_type: 'string' })
+      Field.create({ label: 'Favorite Ice Cream', enabled_by_default: false, data_type: 'string' })
+    end
+
+    it "build default fields" do
+      agreement = create(:agreement)
+      agreement.fields.length.should == 0
+
+      agreement.build_default_fields
+      agreement.agreement_fields.length.should == 3
+
+      # no dupes on re-build
+      agreement.build_default_fields
+      agreement.agreement_fields.length.should == 3
+
+      agreement.reload
+      agreement.agreement_fields.length.should == 0
+    end
+
+    it "has some enabled agreement fields and some disabled" do
+      agreement = build(:agreement)
+      agreement.build_default_fields
+      agreement.save
+      agreement.reload
+
+      agreement.enabled_agreement_fields.length.should == 2
+    end
   end
 end

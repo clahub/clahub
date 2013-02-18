@@ -28,7 +28,37 @@ feature "Agreeing to a CLA" do
     page.should have_no_content('Sign in with GitHub')
     page.should have_content('I agree')
 
-    click_link 'I agree'
+    click_button 'I agree'
+    page.should have_content('You have agreed to the CLA for the_owner/the_project.')
+  end
+
+  scenario 'Prompts signee to fill in all fields' do
+    agreement = Agreement.last
+
+    Field.create({ label: 'Email', enabled_by_default: true, data_type: 'string' })
+    Field.create({ label: 'Name', enabled_by_default: true, data_type: 'string' })
+    Field.create({ label: 'Favorite Ice Cream', enabled_by_default: false, data_type: 'string' })
+
+    agreement.build_default_fields
+    agreement.save
+
+    mock_github_oauth(info: { nickname: 'jasonm' })
+    visit '/agreements/the_owner/the_project'
+    click_link 'Sign in with GitHub to agree to this CLA'
+
+    page.should have_content('The CLA text')
+    find_field('Email').should be
+    find_field('Name').should be
+
+    click_button 'I agree'
+
+    page.should have_content("Name can't be blank")
+    page.should have_content("Email can't be blank")
+
+    fill_in 'Email', with: 'jason.p.morrison@gmail.com'
+    fill_in 'Name', with: 'Jason Morrison'
+
+    click_button 'I agree'
     page.should have_content('You have agreed to the CLA for the_owner/the_project.')
   end
 
@@ -41,7 +71,7 @@ feature "Agreeing to a CLA" do
     page.should have_no_content('Sign in with GitHub')
     page.should have_content('I agree')
 
-    click_link 'I agree'
+    click_button 'I agree'
     page.should have_content('You have agreed to the CLA for the_owner/the_project.')
     page.should have_no_content('I agree')
   end
@@ -130,6 +160,6 @@ feature "Agreeing to a CLA" do
     visit '/sign_out'
     visit "/agreements/#{repo_owner}/#{repo_name}"
     click_link 'Sign in with GitHub to agree to this CLA'
-    click_link 'I agree'
+    click_button 'I agree'
   end
 end

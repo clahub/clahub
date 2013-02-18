@@ -204,10 +204,53 @@ feature "Creating a CLA for a repo" do
     scenario "handles gracefully if github returns an error response for creating a repo hook"
   end
 
-
   scenario "Detect when owner has included link to CLA from CONTRIBUTING/CONTRIBUTING.md file"
   scenario "Create an agreement for a repo you admin but do not directly own"
   scenario "Creating an agreement updates commit statuses open for pull requests"
+
+  scenario "Given extra fields, add those fields to an agreement during creation" do
+    load Rails.root.join("db/seeds.rb")
+
+    visit '/'
+    click_link 'Sign in with GitHub to get started'
+
+    select 'jasonm/beta', from: 'user-name-repo-name'
+    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+
+    expect(page).to have_content('Choose any extra fields to require on your agreement:')
+
+    expect(page).to have_content('Email')
+    expect(page).to have_content('Name')
+    expect(page).to have_content('Mailing address')
+    expect(page).to have_content('Country')
+    expect(page).to have_content('Phone or Skype')
+    expect(page).to have_content('Type "I AGREE"')
+    expect(page).to have_content('Type your initials')
+    expect(page).to have_content('Corporate Contributor Information')
+
+    expect(page).to have_content("Please type the exact text")
+    expect(page).to have_content("If you are employed as a software engineer")
+
+    find_field("Email").should be_checked
+    find_field("Name").should be_checked
+    find_field("Mailing address").should be_checked
+    find_field("Country").should be_checked
+    find_field("Phone or Skype").should be_checked
+    find_field('Type "I AGREE"').should be_checked
+    find_field("Type your initials").should_not be_checked
+    find_field("Corporate Contributor Information").should be_checked
+
+    click_button 'Create agreement'
+
+    expect(page).to have_content('Email')
+    expect(page).to have_content('Name')
+    expect(page).to have_content('Mailing address')
+    expect(page).to have_content('Country')
+    expect(page).to have_content('Phone or Skype')
+    expect(page).to have_content('Type "I AGREE"')
+    expect(page).to have_no_content('Type your initials')
+    expect(page).to have_content('Corporate Contributor Information')
+  end
 end
 
 feature "Failing GitHub OAuth" do

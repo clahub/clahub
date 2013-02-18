@@ -93,7 +93,6 @@ Running the app
 Run with Foreman if you like:
 
     foreman start
-    foreman run rails console
 
 Or as normal (.env is loaded by `dotenv` gem):
 

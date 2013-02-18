@@ -10,7 +10,7 @@ Clahub::Application.routes.draw do
   resources :agreements, only: [:new, :create]
 
   constraints :repo_name => /[^\/]+/ do
-    get 'agreements/:user_name/:repo_name.:format' => 'agreements#show', :as => :agreement
+    get 'agreements/:user_name/:repo_name.csv' => 'agreements#show', :as => :agreement, :format => :csv
     get 'agreements/:user_name/:repo_name' => 'agreements#show', :as => :agreement
     post 'agreements/:user_name/:repo_name/signatures' => 'signatures#create', :as => :agreement_signature
   end

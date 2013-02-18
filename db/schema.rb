@@ -11,7 +11,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130118225809) do
+ActiveRecord::Schema.define(:version => 20130218033834) do
+
+  create_table "agreement_fields", :force => true do |t|
+    t.integer  "agreement_id"
+    t.integer  "field_id"
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+    t.boolean  "enabled",      :default => true, :null => false
+  end
+
+  add_index "agreement_fields", ["agreement_id", "field_id"], :name => "index_agreement_fields_on_agreement_id_and_field_id"
 
   create_table "agreements", :force => true do |t|
     t.string   "user_name"
@@ -30,6 +40,23 @@ ActiveRecord::Schema.define(:version => 20130118225809) do
     t.text     "body"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "field_entries", :force => true do |t|
+    t.integer "signature_id"
+    t.integer "agreement_field_id"
+    t.text    "value"
+  end
+
+  add_index "field_entries", ["signature_id", "agreement_field_id"], :name => "index_field_entries_on_signature_id_and_agreement_field_id"
+
+  create_table "fields", :force => true do |t|
+    t.string   "label"
+    t.string   "data_type"
+    t.datetime "created_at",                           :null => false
+    t.datetime "updated_at",                           :null => false
+    t.boolean  "enabled_by_default", :default => true, :null => false
+    t.text     "description"
   end
 
   create_table "signatures", :force => true do |t|

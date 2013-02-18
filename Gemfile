@@ -26,6 +26,7 @@ group :development do
 end
 
 group :test do
+  gem 'launchy'
   gem 'capybara'
   gem 'shoulda-matchers'
   gem 'factory_girl_rails'
