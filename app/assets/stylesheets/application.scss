@@ -72,6 +72,11 @@ body.signatures-create {
     @extend .span4;
   }
 
+  a#sign-in-to-agree {
+    @extend .btn, .btn-primary, .btn-large;
+    @extend .span4;
+  }
+
   a#already-agreed {
     @extend .btn, .btn-success, .btn-large, .disabled;
   }
