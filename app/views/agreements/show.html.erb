@@ -15,21 +15,22 @@
         <i class="icon-ok"></i> You have signed this CLA.
       </a>
     <% else %>
-      <label>More fields:</label>
-      <ul class="unstyled">
-        <% @agreement.enabled_agreement_fields.each do |agreement_field| %>
-          <li>
-            <%= label_tag "agreement_field_#{agreement_field.id}", agreement_field.field.label %>
-          </li>
-        <% end %>
-      </ul>
+      <%= form_for @signature, url: agreement_signature_path(@agreement.user_name, @agreement.repo_name), html: { class: 'form-horizontal' } do |form| %>
+        <%= form.fields_for :field_entries do |f| %>
+          <% extra_group_class = f.error_messages.present? ? "error" : ""%>
 
-      <%= link_to 'I agree',
-                  agreement_signature_path(
-                    user_name: @agreement.user_name,
-                    repo_name: @agreement.repo_name),
-                  id: "agree-link",
-                  method: :post %>
+          <div class="control-group <%= extra_group_class %>">
+            <%= f.hidden_field :agreement_field_id %>
+            <%= f.label :value, f.object.agreement_field.field.label, class: "control-label" %>
+            <div class="controls">
+              <%= agreement_field_input(f) %>
+              <span class="help-inline"><%= error_message_on f.object, :value %></span>
+            </div>
+          </div>
+        <% end %>
+
+        <%= form.button 'I agree', type: 'submit', id: 'agreement-submit' %>
+      <% end %>
     <% end %>
   <% else %>
     <a id="agree-link" href="/auth/github">Sign in with GitHub to agree to this CLA &raquo;</a>

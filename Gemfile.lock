@@ -109,6 +109,8 @@ GEM
     jruby-pageant (1.1.1)
     json (1.7.6)
     kramdown (0.14.1)
+    launchy (2.1.2)
+      addressable (~> 2.3)
     libwebsocket (0.1.7.1)
       addressable
       websocket
@@ -264,6 +266,7 @@ DEPENDENCIES
   guard-livereload
   jquery-rails
   kramdown
+  launchy
   localtunnel
   omniauth
   omniauth-github

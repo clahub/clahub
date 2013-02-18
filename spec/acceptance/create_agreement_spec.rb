@@ -204,12 +204,13 @@ feature "Creating a CLA for a repo" do
     scenario "handles gracefully if github returns an error response for creating a repo hook"
   end
 
-
   scenario "Detect when owner has included link to CLA from CONTRIBUTING/CONTRIBUTING.md file"
   scenario "Create an agreement for a repo you admin but do not directly own"
   scenario "Creating an agreement updates commit statuses open for pull requests"
 
-  scenario "Adding fields to an agreement during creation" do
+  scenario "Given extra fields, add those fields to an agreement during creation" do
+    load Rails.root.join("db/seeds.rb")
+
     visit '/'
     click_link 'Sign in with GitHub to get started'
 

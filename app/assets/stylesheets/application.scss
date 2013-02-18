@@ -56,7 +56,8 @@ body.agreements-new {
   }
 }
 
-body.agreements-show {
+body.agreements-show,
+body.signatures-create {
   header {
     @extend .row;
   }
@@ -66,7 +67,7 @@ body.agreements-show {
     margin-top: 27px;
   }
 
-  a#agree-link {
+  button#agreement-submit {
     @extend .btn, .btn-primary, .btn-large;
     @extend .span4;
   }
@@ -120,3 +121,10 @@ div.field-selection-group label {
   display: inline-block;
 }
 
+form.form-horizontal .field_with_errors {
+  display: inline;
+}
+
+.field_with_errors {
+  @include formFieldState($errorText, $errorText, $errorBackground);
+}

@@ -20,4 +20,12 @@ module ApplicationHelper
       link_to(content, path_or_options)
     end
   end
+
+  def agreement_field_input(builder)
+    if builder.object.agreement_field.field.data_type == 'text'
+      builder.text_area :value, rows: 5, class: "input-xxlarge"
+    else
+      builder.text_field :value, class: "input-xxlarge"
+    end
+  end
 end

@@ -118,31 +118,35 @@ describe Agreement do
     agreement.check_open_pulls
   end
 
-  it "build default fields" do
-    number_of_fields = Field.all.length
-    number_of_fields.should be > 0
+  context "with some fields" do
+    before do
+      Field.create({ label: 'Email', enabled_by_default: true, data_type: 'string' })
+      Field.create({ label: 'Name', enabled_by_default: true, data_type: 'string' })
+      Field.create({ label: 'Favorite Ice Cream', enabled_by_default: false, data_type: 'string' })
+    end
 
-    agreement = create(:agreement)
-    agreement.fields.length.should == 0
+    it "build default fields" do
+      agreement = create(:agreement)
+      agreement.fields.length.should == 0
 
-    agreement.build_default_fields
-    agreement.agreement_fields.length.should == number_of_fields
+      agreement.build_default_fields
+      agreement.agreement_fields.length.should == 3
 
-    agreement.build_default_fields
-    agreement.agreement_fields.length.should == number_of_fields
+      # no dupes on re-build
+      agreement.build_default_fields
+      agreement.agreement_fields.length.should == 3
 
-    agreement.reload
-    agreement.agreement_fields.length.should == 0
-  end
+      agreement.reload
+      agreement.agreement_fields.length.should == 0
+    end
 
-  it "has some enabled agreement fields and some disabled" do
-    agreement = build(:agreement)
-    agreement.build_default_fields
+    it "has some enabled agreement fields and some disabled" do
+      agreement = build(:agreement)
+      agreement.build_default_fields
+      agreement.save
+      agreement.reload
 
-    agreement.save
-    agreement.reload
-
-    agreement.enabled_agreement_fields.should be
-    agreement.enabled_agreement_fields.length.should be < agreement.fields.length
+      agreement.enabled_agreement_fields.length.should == 2
+    end
   end
 end
