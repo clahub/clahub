@@ -5,6 +5,10 @@ class FieldEntry < ActiveRecord::Base
 
   validate :valid_value
 
+  def ordering
+    agreement_field.field_id
+  end
+
   private
 
   def valid_value

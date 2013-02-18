@@ -16,7 +16,7 @@
       </a>
     <% else %>
       <%= form_for @signature, url: agreement_signature_path(@agreement.user_name, @agreement.repo_name), html: { class: 'form-horizontal' } do |form| %>
-        <%= form.fields_for :field_entries do |f| %>
+        <%= form.fields_for :field_entries, @signature.field_entries.sort_by(&:ordering) do |f| %>
           <% extra_group_class = f.error_messages.present? ? "error" : ""%>
 
           <div class="control-group <%= extra_group_class %>">

@@ -9,4 +9,8 @@ class AgreementField < ActiveRecord::Base
   def self.enabled
     where("enabled = TRUE")
   end
+
+  def ordering
+    field_id
+  end
 end

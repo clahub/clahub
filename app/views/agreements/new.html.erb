@@ -37,7 +37,7 @@
   <div class="field-selection-group">
     <label>Choose any extra fields to require on your agreement:</label>
     <ul class="unstyled">
-      <%= form.fields_for :agreement_fields do |f| %>
+      <%= form.fields_for :agreement_fields, @agreement.agreement_fields.sort_by(&:ordering) do |f| %>
         <li>
           <%= f.hidden_field :field_id %>
           <%= f.check_box :enabled %>
