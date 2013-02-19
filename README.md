@@ -14,11 +14,11 @@ appropriate, I hope it can reduce the friction of contribution.
 This project is a work-in-progress.  Any and all feedback is welcome!
 
 It currently works, but could use UI and functionality improvement.  Find
-such discussion in [GitHub issues](https://github.com/jasonm/clahub/issues).
+such discussion in [GitHub issues](https://github.com/clahub/clahub/issues).
 
 Build status
 ------------
-[![Build Status](https://secure.travis-ci.org/jasonm/clahub.png)](http://travis-ci.org/jasonm/clahub)
+[![Build Status](https://secure.travis-ci.org/clahub/clahub.png)](http://travis-ci.org/clahub/clahub)
 
 What's a CLA?
 -------------
@@ -151,7 +151,7 @@ See DEPLOY.md for information on deploying.
 License
 ================
 
-See [LICENSE](https://github.com/jasonm/clahub/blob/master/LICENSE) for the project license.
+See [LICENSE](https://github.com/clahub/clahub/blob/master/LICENSE) for the project license.
 
 The "Clipboard and pencil" graphic used in the homepage logo is
 licensed from iStockPhoto.com:
