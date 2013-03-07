@@ -19,6 +19,7 @@ public/system
 coverage/*
 *.swp
 *.swo
+*~
 rerun.txt
 tags
 !.keep
