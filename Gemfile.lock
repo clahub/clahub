@@ -132,6 +132,7 @@ GEM
       jruby-pageant (>= 1.1.1)
     net-ssh-gateway (1.1.0)
       net-ssh (>= 1.99.1)
+    newrelic_rpm (3.6.0.78)
     nokogiri (1.5.6)
     oauth2 (0.5.2)
       faraday (~> 0.7)
@@ -268,6 +269,7 @@ DEPENDENCIES
   kramdown
   launchy
   localtunnel
+  newrelic_rpm
   omniauth
   omniauth-github
   paul_revere

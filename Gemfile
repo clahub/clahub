@@ -16,6 +16,7 @@ gem 'dynamic_form'
 gem 'rack-canonical-host'
 gem 'paul_revere'
 gem 'kramdown'
+gem 'newrelic_rpm'
 
 group :development do
   gem 'localtunnel'
