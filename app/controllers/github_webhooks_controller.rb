@@ -3,6 +3,7 @@ class GithubWebhooksController < ApplicationController
     event = request.headers['X-GitHub-Event']
 
     Rails.logger.info(event.inspect)
+    Rails.logger.info(params)
 
     if event == 'push'
       payload = GithubPush.new(params[:payload])
