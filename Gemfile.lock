@@ -62,7 +62,7 @@ GEM
       debugger-ruby_core_source (~> 1.1.7)
     debugger-linecache (1.1.2)
       debugger-ruby_core_source (>= 1.1.1)
-    debugger-ruby_core_source (1.1.8)
+    debugger-ruby_core_source (1.1.9)
     diff-lcs (1.1.3)
     dotenv (0.4.0)
     dynamic_form (1.1.4)
