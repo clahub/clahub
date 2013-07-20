@@ -4,6 +4,9 @@
     <ul class="nav">
       <%= nav_link_to 'Home', home_path %>
       <%= nav_link_to 'Why CLAs?', page_path('why_cla') %>
+      <% if signed_in? %>
+        <%= nav_link_to 'My agreements and signatures', agreements_path %>
+      <% end %>
     </ul>
   </div>
 </div>

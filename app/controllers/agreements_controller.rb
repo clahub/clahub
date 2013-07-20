@@ -1,4 +1,9 @@
 class AgreementsController < ApplicationController
+  def index
+    @agreements = current_user.agreements
+    @signatures = current_user.signatures
+  end
+
   def new
     @agreement = current_user.agreements.new
     @agreement.build_default_fields
