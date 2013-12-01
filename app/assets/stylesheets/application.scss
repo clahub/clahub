@@ -95,7 +95,8 @@ body.signatures-create {
   }
 
   code#contributing-markup {
-    @extend .well, .row;
+    @extend .well;
+    display: block;
   }
 }
 
