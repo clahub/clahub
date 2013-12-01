@@ -34,3 +34,11 @@ redirect my-clahub.herokuapp.com to www.my-clahub.com):
     heroku config:add CANONICAL_URL=www.my-clahub.com
 
 At your DNS provider, add a CNAME from www.my-clahub.com to my-clahub.herokuapp.com
+
+
+Analytics
+------------------
+
+Google Universal Analytics is enabled if you set environment variables `UA_KEY`
+and `UA_DOMAIN`.  The JavaScript is added from
+`app/views/layouts/application.html.erb`.
