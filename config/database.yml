@@ -1,23 +1,21 @@
+options: &options
+  adapter: postgresql
+  encoding: utf8
+  pool: 5
+  username:
+  password:
+  template: template0 # Required for UTF8 encoding
+
 development:
-  adapter: postgresql
-  encoding: unicode
+  <<: *options
+  host: localhost
   database: clahub_development
-  pool: 5
-  username:
-  password:
 
-test:
-  adapter: postgresql
-  encoding: unicode
+test: &test
+  <<: *options
+  host: localhost
   database: clahub_test
-  pool: 5
-  username:
-  password:
 
-production:
-  adapter: postgresql
-  encoding: unicode
-  database: clahub_production
-  pool: 5
-  username:
-  password:
+production: &test
+  <<: *options
+
