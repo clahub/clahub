@@ -7,7 +7,8 @@ gem 'rails', '3.2.16'
 gem 'pg'
 gem 'jquery-rails'
 gem 'thin'
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', "~> 2.0"
+gem 'sass', "~> 3.2.0"
 gem 'chosen-rails'
 gem 'omniauth'
 gem 'omniauth-github'
@@ -22,7 +23,7 @@ group :development do
   gem 'localtunnel'
   gem 'pry'
   gem 'pry-rails'
-  gem 'pry-debugger'
+  # gem 'pry-debugger'
   gem 'pry-remote'
   gem 'debugger-linecache', '1.2.0'
 end
