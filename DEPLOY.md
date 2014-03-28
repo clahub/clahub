@@ -6,10 +6,13 @@ First, install [Heroku toolbelt](https://toolbelt.heroku.com/) and follow their
 
 Then, for an app named "my-clahub":
 
-    heroku create my-clahub
+    heroku apps:create my-clahub
     heroku config:add SECRET_TOKEN=some-random-key-with-plenty-of-entropy-here
+    heroku addons:add heroku-postgresql
 
-Note that the `SECRET_TOKEN` MUST be at least 30 characters.
+Note that the `SECRET_TOKEN` MUST be at least 30 characters. One way to generate it:
+
+    heroku config:add SECRET_TOKEN=$( head /dev/random | base64 | head -n 1 )
 
 Push the code up:
 
@@ -18,11 +21,15 @@ Push the code up:
 Migrate the database:
 
     heroku run rake db:migrate
+    heroku run rake db:seed
 
 Register for a new [GitHub application](https://github.com/settings/applications/new)
 OAuth key/secret pair, and add it to the Heroku environment:
 
     heroku config:add GITHUB_KEY=aaa111bbb GITHUB_SECRET=ccc222ddd
+    heroku restart
+
+If you have problems, try running `heroku logs`.
 
 Domain name
 ------------------
