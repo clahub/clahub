@@ -1,7 +1,7 @@
 language: ruby
 script: 'rake db:create db:test:load default'
 rvm:
-  - 1.9.3
+  - 2.1.1
 env:
 notifications:
   email: false
