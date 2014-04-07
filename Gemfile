@@ -18,6 +18,7 @@ gem 'rack-canonical-host'
 gem 'paul_revere'
 gem 'kramdown'
 gem 'newrelic_rpm'
+gem 'rack-ssl-enforcer'
 
 group :development do
   gem 'localtunnel'

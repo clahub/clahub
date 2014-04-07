@@ -43,6 +43,13 @@ redirect my-clahub.herokuapp.com to www.my-clahub.com):
 At your DNS provider, add a CNAME from www.my-clahub.com to my-clahub.herokuapp.com
 
 
+HTTPS
+------------------
+
+In the production environment, SSL is enforced.  If you really do not want SSL:
+
+    heroku config:add DISABLE_SSL_ENFORCEMENT=true
+
 Analytics
 ------------------
 
