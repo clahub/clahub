@@ -1,5 +1,5 @@
 language: ruby
-script: 'rake db:create db:test:load default'
+script: 'bundle exec rake db:create db:test:load default'
 rvm:
   - 2.1.1
 env:
