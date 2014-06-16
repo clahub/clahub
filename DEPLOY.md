@@ -56,3 +56,30 @@ Analytics
 Google Universal Analytics is enabled if you set environment variables `UA_KEY`
 and `UA_DOMAIN`.  The JavaScript is added from
 `app/views/layouts/application.html.erb`.
+
+Cloud Foundry
+===============
+eg: run.pivotal.io
+
+Create a Postgres service
+    
+    export POSTGRES_SERVICE=your_service_name
+    cf create-service elephantsql turtle $POSTGRES_SERVICE
+
+Register for a new [GitHub application](https://github.com/settings/applications/new)
+OAuth key/secret pair
+
+    export GITHUB_KEY=aaa111bbb
+    export GITHUB_SECRET=ccc222ddd
+
+Upload:
+
+    export APP_NAME="your-app-name"
+    cf login -a https://api.run.pivotal.io ... #your login credentials
+    cf target -s ... #the correct org and space
+    cf push $APP_NAME -m 256M -c "bundle exec rake cf:on_first_instance db:migrate db:seed && bundle exec thin start -p \$PORT" # This will fail, since we haven't added the right env variables yet 
+    cf set-env $APP_NAME SECRET_TOKEN $( head /dev/random | base64 | head -n 1 )
+    cf set-env $APP_NAME GITHUB_KEY $GITHUB_KEY 
+    cf set-env $APP_NAME GITHUB_SECRET $GITHUB_SECRET 
+    cf bind-service $APP_NAME $POSTGRES_SERVICE
+    cf push $APP_NAME #should succeed this time
