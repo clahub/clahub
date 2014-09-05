@@ -32,7 +32,7 @@ class PushStatusChecker
   end
 
   def mark(commit, state)
-    target_url = "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}"
+    target_url = "#{HOST}/agreements/#{@push.user_name}/#{repo_agreement.repo_name}"
 
     GithubRepos.new(repo_agreement.user).set_status(@push.user_name, @push.repo_name, sha = commit.id, {
       state: state,
@@ -68,9 +68,14 @@ class PushStatusChecker
   end
 
   def repo_agreement
-    @repo_agreement ||= Agreement.where({
-      user_name: @push.user_name,
-      repo_name: @push.repo_name
-    }).first
+    #@repo_agreement ||= Agreement.where({
+    #  user_name: @push.user_name,
+    #  repo_name: @push.repo_name
+    #}).first
+    for a in Agreement.where({ user_name: @push.user_name })
+      if a['repo_name'] == @push.repo_name || (a['repo_name'] == GithubRepos::ALL_REPOS && a['other_repo_names'].include?(@push.repo_name))
+        return a
+      end
+    end
   end
 end

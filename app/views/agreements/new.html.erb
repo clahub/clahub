@@ -6,6 +6,11 @@
   <%= form.label :user_name_repo_name, "Choose a repo:" %>
   <select name="agreement[user_name_repo_name]" id="user-name-repo-name" class="select-chosen" data-placeholder="GitHub repositories for <%= current_user.nickname %>" style="width:350px;" tabindex="1">
     <option value=""></option>
+    <% @orgs.each do |org| %>
+      <option value="<%= org_slash_all(org) %>">
+        <%= org_slash_all(org) %>
+      </option>
+    <% end %>
     <% @repos.each do |repo| %>
       <option value="<%= owner_slash_name(repo) %>">
         <%= owner_slash_name(repo) %>

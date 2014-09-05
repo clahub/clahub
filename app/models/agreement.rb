@@ -5,6 +5,7 @@ class Agreement < ActiveRecord::Base
   has_many :agreement_fields, inverse_of: :agreement
   has_many :fields, through: :agreement_fields
 
+  serialize :other_repo_names
   validates :repo_name, presence: true
   validates :user_name, presence: true
   validates :text, presence: true
@@ -22,12 +23,22 @@ class Agreement < ActiveRecord::Base
       }
     }
 
-    response = GithubRepos.new(self.user).create_hook(user_name, repo_name, hook_inputs)
-
-    self.update_attribute(:github_repo_hook_id, response['id'])
+    if repo_name != GithubRepos::ALL_REPOS
+      response = GithubRepos.new(self.user).create_hook(user_name, repo_name, hook_inputs)
+      self.update_attribute(:github_repo_hook_id, response['id'])
+    else
+      ids = []
+      for repo in other_repo_names
+        puts "Creating hook for #{user_name}/#{repo}"
+        response = GithubRepos.new(self.user).create_hook(user_name, repo, hook_inputs)
+        ids << response['id']
+      end
+      self.update_attribute(:other_github_repo_hook_ids, ids)
+    end
   end
 
   def delete_github_repo_hook
+    # TODO: handle deleting multiple hooks from other_github_repo_hook_ids
     if github_repo_hook_id
       GithubRepos.new(self.user).delete_hook(user_name, repo_name, github_repo_hook_id)
       self.update_attribute(:github_repo_hook_id, nil)
@@ -44,7 +55,7 @@ class Agreement < ActiveRecord::Base
 
   def check_open_pulls
     # TODO: async this so that creating a signature doesn't take so long.
-    CheckOpenPullsJob.new(owner: user, user_name: user_name, repo_name: repo_name).run
+    CheckOpenPullsJob.new(owner: user, user_name: user_name, repo_name: repo_name, other_repo_names: other_repo_names).run
   end
 
   def build_default_fields

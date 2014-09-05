@@ -8,12 +8,19 @@ class AgreementsController < ApplicationController
     @agreement = current_user.agreements.new
     @agreement.build_default_fields
     @repos = repos_for_current_user
+    @orgs = orgs_for_current_user
   end
 
   def create
     @agreement = current_user.agreements.new(params[:agreement].slice(:text, :agreement_fields_attributes))
     if params[:agreement]
       @agreement.user_name, @agreement.repo_name = params[:agreement][:user_name_repo_name].split('/')
+      if @agreement.repo_name == GithubRepos::ALL_REPOS
+        @agreement.other_repo_names = []
+        for repo in org_repos_for_current_user(@agreement.user_name) do
+          @agreement.other_repo_names << repo.name
+        end
+      end
     end
 
     if @agreement.save
@@ -22,6 +29,7 @@ class AgreementsController < ApplicationController
     else
       @agreement.build_default_fields
       @repos = repos_for_current_user
+      @orgs = orgs_for_current_user
       render 'new'
     end
   end
@@ -58,6 +66,18 @@ class AgreementsController < ApplicationController
   def repos_for_current_user
     DevModeCache.cache("repos-for-#{current_user.uid}") do
       GithubRepos.new(current_user).repos
+    end
+  end
+
+  def orgs_for_current_user
+    DevModeCache.cache("orgs-for-#{current_user.uid}") do
+      GithubRepos.new(current_user).orgs
+    end
+  end
+
+  def org_repos_for_current_user(org)
+    DevModeCache.cache("org-repos-for-#{current_user.uid}-#{org}") do
+      GithubRepos.new(current_user).org_repos(org)
     end
   end
 end
