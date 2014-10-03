@@ -37,7 +37,8 @@ class PushStatusChecker
     GithubRepos.new(repo_agreement.user).set_status(@push.user_name, @push.repo_name, sha = commit.id, {
       state: state,
       target_url: target_url,
-      description: STATUS_DESCRIPTIONS[state]
+      description: STATUS_DESCRIPTIONS[state],
+      context: "clahub"
     })
   end
 
