@@ -122,6 +122,9 @@ To take advantage of this:
 LocalTunnel
 ------------------
 
+** Note: ** LocalTunnel is currentyl down and the relevant gem is unavailable unless you get it manually.
+On the LocalTunnel github page, it is suggested to use NGrok (https://ngrok.com/) instead.
+
 As part of the app, we sign up to receive GitHub webhooks (HTTP requests to
 `/repo_hook`) to be notified when stuff happens to repos we care about.  (In
 particular, we want to know about new pushes so we can assess whether their
