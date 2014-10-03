@@ -21,7 +21,6 @@ gem 'newrelic_rpm'
 gem 'rack-ssl-enforcer'
 
 group :development do
-  gem 'localtunnel'
   gem 'pry'
   gem 'pry-rails'
   # gem 'pry-debugger'
