@@ -291,7 +291,6 @@ DEPENDENCIES
   jquery-rails
   kramdown
   launchy
-  localtunnel
   newrelic_rpm
   omniauth
   omniauth-github
