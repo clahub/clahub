@@ -236,7 +236,7 @@ feature "Creating a CLA for a repo" do
 
     expect(page).to have_no_content("Please type the exact text")
     expect(page).to have_no_content("If you are employed as a software engineer")
-    page.execute_script("$('.expansion-container>a').click();")
+    page.execute_script("$('a[rel=popover]').click();")
     expect(page).to have_content("Please type the exact text")
     expect(page).to have_content("If you are employed as a software engineer")
 
