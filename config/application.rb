@@ -66,3 +66,6 @@ module Clahub
     config.assets.version = '1.0'
   end
 end
+
+require "dotenv"
+Dotenv.load
