@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 ruby "2.1.1" # make sure .ruby-version agrees
 
-gem 'rails', '3.2.16'
+gem 'rails', '3.2.19'
 
 gem 'pg'
 gem 'jquery-rails'
@@ -26,6 +26,7 @@ group :development do
   # gem 'pry-debugger'
   gem 'pry-remote'
   gem 'debugger-linecache', '1.2.0'
+  gem 'httplog'
 end
 
 group :test do
