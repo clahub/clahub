@@ -131,10 +131,6 @@ GEM
       celluloid-io (>= 0.15.0)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
-    localtunnel (0.3)
-      json (>= 1.2.4)
-      net-ssh (>= 2.0.22)
-      net-ssh-gateway (>= 1.0.1)
     lumberjack (1.0.5)
     mail (2.5.4)
       mime-types (~> 1.16)
@@ -145,9 +141,6 @@ GEM
     multi_json (1.9.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
-    net-ssh (2.8.0)
-    net-ssh-gateway (1.2.0)
-      net-ssh (>= 2.6.5)
     newrelic_rpm (3.7.3.204)
     nio4r (1.0.0)
     nokogiri (1.6.1)
@@ -291,7 +284,6 @@ DEPENDENCIES
   jquery-rails
   kramdown
   launchy
-  localtunnel
   newrelic_rpm
   omniauth
   omniauth-github
