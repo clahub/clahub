@@ -31,14 +31,11 @@ class CheckOpenPullsJob
           name: @repo_name
         },
         commits: commit_mashes.map { |mash|
-          {
-            author: { username: mash.author.login },
-            id: mash.sha
-          }.tap do |commit_hash|
-            if mash.committer
-              commit_hash[:committer] = { username: mash.committer.login }
-            end
-          end
+          # TODO: Add test case for no author only committer on this phase
+          commit_hash = { id: mash.sha }
+          commit_hash[:author] = { username: mash.author.login } if mash.author
+          commit_hash[:committer] = { username: mash.committer.login } if mash.committer
+          commit_hash
         }
       }.to_json)
     end

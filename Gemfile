@@ -1,13 +1,14 @@
 source 'https://rubygems.org'
 
-ruby "2.0.0" # make sure .ruby-version agrees
+ruby "2.1.1" # make sure .ruby-version agrees
 
-gem 'rails', '3.2.16'
+gem 'rails', '3.2.19'
 
 gem 'pg'
 gem 'jquery-rails'
 gem 'thin'
 gem 'bootstrap-sass', '~> 2.3.2'
+gem 'sass', "~> 3.2.0"
 gem 'chosen-rails'
 gem 'omniauth'
 gem 'omniauth-github'
@@ -17,14 +18,15 @@ gem 'rack-canonical-host'
 gem 'paul_revere'
 gem 'kramdown'
 gem 'newrelic_rpm'
+gem 'rack-ssl-enforcer'
 
 group :development do
-  gem 'localtunnel'
   gem 'pry'
   gem 'pry-rails'
-  gem 'pry-debugger'
+  # gem 'pry-debugger'
   gem 'pry-remote'
   gem 'debugger-linecache', '1.2.0'
+  gem 'httplog'
 end
 
 group :test do
