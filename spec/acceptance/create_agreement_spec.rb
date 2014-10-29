@@ -147,11 +147,17 @@ feature "Creating a CLA for a repo" do
     page.should have_content("Link from your contributing guidelines")
   end
 
+  def select_chosen(value, options)
+    selector = options[:from]
+    page.execute_script("$('#{ selector }').val('#{value}');")
+  end
+
   scenario "Preview markdown formatting for your agreement text", js: true do
     visit '/'
     click_link 'Sign in with GitHub to get started'
 
-    select 'jasonm/beta', from: 'user-name-repo-name'
+    select_chosen 'jasonm/beta', from: 'select#user-name-repo-name'
+
     fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
 
     markdown_source = '![](http://images.com/img.jpg) _markdown test_'
@@ -208,13 +214,13 @@ feature "Creating a CLA for a repo" do
   scenario "Create an agreement for a repo you admin but do not directly own"
   scenario "Creating an agreement updates commit statuses open for pull requests"
 
-  scenario "Given extra fields, add those fields to an agreement during creation" do
+  scenario "Given extra fields, add those fields to an agreement during creation", js: true do
     load Rails.root.join("db/seeds.rb")
 
     visit '/'
     click_link 'Sign in with GitHub to get started'
 
-    select 'jasonm/beta', from: 'user-name-repo-name'
+    select_chosen 'jasonm/beta', from: 'select#user-name-repo-name'
     fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
 
     expect(page).to have_content('Choose any extra fields to require on your agreement:')
@@ -228,6 +234,9 @@ feature "Creating a CLA for a repo" do
     expect(page).to have_content('Type your initials')
     expect(page).to have_content('Corporate Contributor Information')
 
+    expect(page).to have_no_content("Please type the exact text")
+    expect(page).to have_no_content("If you are employed as a software engineer")
+    page.execute_script("$('a[rel=popover]').click();")
     expect(page).to have_content("Please type the exact text")
     expect(page).to have_content("If you are employed as a software engineer")
 

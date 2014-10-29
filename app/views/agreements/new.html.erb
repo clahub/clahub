@@ -13,6 +13,12 @@
     <% end %>
   </select>
 
+  <a tabindex="0" href="#" rel="popover" title="Public and organization repos" data-content='CLAHub can see your public repos.  It can also see organization repos if you have <a href="https://help.github.com/articles/permission-levels-for-an-organization-repository/">admin permissions for the repo</a> and your organization role is <a href="https://help.github.com/articles/publicizing-or-concealing-organization-membership/">publicized</a>.'>Why don't I see my repos?</a>
+
+  <br>
+  <br>
+  <br>
+
   <%= form.label :text, "Enter your agreement text:" %>
 
   <ul id="agreement-editor-tabs" class="nav nav-tabs">
@@ -23,7 +29,7 @@
   <div id="agreement-editor-content" class="tab-content">
     <div class="tab-pane active" id="edit-agreement">
       <%= form.text_area :text, placeholder: 'I, the contributor, agree to...', class: "span12", rows: 10 %>
-      <span class="help-block">(You can use <a href="http://kramdown.rubyforge.org/syntax.html">Markdown formatting</a>.)</span>
+      <span class="help-block">(You can use <a href="http://kramdown.gettalong.org/quickref.html">Markdown formatting</a>.)</span>
     </div>
     <div class="tab-pane" id="preview-agreement">
       <div class="preview-spinner progress progress-striped active">
@@ -43,13 +49,7 @@
           <%= f.check_box :enabled %>
           <%= f.label :enabled, f.object.field.label %>
           <% if description = f.object.field.description %>
-            <span class="expansion-container">
-              <div class="expansion-content" style="display: none;">
-                <p>When signing your agreement, the person signing will see helper text for this field:</p>
-                <blockquote><%= description %></blockquote>
-              </div>
-              <a href="#">What's this?</a>
-            </span>
+            <a tabindex="0" href="#" rel="popover" title="<% f.object.field.label %>" data-content='<p>When signing your agreement, the person signing will see helper text for this field:</p><blockquote><%= description %></blockquote>'>What's this?</a>
           <% end %>
         </li>
       <% end %>
@@ -66,9 +66,6 @@
   <script type="text/javascript">
     //<![CDATA[
       $(function() {
-        $('.expansion-container>a').click(function(e) {
-          $(e.target).closest('span.expansion-container').find('>*').toggle();
-        });
         $('select.select-chosen').chosen({ search_contains: true });
 
         (function() {

@@ -1,8 +1,8 @@
 class GithubRepos
-  REPOS_PER_PAGE = 1000
+  REPOS_PER_PAGE = 100 # the max
 
   def initialize(user)
-    @github ||= Github.new(oauth_token: user.oauth_token)
+    @github ||= Github.new(oauth_token: user.oauth_token, auto_pagination: true)
   end
 
   def repos
@@ -37,7 +37,7 @@ class GithubRepos
   def org_repos
     repos = []
     @github.orgs.list.each do |org|
-      @github.repos.list(org: org.login, per_page: 200).each do |repo|
+      @github.repos.list(org: org.login, per_page: REPOS_PER_PAGE).each do |repo|
         if repo.permissions.admin
           repos.push(repo)
         end
