@@ -1,0 +1,2 @@
+class GithubLimitedOauthController < GithubOauthController
+end
