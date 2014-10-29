@@ -3,6 +3,7 @@ Clahub::Application.routes.draw do
   match "/pages/*id" => 'pages#show', as: :page, format: false
 
   match 'auth/github/callback' => 'github_oauth#callback', :as => :github_oauth_callback
+  match 'auth/github_limited/callback' => 'github_limited_oauth#callback', :as => :github_limited_oauth_callback
   match 'auth/failure' => 'github_oauth#failure'
   match 'sign_out' => 'sessions#destroy', :as => :sign_out
 
