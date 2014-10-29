@@ -23,7 +23,7 @@ module GithubMockHelpers
     assert_options(options, :oauth_token, :repos)
 
     json_response = options[:repos].to_json
-    stub_request(:get, "https://api.github.com/user/repos?access_token=#{options[:oauth_token]}&per_page=1000").to_return(status: 200, body: json_response)
+    stub_request(:get, "https://api.github.com/user/repos?access_token=#{options[:oauth_token]}&per_page=100").to_return(status: 200, body: json_response)
   end
 
   def mock_github_repo_hook(options={})
@@ -83,7 +83,7 @@ module GithubMockHelpers
     assert_options_array(options[:repos], :name, :permissions)
 
     json_response = options[:repos].to_json
-    url = "https://api.github.com/orgs/#{options[:org]}/repos?access_token=#{options[:oauth_token]}&per_page=200"
+    url = "https://api.github.com/orgs/#{options[:org]}/repos?access_token=#{options[:oauth_token]}&per_page=100"
     stub_request(:get, url).to_return(status: 200, body: json_response)
   end
 

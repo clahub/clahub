@@ -41,6 +41,20 @@
 </div>
 
 <%= javascript_include_tag "application" %>
+
+<% content_for :javascript do %>
+  <script type="text/javascript">
+    $("[rel=popover]")
+      .popover({ html: true })
+      .click(function(e) {
+        e.preventDefault();
+      })
+      .blur(function(e) {
+        $(this).popover('hide');
+      });
+  </script>
+<% end %>
+
 <%= yield :javascript %>
 <% if ENV['UA_KEY'] %>
   <script>

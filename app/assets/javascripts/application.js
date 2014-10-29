@@ -15,6 +15,8 @@
 //= require bootstrap-transition
 //= require bootstrap-carousel
 //= require bootstrap-tab
+//= require bootstrap-tooltip
+//= require bootstrap-popover
 //= require chosen-jquery
 //= require announcements
 //= require_tree .
