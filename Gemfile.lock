@@ -222,7 +222,7 @@ GEM
       rspec-expectations (~> 2.99.0)
       rspec-mocks (~> 2.99.0)
     safe_yaml (1.0.4)
-    sass (3.2.0)
+    sass (3.2.19)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
@@ -267,7 +267,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bootstrap-sass (~> 2.3.2)
+  bootstrap-sass (~> 2.3)
   capybara
   chosen-rails
   coffee-rails (~> 3.2.1)
