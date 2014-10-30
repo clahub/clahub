@@ -46,6 +46,7 @@ group :test, :development do
   gem 'simplecov', require: false
   gem 'dotenv'
   gem 'guard-livereload'
+  gem 'jazz_hands'
 end
 
 group :development, :darwin do
