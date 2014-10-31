@@ -19,6 +19,7 @@ gem 'paul_revere'
 gem 'kramdown'
 gem 'newrelic_rpm'
 gem 'rack-ssl-enforcer'
+gem 'dotenv'
 
 group :development do
   gem 'pry'
@@ -42,7 +43,6 @@ end
 group :test, :development do
   gem 'rspec-rails', '~> 2.0'
   gem 'simplecov', require: false
-  gem 'dotenv'
   gem 'guard-livereload'
 end
 
