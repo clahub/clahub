@@ -11,14 +11,18 @@ class AgreementsController < ApplicationController
   end
 
   def create
-    @agreement = current_user.agreements.new(params[:agreement].slice(:text, :agreement_fields_attributes))
-    if params[:agreement]
-      @agreement.user_name, @agreement.repo_name = params[:agreement][:user_name_repo_name].split('/')
-    end
+    @agreement = current_user.agreements.new(params[:agreement].slice(:text, :github_repositories, :agreement_fields_attributes))
 
     if @agreement.save
-      @agreement.create_github_repo_hook
-      redirect_to agreement_path(user_name: @agreement.user_name, repo_name: @agreement.repo_name), notice: "Your Contributor License Ageement for #{@agreement.user_name}/#{@agreement.repo_name} is ready."
+      if params[:agreement] && params[:agreement][:github_repositories]
+        repos = params[:agreement][:github_repositories].delete_if{ |repo| repo.blank? }
+        repos.each do |r|
+          repo = r.split('/')
+          repository = Repository.create({agreement_id: @agreement.id, user_name: repo.first, repo_name: repo.last})
+          repository.create_github_repo_hook
+        end
+      end
+      redirect_to @agreement, notice: "Your Contributor License Ageement is ready."
     else
       @agreement.build_default_fields
       @repos = repos_for_current_user
@@ -27,7 +31,7 @@ class AgreementsController < ApplicationController
   end
 
   def show
-    @agreement = Agreement.find_by_user_name_and_repo_name!(params[:user_name], params[:repo_name])
+    @agreement = Agreement.find(params[:id])
 
     if signed_out?
       session[:redirect_after_github_oauth_url] = request.url
@@ -42,7 +46,7 @@ class AgreementsController < ApplicationController
 
       format.csv do
         if @agreement.owned_by?(current_user)
-          filename = "#{@agreement.repo_name}-contributor-agreement-signatures-#{Time.now.strftime("%Y%m%d-%H%M%S")}.csv"
+          filename = "#{@agreement.repository_names_for_csv}-contributor-agreement-signatures-#{Time.now.strftime("%Y%m%d-%H%M%S")}.csv"
           headers["Content-Type"] ||= 'text/csv'
           headers["Content-Disposition"] = "attachment; filename=\"#{filename}\""
           render text: AgreementCsvPresenter.new(@agreement).to_csv

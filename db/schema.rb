@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130218033834) do
+ActiveRecord::Schema.define(:version => 20141030225009) do
 
   create_table "agreement_fields", :force => true do |t|
     t.integer  "agreement_id"
@@ -24,17 +24,13 @@ ActiveRecord::Schema.define(:version => 20130218033834) do
   add_index "agreement_fields", ["agreement_id", "field_id"], :name => "index_agreement_fields_on_agreement_id_and_field_id"
 
   create_table "agreements", :force => true do |t|
-    t.string   "user_name"
-    t.string   "repo_name"
     t.text     "text"
     t.integer  "user_id"
-    t.datetime "created_at",          :null => false
-    t.datetime "updated_at",          :null => false
-    t.integer  "github_repo_hook_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   add_index "agreements", ["user_id"], :name => "index_licenses_on_user_id"
-  add_index "agreements", ["user_name", "repo_name"], :name => "index_licenses_on_user_name_and_repo_name"
 
   create_table "announcements", :force => true do |t|
     t.text     "body"
@@ -57,6 +53,15 @@ ActiveRecord::Schema.define(:version => 20130218033834) do
     t.datetime "updated_at",                           :null => false
     t.boolean  "enabled_by_default", :default => true, :null => false
     t.text     "description"
+  end
+
+  create_table "repositories", :force => true do |t|
+    t.integer  "agreement_id"
+    t.string   "user_name"
+    t.string   "repo_name"
+    t.integer  "github_repo_hook_id"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
   end
 
   create_table "signatures", :force => true do |t|
