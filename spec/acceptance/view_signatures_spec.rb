@@ -5,13 +5,15 @@ feature 'Viewing signatures for an agreement' do
     Field.create({ label: 'Email', enabled_by_default: true, data_type: 'string' })
 
     owner = create(:user, nickname: 'oswald_owner', uid: 1)
-    agreement = build(:agreement, user: owner, repo_name: 'the_project', text: "The CLA text")
-    agreement.build_default_fields
-    agreement.save!
+    @agreement = build(:agreement, user: owner, text: "The CLA text")
+    @agreement.build_default_fields
+    @agreement.save!
+    
+    repository = build(:repository, repo_name: 'the_project', agreement: @agreement, user_name: @agreement.user.nickname)
 
     signee = create(:user, nickname: 'sally_signee', name: 'Sally Signee', uid: 2)
-    signature = build(:signature, user: signee, agreement: agreement)
-    signature.field_entries.build({ signature: signature, agreement_field: agreement.agreement_fields.first, value: "a@b.com" })
+    signature = build(:signature, user: signee, agreement: @agreement)
+    signature.field_entries.build({ signature: signature, agreement_field: @agreement.agreement_fields.first, value: "a@b.com" })
     signature.save!
   end
 
@@ -34,7 +36,7 @@ feature 'Viewing signatures for an agreement' do
   scenario 'A non-owner may not download a CSV of signatures' do
     view_license_as('sally_signee')
     expect(page).to have_no_content('Download CSV')
-    visit '/agreements/oswald_owner/the_project.csv'
+    visit "/agreements/#{@agreement.id}.csv"
     page.status_code.should == 404
   end
 
@@ -61,7 +63,7 @@ feature 'Viewing signatures for an agreement' do
 
     mock_github_oauth(info: { nickname: github_nickname }, uid: github_uid)
     visit '/sign_out'
-    visit '/agreements/oswald_owner/the_project'
+    visit "/agreements/#{@agreement.id}"
     click_link 'Sign in with GitHub to agree to this CLA'
   end
 end

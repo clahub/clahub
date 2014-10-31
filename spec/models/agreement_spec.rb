@@ -1,18 +1,20 @@
 require 'spec_helper'
 
 describe Agreement do
-  it { should validate_presence_of :user_name }
-  it { should validate_presence_of :repo_name }
   it { should validate_presence_of :text }
   it { should belong_to :user }
   it { should have_many :signatures }
   it { should have_many :agreement_fields }
   it { should have_many :fields }
+  it { should have_many :repositories }
 
-  it "validates one agreement per user/repo" do
+  it "validates user/repo can be added to one agreement only", focus: true do
     user = create(:user, nickname: 'alice')
-    first = create(:agreement, user: user, repo_name: 'alpha')
-    second = build(:agreement, user: user, repo_name: 'alpha')
+    first = create(:agreement, user: user, github_repositories: ['alice/alpha'])
+    second = create(:agreement, user: user, github_repositories: ['alice/alpha'])
+    
+    # puts "============= #{first.repositories.inspect}"
+    # puts "============= #{second.repositories.inspect}"
 
     expect(second).to_not be_valid
     expect(second.errors[:base]).to include('An agreement already exists for alice/alpha')

@@ -39,23 +39,25 @@ feature "Creating a CLA for a repo" do
     page.should have_content("jasonm/alpha")
     page.should have_content("jasonm/beta")
 
-    select 'jasonm/beta', from: 'user-name-repo-name'
-    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    select 'jasonm/beta', from: 'agreement_github_repositories'
+    fill_in "agreement_text", with: 'As a contributor, I assign copyright to the organization.'
     click_button 'Create agreement'
+    
+    agreement = Agreement.last
 
-    page.should have_content('Your Contributor License Ageement for jasonm/beta is ready.')
+    page.should have_content('Your Contributor License Ageement is ready.')
     page.should have_content('jasonm')
     page.should have_content('beta')
     page.should have_content('As a contributor, I assign copyright to the organization.')
 
-    suggested_content_for_contributing_file = %[<a href="#{HOST}/agreements/jasonm/beta">sign the Contributor License Agreement</a>.]
+    suggested_content_for_contributing_file = %[<a href="#{HOST}/agreements/#{agreement.id}">sign the Contributor License Agreement</a>.]
     page.should have_content(suggested_content_for_contributing_file)
 
-    visit '/agreements/jasonm/beta'
+    visit "/agreements/#{agreement.id}"
     page.should have_content('As a contributor, I assign copyright to the organization.')
 
     visit '/sign_out'
-    visit '/agreements/jasonm/beta'
+    visit "/agreements/#{agreement.id}"
     page.should have_content('As a contributor, I assign copyright to the organization.')
   end
 
@@ -100,8 +102,8 @@ feature "Creating a CLA for a repo" do
     page.should have_content("my-adminned-org/delta")
     page.should have_no_content("someone-elses-org/epsilon")
 
-    select 'my-adminned-org/chi', from: 'user-name-repo-name'
-    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    select 'my-adminned-org/chi', from: 'agreement_github_repositories'
+    fill_in "agreement_text", with: 'As a contributor, I assign copyright to the organization.'
     click_button 'Create agreement'
 
     inputs = {
@@ -113,15 +115,15 @@ feature "Creating a CLA for a repo" do
 
     a_request(:post, "https://api.github.com/repos/my-adminned-org/chi/hooks?access_token=#{token}").with(body: inputs.to_json).should have_been_made
 
-    expect(Agreement.last.github_repo_hook_id).to eq(resulting_github_repo_hook_id)
+    expect(Agreement.last.repositories.last.github_repo_hook_id).to eq(resulting_github_repo_hook_id)
   end
 
   scenario "Sign up for commit notifications when an agreement is created" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
 
-    select 'jasonm/beta', from: 'user-name-repo-name'
-    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    select 'jasonm/beta', from: 'agreement_github_repositories'
+    fill_in "agreement_text", with: 'As a contributor, I assign copyright to the organization.'
     click_button 'Create agreement'
 
     inputs = {
@@ -133,15 +135,15 @@ feature "Creating a CLA for a repo" do
 
     a_request(:post, "https://api.github.com/repos/jasonm/beta/hooks?access_token=#{token}").with(body: inputs.to_json).should have_been_made
 
-    expect(Agreement.last.github_repo_hook_id).to eq(resulting_github_repo_hook_id)
+    expect(Agreement.last.repositories.last.github_repo_hook_id).to eq(resulting_github_repo_hook_id)
   end
 
   scenario "Encourage owner to include a link to this CLA from your CONTRIBUTING file" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
 
-    select 'jasonm/beta', from: 'user-name-repo-name'
-    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    select 'jasonm/beta', from: 'agreement_github_repositories'
+    fill_in "agreement_text", with: 'As a contributor, I assign copyright to the organization.'
     click_button 'Create agreement'
 
     page.should have_content("Link from your contributing guidelines")
@@ -156,16 +158,16 @@ feature "Creating a CLA for a repo" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
 
-    select_chosen 'jasonm/beta', from: 'select#user-name-repo-name'
+    select_chosen 'jasonm/beta', from: 'select#agreement_github_repositories'
 
-    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    fill_in "agreement_text", with: 'As a contributor, I assign copyright to the organization.'
 
     markdown_source = '![](http://images.com/img.jpg) _markdown test_'
     expected_html = '<p><img src="http://images.com/img.jpg" alt=""> <em>markdown test</em></p>'
 
     page.first("div#preview-agreement div.preview", visible: true).should be_nil
 
-    fill_in :agreement, with: markdown_source
+    fill_in "agreement_text", with: markdown_source
     click_link "Preview"
 
     page.find("div#preview-agreement div.preview", visible: true).should be_present
@@ -179,31 +181,40 @@ feature "Creating a CLA for a repo" do
     end
 
     scenario "Require agreement text to be entered" do
-      select 'jasonm/beta', from: 'user-name-repo-name'
-      fill_in :agreement, with: ''
-      click_button 'Create agreement'
-
+      within "form#new_agreement" do
+        select 'jasonm/beta', from: 'agreement_github_repositories'
+        fill_in "agreement_text", with: ''
+        click_button 'Create agreement'
+      end
+      
       page.should have_content("Text can't be blank")
     end
 
     scenario 'Require repo to be chosen' do
-      fill_in :agreement, with: ''
-      click_button 'Create agreement'
+      within "form#new_agreement" do
+        fill_in "agreement_text", with: 'Some text here!'
+        click_button 'Create agreement'
+      end
 
-      page.should have_content("Repo name can't be blank")
+      page.should have_content("You have to select at least one repository from the list")
     end
 
     scenario "only lets you create one agreement per repo" do
-      select 'jasonm/beta', from: 'user-name-repo-name'
-      fill_in :agreement, with: 'Be awesome'
-      click_button 'Create agreement'
+      within "form#new_agreement" do
+        select 'jasonm/beta', from: 'agreement_github_repositories'
+        fill_in "agreement_text", with: 'Be awesome'
+        click_button 'Create agreement'
+      end
 
       visit '/agreements/new'
-      select 'jasonm/beta', from: 'user-name-repo-name'
-      fill_in :agreement, with: 'Be awesome'
-      click_button 'Create agreement'
+      
+      within "form#new_agreement" do
+        select 'jasonm/beta', from: 'agreement_github_repositories'
+        fill_in "agreement_text", with: 'Be awesome'
+        click_button 'Create agreement'
+      end
 
-      page.should have_content("An agreement already exists for jasonm/beta")
+      page.should have_content("Github repositories you selected are (one or all) already part of a CLA")
     end
 
     scenario "handles gracefully if github returns an error response for repos"
@@ -220,8 +231,8 @@ feature "Creating a CLA for a repo" do
     visit '/'
     click_link 'Sign in with GitHub to get started'
 
-    select_chosen 'jasonm/beta', from: 'select#user-name-repo-name'
-    fill_in :agreement, with: 'As a contributor, I assign copyright to the organization.'
+    select_chosen 'jasonm/beta', from: 'select#agreement_github_repositories'
+    fill_in "agreement_text", with: 'As a contributor, I assign copyright to the organization.'
 
     expect(page).to have_content('Choose any extra fields to require on your agreement:')
 
