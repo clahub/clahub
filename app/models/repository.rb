@@ -31,5 +31,9 @@ class Repository < ActiveRecord::Base
     # TODO: async this so that creating a signature doesn't take so long.
     CheckOpenPullsJob.new(owner: agreement.user, user_name: user_name, repo_name: repo_name).run
   end
+  
+  def name
+    "#{user_name}/#{repo_name}"
+  end
 
 end
