@@ -37,6 +37,6 @@ class Signature < ActiveRecord::Base
   end
 
   def check_open_pulls_on_agreement
-    agreement.repositories.map{ |repo| repo.check_open_pulls }
+    agreement.repositories.collect(&:check_open_pulls)
   end
 end
