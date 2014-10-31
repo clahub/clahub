@@ -16,6 +16,7 @@ class Agreement < ActiveRecord::Base
   # validate :one_agreement_per_user_repo
   validate :has_repositories_selected
   validate :repositories_not_already_in_a_agreement, if: "!github_repositories.blank?"
+  validate :has_at_least_one_repository, on: :save
 
   accepts_nested_attributes_for :agreement_fields, :repositories
 
@@ -43,7 +44,7 @@ class Agreement < ActiveRecord::Base
   end
   
   def repositories_with_user_repo
-    repositories.collect{ |r| "#{r.user_name}/#{r.repo_name}" }
+    repositories.collect(&:name)
   end
   
   def repository_names_for_csv
@@ -74,6 +75,10 @@ class Agreement < ActiveRecord::Base
     if selected_repositories.present?
       errors.add(:github_repositories, "you selected are (one or all) already part of a CLA")
     end
+  end
+  
+  def has_at_least_one_repository
+    repositories.present?
   end
   
   # 
