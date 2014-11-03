@@ -1,0 +1,23 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: clahub_development
+  pool: 5
+  username:
+  password:
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: clahub_test
+  pool: 5
+  username:
+  password:
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: clahub_production
+  pool: 5
+  username:
+  password:
