@@ -46,6 +46,10 @@ div#github_repositories_chzn {
   margin-bottom: 27px;
 }
 
+.agreements-index ul .btn {
+  margin:0 0 0 20px;
+}
+
 body.agreements-new {
   div#agreement-editor-content {
     textarea {
@@ -55,6 +59,7 @@ body.agreements-new {
   }
 }
 
+body.agreements-edit,
 body.agreements-show,
 body.signatures-create {
   header {

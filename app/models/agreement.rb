@@ -20,6 +20,16 @@ class Agreement < ActiveRecord::Base
 
   accepts_nested_attributes_for :agreement_fields, :repositories
 
+  def name
+    tmp = []
+    
+    repositories.group_by(&:user_name).each do |k, v|
+      tmp << "#{k}/[#{v.collect(&:repo_name).join(", ")}]"
+    end
+
+    "#{tmp.join(", ")}"
+  end
+
   def owned_by?(candidate)
     candidate == self.user
   end
