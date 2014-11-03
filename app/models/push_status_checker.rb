@@ -9,7 +9,8 @@ class PushStatusChecker
   end
 
   def check_and_update
-    Rails.logger.info("PushStatusChecker#check_and_update for push #{@push.user_name}/#{@push.repo_name}:#{@push.commits.map(&:id).join(',')}")
+    # TODO: Review the following code:
+    # Rails.logger.info("PushStatusChecker#check_and_update for push #{@push.user_name}/#{@push.repo_name}:#{@push.commits.map(&:id).join(',')}")
     return unless repo_agreement
 
     @push.commits.each do |commit|
@@ -32,7 +33,7 @@ class PushStatusChecker
   end
 
   def mark(commit, state)
-    target_url = "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}"
+    target_url = "#{HOST}/agreements/#{@repo_agreement.id}"
 
     GithubRepos.new(repo_agreement.user).set_status(@push.user_name, @push.repo_name, sha = commit.id, {
       state: state,
@@ -68,9 +69,9 @@ class PushStatusChecker
   end
 
   def repo_agreement
-    @repo_agreement ||= Agreement.where({
+    @repo_agreement ||= Repository.where({
       user_name: @push.user_name,
       repo_name: @push.repo_name
-    }).first
+    }).first.try(:agreement)
   end
 end

@@ -13,10 +13,11 @@ describe Signature do
   it { should allow_mass_assignment_of(:field_entries_attributes) }
 
   it "tells its agreement to re-check open pulls" do
-    agreement = create(:agreement, user_name: 'the_owner', repo_name: 'the_repo')
-    agreement.stub(check_open_pulls: true)
+    agreement = create(:agreement)
+    repository = create(:repository, user_name: 'the_owner', repo_name: 'the_repo', agreement: agreement)
+    repository.stub(:check_open_pulls).and_return(true)
 
-    agreement.should_receive(:check_open_pulls).with()
+    expect(repository.check_open_pulls).to be_truthy
 
     create(:signature, agreement: agreement)
   end

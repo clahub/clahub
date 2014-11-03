@@ -9,11 +9,9 @@ Clahub::Application.routes.draw do
   resources :repos, only: [:index]
   resources :agreements, only: [:index, :new, :create]
 
-  constraints :repo_name => /[^\/]+/ do
-    get 'agreements/:user_name/:repo_name.csv' => 'agreements#show', :as => :agreement, :format => :csv
-    get 'agreements/:user_name/:repo_name' => 'agreements#show', :as => :agreement
-    post 'agreements/:user_name/:repo_name/signatures' => 'signatures#create', :as => :agreement_signature
-  end
+  get 'agreements/:id.csv' => 'agreements#show', :as => :agreement, :format => :csv
+  get 'agreements/:id' => 'agreements#show', :as => :agreement
+  post 'agreements/:id/signatures' => 'signatures#create', :as => :agreement_signature
 
   post 'repo_hook' => 'github_webhooks#repo_hook'
 

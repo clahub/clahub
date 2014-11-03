@@ -24,7 +24,8 @@ describe 'receiving github repo webhook callbacks' do
 
   it 'gets a push with 1 commit, where the author has agreed, and marks the commit as success' do
     user = create(:user, email: 'jason@gmail.com', nickname: 'jasonm', oauth_token: token)
-    agreement = create(:agreement, user: user, repo_name: 'mangostickyrice')
+    agreement = create(:agreement, user: user)
+    repository = create(:repository, repo_name: 'mangostickyrice', agreement: agreement)
     create(:signature, user: user, agreement: agreement)
 
     payload = {
@@ -36,7 +37,7 @@ describe 'receiving github repo webhook callbacks' do
     status_url = "https://api.github.com/repos/jasonm/mangostickyrice/statuses/aaa111?access_token=#{token}"
     status_params = {
       state: 'success',
-      target_url: "#{HOST}/agreements/jasonm/mangostickyrice",
+      target_url: "#{HOST}/agreements/#{agreement.id}",
       description: 'All contributors have signed the Contributor License Agreement.',
       context: "clahub"
     }
@@ -45,7 +46,8 @@ describe 'receiving github repo webhook callbacks' do
 
   it 'gets a push with 1 commit, where the author has NOT agreed, and marks the commit as failure' do
     user = create(:user, email: 'jason@gmail.com', nickname: 'jasonm', oauth_token: token)
-    agreement = create(:agreement, user: user, repo_name: 'mangostickyrice')
+    agreement = create(:agreement, user: user)
+    repository = create(:repository, repo_name: 'mangostickyrice', agreement: agreement)
 
     payload = {
       repository: { name: 'mangostickyrice', owner: { name: 'jasonm', email: 'jason@gmail.com' } },
@@ -56,7 +58,7 @@ describe 'receiving github repo webhook callbacks' do
     status_url = "https://api.github.com/repos/jasonm/mangostickyrice/statuses/aaa111?access_token=#{token}"
     status_params = {
       state: 'failure',
-      target_url: "#{HOST}/agreements/jasonm/mangostickyrice",
+      target_url: "#{HOST}/agreements/#{agreement.id}",
       description: 'Not all contributors have signed the Contributor License Agreement.',
       context: "clahub"
     }
@@ -66,7 +68,8 @@ describe 'receiving github repo webhook callbacks' do
   it 'gets a push, where the author has agreed but the committer has NOT agreed, and marks the commit as failure' do
     author = create(:user, email: 'jasonm@gmail.com', nickname: 'jasonm', oauth_token: token)
     committer = create(:user, email: 'committer@gmail.com', nickname: 'the-committer', oauth_token: token)
-    agreement = create(:agreement, user: author, repo_name: 'mangostickyrice')
+    agreement = create(:agreement, user: author)
+    repository = create(:repository, repo_name: 'mangostickyrice', agreement: agreement)
     create(:signature, user: author, agreement: agreement)
 
     payload = {
@@ -82,7 +85,7 @@ describe 'receiving github repo webhook callbacks' do
     status_url = "https://api.github.com/repos/jasonm/mangostickyrice/statuses/aaa111?access_token=#{token}"
     status_params = {
       state: 'failure',
-      target_url: "#{HOST}/agreements/jasonm/mangostickyrice",
+      target_url: "#{HOST}/agreements/#{agreement.id}",
       description: 'Not all contributors have signed the Contributor License Agreement.',
       context: "clahub"
     }
@@ -92,7 +95,8 @@ describe 'receiving github repo webhook callbacks' do
   it 'gets a push, where the author and committer both agreed, and marks the commit as success' do
     author = create(:user, email: 'jasonm@gmail.com', nickname: 'jasonm', oauth_token: token)
     committer = create(:user, email: 'committer@gmail.com', nickname: 'the-committer', oauth_token: token)
-    agreement = create(:agreement, user: author, repo_name: 'mangostickyrice')
+    agreement = create(:agreement, user: author)
+    repository = create(:repository, repo_name: 'mangostickyrice', agreement: agreement)
     create(:signature, user: author, agreement: agreement)
     create(:signature, user: committer, agreement: agreement)
 
@@ -109,7 +113,7 @@ describe 'receiving github repo webhook callbacks' do
     status_url = "https://api.github.com/repos/jasonm/mangostickyrice/statuses/aaa111?access_token=#{token}"
     status_params = {
       state: 'success',
-      target_url: "#{HOST}/agreements/jasonm/mangostickyrice",
+      target_url: "#{HOST}/agreements/#{agreement.id}",
       description: 'All contributors have signed the Contributor License Agreement.',
       context: "clahub"
     }

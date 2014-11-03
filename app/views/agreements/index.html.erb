@@ -4,8 +4,10 @@
     <ul>
       <% @agreements.each do |agreement| %>
         <li>
-          <%= link_to agreement_path(agreement.user_name, agreement.repo_name) do %>
-            <%= agreement.user_name %>/<%= agreement.repo_name %>
+          <%= link_to agreement_path(agreement) do %>
+            <% agreement.repositories.each do |r| %>
+              <%= r.user_name %>/<%= r.repo_name %>
+            <% end %>
           <% end %>
         </li>
       <% end %>
@@ -22,8 +24,10 @@
       <% @signatures.each do |signature| %>
         <% agreement = signature.agreement %>
         <li>
-          <%= link_to agreement_path(agreement.user_name, agreement.repo_name) do %>
-            <%= agreement.user_name %>/<%= agreement.repo_name %>
+          <%= link_to agreement_path(agreement) do %>
+            <% agreement.repositories.each do |r| %>
+              <%= r.user_name %>/<%= r.repo_name %>
+            <% end %>
           <% end %>
         </li>
       <% end %>

@@ -1,11 +1,18 @@
 <header>
-  <h1>
-    Agreement for
-    <%= @agreement.user_name %>/<%= @agreement.repo_name %></h1>
+  <h1>Agreement</h1>
 </header>
-
+    
 <div class="row">
   <div id="agreement-text"><%== @rendered_agreement_html %></div>
+</div>
+
+<div class="row">
+  <h3>Repositories involved in the agreement:</h3>
+  <ul>
+    <% @agreement.repositories_with_user_repo.each do |repo| %>
+      <li><%= repo %></li>
+    <% end %>
+  </ul>
 </div>
 
 <div class="row">
@@ -15,7 +22,8 @@
         <i class="icon-ok"></i> You have signed this CLA.
       </a>
     <% else %>
-      <%= form_for @signature, url: agreement_signature_path(@agreement.user_name, @agreement.repo_name), html: { class: 'form-horizontal' } do |form| %>
+      <h3>Agreement form:</h3>
+      <%= form_for @signature, url: agreement_signature_path(@agreement), html: { class: 'form-horizontal' } do |form| %>
         <%= form.fields_for :field_entries, @signature.field_entries.sort_by(&:ordering) do |f| %>
           <% extra_group_class = f.error_messages.present? ? "error" : ""%>
 
