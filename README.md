@@ -99,13 +99,6 @@ Or as normal (.env is loaded by `dotenv` gem):
     rails server
     rails console
 
-Coverage
-----------------
-
-Use SimpleCov to build code coverage:
-
-    COVERAGE=true rake
-
 LiveReload
 ----------------
 
@@ -138,6 +131,43 @@ if using `foreman`.  This is read in `config/initializers/host.rb`
 *Note* that the dynamic hostname you use is saved in the GitHub webhook 
 registrations.  If your dynamic hostname changes, you will need to update the
 webhooks in GitHub so that it knows where to send the requests.
+
+Usage
+===================
+Create an Agreement
+-------------------
+1. Sign in with Github by clicking the “Sign in with GitHub to get started” button.
+2. Click on “My agreements and signatures” link in top menu bar.
+3. Click on “Create a new agreement” button.
+4. Select one or more repositories that should comply with the CLA you are creating by clicking or writing their name, repositories listed are those you own individually or as an administrator of other. repositories. If you want to remove one of them from the list, click on the “x” icon next to their name.
+5. Write the text to agree to. Remember you can use markdown too. Click the “preview” if you want to check how it looks so far.
+6. Select the fields the form will have. Whenever the user decides to agree to a CLA, they’ll have to fill those fields.
+7. Finally click the “create agreement” button.
+
+Sharing an Agreement
+--------------------
+So, you created one but want to people to sign it, good news just share a link:
+1. Sign in with Github by clicking the “Sign in with GitHub to get started” button.
+2. Click on “My agreements and signatures” link in top menu bar.
+3. Click on a repo from the "Agreements you have created" section.
+4. At the bottom of the page, you'll find the "Link from your contributing guidelines" header with a link to share your agreement below it.
+
+Signatures
+--------------------
+1. Sign in with Github by clicking the “Sign in with GitHub to get started” button.
+2. Click on “My agreements and signatures” link in top menu bar.
+3. Click on a repo from the "Agreements you have created" section.
+4. At the bottom of the page, you'll find the "Users who have signed" header with a list of all the users who agreed to your CLA and a link to download the list as a CSV file.
+
+Testing
+=======
+
+Coverage
+----------------
+
+Use SimpleCov to build code coverage:
+
+    COVERAGE=true rake
 
 Deployment
 ================
