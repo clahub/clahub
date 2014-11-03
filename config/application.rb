@@ -67,5 +67,7 @@ module Clahub
   end
 end
 
-require "dotenv"
-Dotenv.load
+if !Rails.env.production?
+  require "dotenv"
+  Dotenv.load
+end
