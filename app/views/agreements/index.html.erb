@@ -1,14 +1,10 @@
 <div class="row">
   <h2>Agreements you have created:</h2>
   <% if @agreements.any? %>
-    <ul>
+    <ul id="my-agreements">
       <% @agreements.each do |agreement| %>
         <li>
-          <%= link_to agreement_path(agreement) do %>
-            <% agreement.repositories.each do |r| %>
-              <%= r.user_name %>/<%= r.repo_name %>
-            <% end %>
-          <% end %>
+          <%= link_to agreement.name, agreement_path(agreement) %> <%= link_to "Edit", edit_agreement_path(agreement), class: 'btn btn-default btn-small' %>
         </li>
       <% end %>
     </ul>

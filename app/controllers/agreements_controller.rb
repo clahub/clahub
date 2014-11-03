@@ -14,15 +14,8 @@ class AgreementsController < ApplicationController
     @agreement = current_user.agreements.new(params[:agreement].slice(:text, :github_repositories, :agreement_fields_attributes))
 
     if @agreement.save
-      if params[:agreement] && params[:agreement][:github_repositories]
-        repos = params[:agreement][:github_repositories].delete_if{ |repo| repo.blank? }
-        repos.each do |r|
-          repo = r.split('/')
-          repository = Repository.create({agreement_id: @agreement.id, user_name: repo.first, repo_name: repo.last})
-          repository.create_github_repo_hook
-        end
-      end
-      redirect_to @agreement, notice: "Your Contributor License Ageement is ready."
+      add_repos_to_agreement(params)
+      redirect_to @agreement, notice: "Your Contributor License Agreement is ready."
     else
       @agreement.build_default_fields
       @repos = repos_for_current_user
@@ -57,11 +50,36 @@ class AgreementsController < ApplicationController
     end
   end
 
+  def edit
+    session[:redirect_after_github_oauth_url] = request.url if signed_out?
+    @agreement = Agreement.find(params[:id])
+    user_repos = @agreement.repositories.collect(&:name)
+    @repos = repos_for_current_user.reject{ |repo| user_repos.include?(repo.full_name) }
+    @rendered_agreement_html = Kramdown::Document.new(@agreement.text).to_html
+  end
+
+  def update
+    @agreement = Agreement.find(params[:id])
+    add_repos_to_agreement(params)
+    redirect_to @agreement, notice: 'Agreement updated successfully!'
+  end
+
   private
 
-  def repos_for_current_user
-    DevModeCache.cache("repos-for-#{current_user.uid}") do
-      GithubRepos.new(current_user).repos
+  def add_repos_to_agreement(params)
+    if params[:agreement] && params[:agreement][:github_repositories]
+      repos = params[:agreement][:github_repositories].delete_if{ |repo| repo.blank? }
+      repos.each do |r|
+        repo = r.split('/')
+        repository = Repository.create({agreement_id: @agreement.id, user_name: repo.first, repo_name: repo.last})
+        repository.create_github_repo_hook
+      end
     end
+  end
+
+  def repos_for_current_user
+    # DevModeCache.cache("repos-for-#{current_user.uid}") do
+      GithubRepos.new(current_user).repos
+    # end
   end
 end

@@ -1,0 +1,66 @@
+<header>
+  <h1>Agreement</h1>
+</header>
+    
+<div class="row">
+  <div id="agreement-text"><%== @rendered_agreement_html %></div>
+</div>
+
+<div class="row">
+  <h3>Repositories involved in the agreement:</h3>
+  <ul>
+    <% @agreement.repositories_with_user_repo.each do |repo| %>
+      <li><%= repo %></li>
+    <% end %>
+  </ul>
+</div>
+
+<div class="row">
+  <h3>Add repositories to your agreement:</h3>
+  <%= form_for(@agreement) do |form| %>
+    <%= form.error_messages %>
+    
+    <%= form.label :github_repositories, "Choose a repo:" %>
+    <%= form.select :github_repositories, @repos.collect { |repo| [owner_slash_name(repo), owner_slash_name(repo)] }, { include_blank: false }, { multiple: true, class: 'select-chosen', data: {placeholder: "GitHub repositories for #{current_user.nickname}"}, style: "width:350px;", tabindex: "1" } %>
+    
+    <div class='form-actions'>
+      <%= form.button 'Update Agreement', :class => 'btn btn-primary' %>
+    </div>
+  <% end %>
+</div>
+
+<% content_for :javascript do %>
+  <script type="text/javascript">
+    //<![CDATA[
+      $(function() {
+        $('select.select-chosen').chosen({
+          search_contains: true,
+          no_results_text: "Oops, nothing found!"
+        });
+
+        (function() {
+          var previewTab = $('ul#agreement-editor-tabs a.tab-preview'),
+              source     = $('div#agreement-editor-content textarea'),
+              preview    = $('div#preview-agreement div.preview'),
+              spinner    = $('div#preview-agreement div.preview-spinner');
+
+          previewTab.on('shown', function (e) {
+            preview.hide();
+            spinner.show();
+
+            $.ajax({
+              url: '/markdown_preview',
+              type: 'POST',
+              data: { source: source.val() },
+              dataType: 'html',
+              accepts: { html: 'application/json' }
+            }).success(function(newHtml, _, xhr) {
+              preview.html(newHtml).show();
+              spinner.hide();
+            });
+          })
+        })();
+      });
+    //]]>
+  </script>
+<% end %>

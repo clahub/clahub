@@ -7,7 +7,7 @@ Clahub::Application.routes.draw do
   match 'sign_out' => 'sessions#destroy', :as => :sign_out
 
   resources :repos, only: [:index]
-  resources :agreements, only: [:index, :new, :create]
+  resources :agreements, only: [:index, :new, :create, :edit, :update]
 
   get 'agreements/:id.csv' => 'agreements#show', :as => :agreement, :format => :csv
   get 'agreements/:id' => 'agreements#show', :as => :agreement
