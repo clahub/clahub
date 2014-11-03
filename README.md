@@ -6,49 +6,38 @@ your open source project that's hosted on GitHub.  Contributors digitally sign
 your CLA by signing in with GitHub.  Then, it automatically marks up your pull
 requests based on whether the contributors have all signed your CLA.
 
-Right now it's running at <http://www.clahub.com>
+Usage
+================
 
-I don't intend for this to lead to a proliferation of CLAs.  But when they're
-appropriate, I hope it can reduce the friction of contribution.
+Create an Agreement
+-------------------
+* Sign in with Github by clicking the “Sign in with GitHub to get started” button.
+* Click on “My agreements and signatures” link in top menu bar
+* Click on “Create a new agreement” button
+* Select one or more repositories that will be included in the CLA by clicking or writing the repository name, please note repositories listed are those you own or listed as an administrator of. To remove a repository from an agreement, click on the “x” icon next to the repository name.
+* Write the CLA agreement text. Remember you can use markdown. Click the “preview” link to preview your CLA agreement text.
+* Select fields the CLA form will include. When user agrees to CLA, these fields will be required.
+* Finally click the “create agreement” button.
 
-This project is a work-in-progress.  Any and all feedback is welcome!
+Sharing an Agreement
+--------------------
+So, you created one but want to people to sign it, good news just share a link:
+1. Sign in with Github by clicking the “Sign in with GitHub to get started” button.
+2. Click on “My agreements and signatures” link in top menu bar.
+3. Click on a repo from the "Agreements you have created" section.
+4. At the bottom of the page, you'll find the "Link from your contributing guidelines" header with a link to share your agreement below it.
 
-It currently works, but could use UI and functionality improvement.  Find
-such discussion in [GitHub issues](https://github.com/clahub/clahub/issues).
+Signatures
+--------------------
+1. Sign in with Github by clicking the “Sign in with GitHub to get started” button.
+2. Click on “My agreements and signatures” link in top menu bar.
+3. Click on a repo from the "Agreements you have created" section.
+4. At the bottom of the page, you'll find the "Users who have signed" header with a list of all the users who agreed to your CLA and a link to download the list as a CSV file.
 
-Build status
-------------
-[![Build Status](https://secure.travis-ci.org/clahub/clahub.png)](http://travis-ci.org/clahub/clahub)
-
-What's a CLA?
--------------
-Contributor Agreements are a way to prove intellectual property (IP) provenance
-of contributions to an open-source project.  They generally say that:
-
-> 1. The code I’m contributing is mine, and I have the right to license it.
-
-> 2. I’m granting you a license to distribute said code under the terms of this
-> agreement (typically “as you see fit” or “under an OSI-approved license” or
-> whatever).
-
--- From [_Contributor License Agreements_ by Jacob Kaplan-Moss](http://jacobian.org/writing/contributor-license-agreements/)
-
-Here's some more background on CLAs:
-
-* [Wikipedia page](http://en.wikipedia.org/wiki/Contributor_License_Agreement) for CLAs
-* [_A CLA By Any Other Name_ on Groklaw](http://www.groklaw.net/article.php?story=20110524120303815)
-
-Want to choose a CLA?  Harmony Agreements is a web tool that helps you quickly select a CLA:
-* <http://www.harmonyagreements.org/>
-
-Legal disclaimer
-----------------
-I am not a lawyer, and none of the CLAhub documentation, functionality, or
-other communication constitutes legal advice.  Consult your lawyer about
-contributor agreements for your project.
 
 Development
 ================
+
 
 Prerequisites
 ----------------
@@ -75,6 +64,10 @@ installing [PhantomJS](http://phantomjs.org).  Follow the PhantomJS
 installation instructions on the [poltergeist
 README](https://github.com/jonleighton/poltergeist).
 
+Deployment
+================
+See DEPLOY.md for information on deploying.
+
 Getting set up
 ----------------
 
@@ -98,13 +91,6 @@ Or as normal (.env is loaded by `dotenv` gem):
 
     rails server
     rails console
-
-Coverage
-----------------
-
-Use SimpleCov to build code coverage:
-
-    COVERAGE=true rake
 
 LiveReload
 ----------------
@@ -138,6 +124,19 @@ if using `foreman`.  This is read in `config/initializers/host.rb`
 *Note* that the dynamic hostname you use is saved in the GitHub webhook 
 registrations.  If your dynamic hostname changes, you will need to update the
 webhooks in GitHub so that it knows where to send the requests.
+
+
+
+
+Testing
+=======
+
+Coverage
+----------------
+
+Use SimpleCov to build code coverage:
+
+    COVERAGE=true rake
 
 Deployment
 ================
