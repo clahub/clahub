@@ -27,6 +27,8 @@ group :development do
   gem 'pry-remote'
   gem 'debugger-linecache', '1.2.0'
   gem 'httplog'
+  gem "better_errors"
+  gem "binding_of_caller"
 end
 
 group :test do
@@ -44,6 +46,7 @@ group :test, :development do
   gem 'simplecov', require: false
   gem 'dotenv'
   gem 'guard-livereload'
+  gem 'jazz_hands'
 end
 
 group :development, :darwin do

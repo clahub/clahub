@@ -2,26 +2,24 @@ require 'spec_helper'
 
 feature "Agreeing to a CLA" do
   let(:owner) { create(:user, nickname: 'the_owner') }
-
-  background do
-    create(:agreement, user: owner, repo_name: 'the_project', text: "The CLA *text*")
-  end
+  let(:agreement) { create(:agreement, user: owner, text: "The CLA *text*", github_repositories: ["#{owner.nickname}/the_project"]) }
+  let(:repository) { create(:repository, repo_name: 'the_project', agreement: agreement) }
 
   scenario "Prompt a user to log in via GitHub to agree to a CLA" do
-    visit '/agreements/the_owner/the_project'
+    visit "/agreements/#{agreement.id}"
     page.should have_content('The CLA text')
     page.should have_content('Sign in with GitHub to agree to this CLA')
     page.should have_no_content('I agree')
   end
 
   scenario "Agreement text is rendered as markdown" do
-    visit '/agreements/the_owner/the_project'
+    visit "/agreements/#{agreement.id}"
     page.body.should include("The CLA <em>text</em>")
   end
 
   scenario "Allow a user to sign in with GitHub and agree to a CLA" do
     mock_github_oauth(info: { nickname: 'jasonm' })
-    visit '/agreements/the_owner/the_project'
+    visit "/agreements/#{agreement.id}"
     click_link 'Sign in with GitHub to agree to this CLA'
 
     page.should have_content('The CLA text')
@@ -29,26 +27,22 @@ feature "Agreeing to a CLA" do
     page.should have_content('I agree')
 
     click_button 'I agree'
-    page.should have_content('You have agreed to the CLA for the_owner/the_project.')
+    page.should have_content("You have agreed to the CLA for #{agreement.repositories_with_user_repo.join(',')}.")
   end
 
   scenario 'Prompts signee to fill in all fields' do
-    agreement = Agreement.last
-
     Field.create({ label: 'Email', enabled_by_default: true, data_type: 'string' })
     Field.create({ label: 'Name', enabled_by_default: true, data_type: 'string' })
     Field.create({ label: 'Favorite Ice Cream', enabled_by_default: false, data_type: 'string' })
 
     agreement.build_default_fields
-    agreement.save
+    agreement.save!
 
     mock_github_oauth(info: { nickname: 'jasonm' })
-    visit '/agreements/the_owner/the_project'
+    visit "/agreements/#{agreement.id}"
     click_link 'Sign in with GitHub to agree to this CLA'
 
     page.should have_content('The CLA text')
-    find_field('Email').should be
-    find_field('Name').should be
 
     click_button 'I agree'
 
@@ -59,12 +53,12 @@ feature "Agreeing to a CLA" do
     fill_in 'Name', with: 'Jason Morrison'
 
     click_button 'I agree'
-    page.should have_content('You have agreed to the CLA for the_owner/the_project.')
+    page.should have_content("You have agreed to the CLA for #{agreement.repositories_with_user_repo.join(',')}.")
   end
 
   scenario "Do not allow me to agree twice" do
     mock_github_oauth(info: { nickname: 'jasonm' })
-    visit '/agreements/the_owner/the_project'
+    visit "/agreements/#{agreement.id}"
     click_link 'Sign in with GitHub to agree to this CLA'
 
     page.should have_content('The CLA text')
@@ -72,16 +66,17 @@ feature "Agreeing to a CLA" do
     page.should have_content('I agree')
 
     click_button 'I agree'
-    page.should have_content('You have agreed to the CLA for the_owner/the_project.')
+    page.should have_content("You have agreed to the CLA for #{agreement.repositories_with_user_repo.join(',')}.")
     page.should have_no_content('I agree')
   end
 
   # this should go in some other spec
   scenario "Signing the agreement updates commit statuses for pull requests I've issued" do
     CheckOpenPullsJob.enabled = true
-
-    create(:agreement, user: owner, user_name: 'the_owner', repo_name: 'alpha')
-    create(:agreement, user: owner, user_name: 'the_owner', repo_name: 'beta')
+    a1 = create(:agreement, user: owner)
+    create(:repository, user_name: 'the_owner', repo_name: 'alpha', agreement: a1)
+    a2 = create(:agreement, user: owner)
+    create(:repository, user_name: 'the_owner', repo_name: 'beta', agreement: a2)
 
     mock_github_user_repos(oauth_token: oauth_token_for('the_owner'),
       repos: [
@@ -136,13 +131,13 @@ feature "Agreeing to a CLA" do
   end
 
   def expect_commit_status_to_be_set(user_name, repo_name, sha, status)
-    raise "no agreement made for repo" unless agreement = Agreement.find_by_user_name_and_repo_name(user_name, repo_name)
+    raise "no agreement made for repo" unless agreement = Repository.where("user_name = ? AND repo_name = ?", user_name, repo_name).first.try(:agreement)
     raise "no oauth token for creator" unless oauth_token = agreement.user.oauth_token
 
     status_url = "https://api.github.com/repos/#{user_name}/#{repo_name}/statuses/#{sha}?access_token=#{oauth_token}"
     status_params = {
       state: status,
-      target_url: "#{HOST}/agreements/#{user_name}/#{repo_name}",
+      target_url: "#{HOST}/agreements/#{agreement.id}",
       description: PushStatusChecker::STATUS_DESCRIPTIONS[status],
       context: "clahub"
     }
@@ -151,7 +146,8 @@ feature "Agreeing to a CLA" do
   end
 
   def sign_agreement(repo_owner, repo_name, contributor_nickname)
-    unless Agreement.find_by_user_name_and_repo_name(repo_owner, repo_name)
+    repo = Repository.where("user_name = ? AND repo_name = ?", repo_owner, repo_name).first
+    unless repo
       raise "no agreement for #{repo_owner}/#{repo_name} for #{contributor_nickname} to sign"
     end
 
@@ -159,7 +155,7 @@ feature "Agreeing to a CLA" do
     mock_github_oauth(info: { nickname: contributor_nickname }, uid: github_uid)
 
     visit '/sign_out'
-    visit "/agreements/#{repo_owner}/#{repo_name}"
+    visit "/agreements/#{repo.agreement.id}"
     click_link 'Sign in with GitHub to agree to this CLA'
     click_button 'I agree'
   end

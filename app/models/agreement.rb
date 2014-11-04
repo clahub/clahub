@@ -4,34 +4,30 @@ class Agreement < ActiveRecord::Base
   has_many :signing_users, through: :signatures, source: :user
   has_many :agreement_fields, inverse_of: :agreement
   has_many :fields, through: :agreement_fields
+  has_many :repositories
 
-  validates :repo_name, presence: true
-  validates :user_name, presence: true
+  attr_accessible :text, :agreement_fields_attributes, :github_repositories, :repositories
+  attr_accessor :github_repositories
+  
+  before_validation :remove_blanks_from_github_repositories, if: "!github_repositories.blank?"
+  
   validates :text, presence: true
-  validate :one_agreement_per_user_repo
+  # validates :github_repositories, presence: true
+  # validate :one_agreement_per_user_repo
+  validate :has_repositories_selected
+  validate :repositories_not_already_in_a_agreement, if: "!github_repositories.blank?"
+  validate :has_at_least_one_repository, on: :save
 
-  attr_accessible :user_name, :repo_name, :text, :agreement_fields_attributes
+  accepts_nested_attributes_for :agreement_fields, :repositories
 
-  accepts_nested_attributes_for :agreement_fields
-
-  def create_github_repo_hook
-    hook_inputs = {
-      'name' => 'web',
-      'config' => {
-        'url' => "#{HOST}/repo_hook"
-      }
-    }
-
-    response = GithubRepos.new(self.user).create_hook(user_name, repo_name, hook_inputs)
-
-    self.update_attribute(:github_repo_hook_id, response['id'])
-  end
-
-  def delete_github_repo_hook
-    if github_repo_hook_id
-      GithubRepos.new(self.user).delete_hook(user_name, repo_name, github_repo_hook_id)
-      self.update_attribute(:github_repo_hook_id, nil)
+  def name
+    tmp = []
+    
+    repositories.group_by(&:user_name).each do |k, v|
+      tmp << "#{k}/[#{v.collect(&:repo_name).join(", ")}]"
     end
+
+    "#{tmp.join(", ")}"
   end
 
   def owned_by?(candidate)
@@ -40,11 +36,6 @@ class Agreement < ActiveRecord::Base
 
   def signed_by?(candidate)
     signing_users.include?(candidate)
-  end
-
-  def check_open_pulls
-    # TODO: async this so that creating a signature doesn't take so long.
-    CheckOpenPullsJob.new(owner: user, user_name: user_name, repo_name: repo_name).run
   end
 
   def build_default_fields
@@ -61,13 +52,50 @@ class Agreement < ActiveRecord::Base
   def enabled_agreement_fields
     agreement_fields.enabled
   end
+  
+  def repositories_with_user_repo
+    repositories.collect(&:name)
+  end
+  
+  def repository_names_for_csv
+    repositories_with_user_repo.join('-').gsub(/\//, '-')
+  end
 
   private
-
-  def one_agreement_per_user_repo
-    existing = Agreement.find_by_user_name_and_repo_name(user_name, repo_name)
-    if existing && (existing != self)
-      errors[:base] << "An agreement already exists for #{user_name}/#{repo_name}"
+  
+  def remove_blanks_from_github_repositories
+    self.github_repositories = github_repositories.delete_if{|r| r.blank?}
+  end
+  
+  def has_repositories_selected
+    if !github_repositories.present?
+      errors.add(:github_repositories, "You have to select at least one repository from the list")
     end
   end
+  
+  def repositories_not_already_in_a_agreement
+    sql = []
+    selected_repositories = github_repositories.collect{|r| r.split('/')}
+    selected_repositories.each do |r|
+      sql << ActiveRecord::Base.send(:sanitize_sql_for_assignment, ["(user_name='%s' and repo_name='%s')", r.first, r.last])
+    end
+    sql = "SELECT * from repositories WHERE #{sql.join(' OR ')}"
+    # Rails::logger.info("=============== #{sql}")
+    selected_repositories = Repository.find_by_sql(sql)
+    if selected_repositories.present?
+      errors.add(:github_repositories, "you selected are (one or all) already part of a CLA")
+    end
+  end
+  
+  def has_at_least_one_repository
+    repositories.present?
+  end
+  
+  # 
+  # def one_agreement_per_user_repo
+  #   existing = Agreement.find_by_user_name_and_repo_name(user_name, repo_name)
+  #   if existing && (existing != self)
+  #     errors[:base] << "An agreement already exists for #{user_name}/#{repo_name}"
+  #   end
+  # end
 end

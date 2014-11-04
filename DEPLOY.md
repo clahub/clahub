@@ -7,12 +7,12 @@ First, install [Heroku toolbelt](https://toolbelt.heroku.com/) and follow their
 Then, for an app named "my-clahub":
 
     heroku apps:create my-clahub
-    heroku config:add SECRET_TOKEN=some-random-key-with-plenty-of-entropy-here
+    heroku config:set SECRET_TOKEN=some-random-key-with-plenty-of-entropy-here
     heroku addons:add heroku-postgresql
 
 Note that the `SECRET_TOKEN` MUST be at least 30 characters. One way to generate it:
 
-    heroku config:add SECRET_TOKEN=$( head /dev/random | base64 | head -n 1 )
+    heroku config:set SECRET_TOKEN=$( head /dev/random | base64 | head -n 1 )
 
 Push the code up:
 
@@ -26,7 +26,7 @@ Migrate the database:
 Register for a new [GitHub application](https://github.com/settings/applications/new)
 OAuth key/secret pair, and add it to the Heroku environment:
 
-    heroku config:add GITHUB_KEY=aaa111bbb GITHUB_SECRET=ccc222ddd
+    heroku config:set GITHUB_KEY=aaa111bbb GITHUB_SECRET=ccc222ddd
     heroku restart
 
 If you have problems, try running `heroku logs`.
@@ -38,7 +38,7 @@ If you want to enforce a canonical hostname (e.g. host at www.my-clahub.com and
 redirect my-clahub.herokuapp.com to www.my-clahub.com):
 
     heroku domains:add www.my-clahub.com
-    heroku config:add CANONICAL_URL=www.my-clahub.com
+    heroku config:set CANONICAL_URL=www.my-clahub.com
 
 At your DNS provider, add a CNAME from www.my-clahub.com to my-clahub.herokuapp.com
 
@@ -48,7 +48,7 @@ HTTPS
 
 In the production environment, SSL is enforced.  If you really do not want SSL:
 
-    heroku config:add DISABLE_SSL_ENFORCEMENT=true
+    heroku config:set DISABLE_SSL_ENFORCEMENT=true
 
 Analytics
 ------------------

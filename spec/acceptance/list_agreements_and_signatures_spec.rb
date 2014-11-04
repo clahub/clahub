@@ -11,10 +11,14 @@ feature 'Viewing my agreements and signatures' do
     jasonm = create(:user, nickname: 'jasonm')
     alice = create(:user, nickname: 'alice')
 
-    create(:agreement, user: jasonm, user_name: 'jasonm', repo_name: 'jam')
-    create(:agreement, user: jasonm, user_name: 'jasonm', repo_name: 'jelly')
-    create(:agreement, user: alice, user_name: 'alice', repo_name: 'anodyne')
-    create(:agreement, user: alice, user_name: 'alice', repo_name: 'airmattress')
+    agreement_1 = create(:agreement, user: jasonm)
+    create(:repository, user_name: 'jasonm', repo_name: 'jam', agreement: agreement_1)
+    agreement_2 = create(:agreement, user: jasonm)
+    create(:repository, user_name: 'jasonm', repo_name: 'jelly', agreement: agreement_2)
+    agreement_3 = create(:agreement, user: alice)
+    create(:repository,  user_name: 'alice', repo_name: 'anodyne', agreement: agreement_3)
+    agreement_4 = create(:agreement, user: alice)
+    create(:repository,  user_name: 'alice', repo_name: 'airmattress', agreement: agreement_4)
 
     mock_github_oauth(info: { nickname: 'jasonm' }, credentials: { token: 'token' }, uid: github_uid_for_nickname('jasonm'))
     mock_github_user_repos(oauth_token: 'token', repos: [])
@@ -29,8 +33,8 @@ feature 'Viewing my agreements and signatures' do
     page.should_not have_content('airmattress')
     page.should have_content("You haven't signed any agreements.")
 
-    create(:signature, user: jasonm, agreement: Agreement.find_by_user_name_and_repo_name('alice', 'anodyne'))
-    create(:signature, user: jasonm, agreement: Agreement.find_by_user_name_and_repo_name('alice', 'airmattress'))
+    create(:signature, user: jasonm, agreement: agreement_3)
+    create(:signature, user: jasonm, agreement: agreement_4)
     click_link 'My agreements and signatures'
     page.should have_content('anodyne')
     page.should have_content('airmattress')
