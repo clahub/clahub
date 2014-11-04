@@ -1,22 +1,41 @@
-class PushStatusChecker
+class PullRequestStatusChecker
   STATUS_DESCRIPTIONS = {
     true => 'CLAHub: All contributors have signed the Contributor License Agreement.',
     false => 'CLAHub: Not all contributors have signed the Contributor License Agreement.'
   }
 
-  def initialize(push)
-    @push = push
+  def initialize(pull_request)
+    @pull_request = pull_request
   end
 
   def check_and_update
-    Rails.logger.info("PushStatusChecker#check_and_update for push #{@push.user_name}/#{@push.repo_name}:#{@push.commits.map(&:id).join(',')}")
+    Rails.logger.info("PullRequestStatusChecker#check_and_update for pull_request #{@pull_request.user_login}/#{@pull_request.repo_name}:#{@pull_request.number}")
     return unless repo_agreement
 
-    final_status = true
+    gh = GithubRepos.new(repo_agreement.user)
+    commits = gh.get_pull_commits(@pull_request.user_login, @pull_request.repo_name,
+      pull_id = @pull_request.number)
 
-    @push.commits.each do |commit|
-      final_status &&= check_commit(commit)
+    final_status = true
+    last_commit = nil
+
+    commits = commits.sort_by do |commit|
+      commit.committer.date
     end
+
+    commits.each do |commit|
+      final_status &&= check_commit(commit)
+      last_commit = commit
+    end
+
+    target_url = "#{HOST}/agreements/#{@pull_request.user_login}/#{@pull_request.repo_name}"
+    gh = GithubRepos.new(repo_agreement.user)
+    gh.set_status(@pull_request.user_login, @pull_request.repo_name, sha = last_commit.sha, {
+      state: final_status ? 'success' : 'failure',
+      target_url: target_url,
+      description: STATUS_DESCRIPTIONS[final_status],
+      context: "clahub"
+    })
   end
 
   private
@@ -36,10 +55,10 @@ class PushStatusChecker
   end
 
   def mark(commit, state)
-    target_url = "#{HOST}/agreements/#{@push.user_name}/#{@push.repo_name}"
+    target_url = "#{HOST}/agreements/#{@pull_request.user_login}/#{@pull_request.repo_name}"
 
     gh = GithubRepos.new(repo_agreement.user)
-    gh.set_status(@push.user_name, @push.repo_name, sha = commit.id, {
+    gh.set_status(@pull_request.user_login, @pull_request.repo_name, sha = commit.sha, {
       state: state ? 'success' : 'failure',
       target_url: target_url,
       description: STATUS_DESCRIPTIONS[state],
@@ -49,13 +68,13 @@ class PushStatusChecker
 
   def commit_contributors(commit)
     author_email = commit.author.try(:email)
-    author_username = commit.author.try(:username)
+    author_username = commit.author.try(:login)
     author = User.find_by_email_or_nickname(author_email, author_username)
     contributors = [author]
 
     if commit.committer
       committer_email = commit.committer.try(:email)
-      committer_username = commit.committer.try(:username)
+      committer_username = commit.committer.try(:login)
       committer = User.find_by_email_or_nickname(committer_email, committer_username)
       contributors << committer
     end
@@ -74,8 +93,8 @@ class PushStatusChecker
 
   def repo_agreement
     @repo_agreement ||= Agreement.where({
-      user_name: @push.user_name,
-      repo_name: @push.repo_name
+      user_name: @pull_request.user_login,
+      repo_name: @pull_request.repo_name
     }).first
   end
 end
