@@ -1,7 +1,11 @@
 class AgreementsController < ApplicationController
+  
+  before_filter :check_if_member_of_hybridgroup, except: [:index, :show]
+  
   def index
     @agreements = current_user.agreements
     @signatures = current_user.signatures
+    @member_of_hybridgroup = is_member_of_hybridgroup?
   end
 
   def new
@@ -80,6 +84,16 @@ class AgreementsController < ApplicationController
   def repos_for_current_user
     DevModeCache.cache("repos-for-#{current_user.uid}") do
       GithubRepos.new(current_user).repos
+    end
+  end
+  
+  def is_member_of_hybridgroup?
+    repos_for_current_user.collect(&:owner).collect(&:login).include?(GithubRepos::ORGANIZATION)
+  end
+  
+  def check_if_member_of_hybridgroup
+    unless is_member_of_hybridgroup?
+      redirect_to agreements_url, alert: "You must be a member of the #{GithubRepos::ORGANIZATION} organization and have admin rights over at least one repository to access that page"
     end
   end
 end

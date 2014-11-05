@@ -16,4 +16,5 @@ class User < ActiveRecord::Base
   def self.find_by_email_or_nickname(email, nickname)
     self.where("email = ? OR nickname = ?", email, nickname).first
   end
+
 end

@@ -1,12 +1,13 @@
 class GithubRepos
   REPOS_PER_PAGE = 100 # the max
+  ORGANIZATION = "hybridgroup"
 
   def initialize(user)
     @github ||= Github.new(oauth_token: user.oauth_token, auto_pagination: true)
   end
 
   def repos
-    [user_repos, org_repos].flatten
+    org_repos # show only org repos
   end
 
   def create_hook(user_name, repo_name, hook_inputs)
@@ -28,6 +29,7 @@ class GithubRepos
   def get_pull_commits(user_name, repo_name, pull_id)
     @github.pull_requests.commits(user_name, repo_name, pull_id)
   end
+  
   private
 
   def user_repos
@@ -36,11 +38,9 @@ class GithubRepos
 
   def org_repos
     repos = []
-    @github.orgs.list.each do |org|
-      @github.repos.list(org: org.login, per_page: REPOS_PER_PAGE).each do |repo|
-        if repo.permissions.admin
-          repos.push(repo)
-        end
+    @github.repos.list(org: ORGANIZATION, per_page: REPOS_PER_PAGE).each do |repo|
+      if repo.permissions.admin
+        repos.push(repo)
       end
     end
     repos

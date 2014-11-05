@@ -33,6 +33,8 @@
   <% end %>
 </div>
 
-<div class="row form-actions">
-  <p><%= link_to "Create a new agreement", new_agreement_path, class: 'btn btn-primary' %></p>
-</div>
+<% if @member_of_hybridgroup %>
+  <div class="row form-actions">
+    <p><%= link_to "Create a new agreement", new_agreement_path, class: 'btn btn-primary' %></p>
+  </div>
+<% end %>
