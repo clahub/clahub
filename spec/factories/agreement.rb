@@ -4,5 +4,4 @@ FactoryGirl.define do
     text "Generic CLA text"
     github_repositories ["some_user/some_repo"]
   end
-  
 end
