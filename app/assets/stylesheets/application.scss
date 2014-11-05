@@ -2,7 +2,7 @@
 @import "bootstrap";
 
 body {
-  padding-top: 60px;
+  padding-top: 80px;
   padding-bottom: 40px;
   font-size:100%;
 }
@@ -45,6 +45,7 @@ div#how-it-works.carousel {
 
     img {
       @extend .img-rounded;
+      margin:0 auto;
     }
   }
 }
@@ -120,6 +121,8 @@ div.navbar.navbar-fixed-top {
     max-width: 62.5em;
     margin-left:auto;
     margin-right:auto;
+    border:0;
+    line-height:62px;
 
     ul.nav{
       margin:0 0 0 auto;
