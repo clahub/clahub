@@ -78,8 +78,8 @@ class AgreementsController < ApplicationController
   end
 
   def repos_for_current_user
-    # DevModeCache.cache("repos-for-#{current_user.uid}") do
+    DevModeCache.cache("repos-for-#{current_user.uid}") do
       GithubRepos.new(current_user).repos
-    # end
+    end
   end
 end

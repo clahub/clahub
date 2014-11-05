@@ -4,19 +4,26 @@
 body {
   padding-top: 60px;
   padding-bottom: 40px;
+  font-size:100%;
+}
+
+a {
+  color:#f80;
+
+  &:hover{
+    color:#D96D00;
+  }
 }
 
 body.pages-home div.hero-unit {
-  padding: 60px 60px 60px 360px;
+  padding: 60px 60px 60px 60px;
 
   img.logo {
-    width: 360px;
-    height: 360px;
-    margin-top: -360px;
+    display:block;
+    float:left;
+    margin:0 60px 0 0;
 
     position: relative;
-    top: 300px;
-    left: -360px;
   }
 }
 
@@ -105,12 +112,55 @@ body.signatures-create {
 }
 
 div.navbar.navbar-fixed-top {
+  background:#292929;
+
+  .navbar-inner{
+    background:inherit;
+    color:#fff;
+    max-width: 62.5em;
+    margin-left:auto;
+    margin-right:auto;
+
+    ul.nav{
+      margin:0 0 0 auto;
+      text-align:right;
+      float:none;
+      overflow: hidden;
+
+      li {
+        display: inline-block;
+        float:none;
+
+        a {
+          color:#fff;
+          text-shadow:none;
+          line-height:40px;
+
+          &:hover{
+            color:#D96D00;
+          }
+        }
+
+        &.active{
+          a {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
+
   a.brand {
+    width:200px;
     margin-left: 8px;
-    padding-left: 36px;
+    padding:0;
+    line-height:62px;
     background-image: image-url('icon.png');
     background-repeat: no-repeat;
-    background-position: left center;
+    background-position: center center;
+    text-indent:100%;
+    white-space: nowrap;  
+    overflow: hidden;
   }
 }
 
