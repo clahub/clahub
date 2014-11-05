@@ -64,6 +64,26 @@
           search_contains: true,
           no_results_text: "Oops, nothing found!"
         });
+        (function() {
+          var previewTab = $('ul#agreement-editor-tabs a.tab-preview'),
+              source     = $('div#agreement-editor-content textarea'),
+              preview    = $('div#preview-agreement div.preview'),
+              spinner    = $('div#preview-agreement div.preview-spinner');
+          previewTab.on('shown', function (e) {
+            preview.hide();
+            spinner.show();
+            $.ajax({
+              url: '/markdown_preview',
+              type: 'POST',
+              data: { source: source.val() },
+              dataType: 'html',
+              accepts: { html: 'application/json' }
+            }).success(function(newHtml, _, xhr) {
+              preview.html(newHtml).show();
+              spinner.hide();
+            });
+          })
+        })();
       });
     //]]>
   </script>
