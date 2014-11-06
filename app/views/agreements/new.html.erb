@@ -1,60 +1,60 @@
-<%= form_for(@agreement) do |form| %>
-  <%= form.error_messages %>
+<div class="page-header">
+  <h1>New agreement</h1>
+</div>
+<div class="row-fluid">
+  <%= form_for @agreement, html: {class: "form-horizontal", role: "form"} do |form| %>
+    <%= form.error_messages %>
 
-  <legend>Choose a project and your agreement</legend>
+    <%= form.label :github_repositories, "Select one or more repositories" %>
+    <%= form.select :github_repositories, @repos.collect { |repo| [owner_slash_name(repo), owner_slash_name(repo)] }, { include_blank: false }, { multiple: true, class: 'select-chosen', data: {placeholder: "GitHub repositories for #{current_user.nickname}"}, style: "width:350px;", tabindex: "1" } %>
 
-  <%= form.label :github_repositories, "Choose a repo:" %>
-  
-  <%= form.select :github_repositories, @repos.collect { |repo| [owner_slash_name(repo), owner_slash_name(repo)] }, { include_blank: false }, { multiple: true, class: 'select-chosen', data: {placeholder: "GitHub repositories for #{current_user.nickname}"}, style: "width:350px;", tabindex: "1" } %>
+    <a tabindex="0" href="#" rel="popover" title="Public and organization repos" data-content='CLAHub can see your public repos.  It can also see organization repos if you have <a href="https://help.github.com/articles/permission-levels-for-an-organization-repository/">admin permissions for the repo</a> and your organization role is <a href="https://help.github.com/articles/publicizing-or-concealing-organization-membership/">publicized</a>.'>Why don't I see my repos?</a>
 
-  <a tabindex="0" href="#" rel="popover" title="Public and organization repos" data-content='CLAHub can see your public repos.  It can also see organization repos if you have <a href="https://help.github.com/articles/permission-levels-for-an-organization-repository/">admin permissions for the repo</a> and your organization role is <a href="https://help.github.com/articles/publicizing-or-concealing-organization-membership/">publicized</a>.'>Why don't I see my repos?</a>
+    <br/><br/><br/>
 
-  <br>
-  <br>
-  <br>
-
-  <%= form.label :text, "Enter your agreement text:" %>
-
-  <ul id="agreement-editor-tabs" class="nav nav-tabs">
-    <li class="active"><a class="tab-edit" href="#edit-agreement" data-toggle="tab">Edit</a></li>
-    <li><a class="tab-preview" href="#preview-agreement" data-toggle="tab">Preview</a></li>
-  </ul>
-
-  <div id="agreement-editor-content" class="tab-content">
-    <div class="tab-pane active" id="edit-agreement">
-      <%= form.text_area :text, placeholder: 'I, the contributor, agree to...', class: "span12", rows: 10 %>
-      <span class="help-block">(You can use <a href="http://kramdown.gettalong.org/quickref.html">Markdown formatting</a>.)</span>
-    </div>
-    <div class="tab-pane" id="preview-agreement">
-      <div class="preview-spinner progress progress-striped active">
-        <div class="bar" style="width: 100%;"></div>
-      </div>
-      <div class="preview well">
-      </div>
-    </div>
-  </div>
-
-  <div class="field-selection-group">
-    <label>Choose any extra fields to require on your agreement:</label>
-    <ul class="unstyled">
-      <%= form.fields_for :agreement_fields, @agreement.agreement_fields.sort_by(&:ordering) do |f| %>
-        <li>
-          <%= f.hidden_field :field_id %>
-          <%= f.check_box :enabled %>
-          <%= f.label :enabled, f.object.field.label %>
-          <% if description = f.object.field.description %>
-            <a tabindex="0" href="#" rel="popover" title="<% f.object.field.label %>" data-content='<p>When signing your agreement, the person signing will see helper text for this field:</p><blockquote><%= description %></blockquote>'>What's this?</a>
-          <% end %>
-        </li>
-      <% end %>
+    <%= form.label :text, "Enter your agreement text" %>
+    <ul id="agreement-editor-tabs" class="nav nav-tabs">
+      <li class="active"><a class="tab-edit" href="#edit-agreement" data-toggle="tab">Edit</a></li>
+      <li><a class="tab-preview" href="#preview-agreement" data-toggle="tab">Preview</a></li>
     </ul>
-  </div>
+    <div id="agreement-editor-content" class="tab-content">
+      <div class="tab-pane active" id="edit-agreement">
+        <%= form.text_area :text, placeholder: 'I, the contributor, agree to...', class: "span12", rows: 10 %>
+        <span class="help-block">(You can use <a href="http://kramdown.gettalong.org/quickref.html">Markdown formatting</a>.)</span>
+      </div>
+      <div class="tab-pane" id="preview-agreement">
+        <div class="preview-spinner progress progress-striped active">
+          <div class="bar" style="width: 100%;"></div>
+        </div>
+        <div class="preview well">
+        </div>
+      </div>
+    </div>
+    
+    <br/><br/><br/>
+
+    <div class="field-selection-group">
+      <label>Choose any extra fields to require on your agreement</label>
+      <ul class="unstyled">
+        <%= form.fields_for :agreement_fields, @agreement.agreement_fields.sort_by(&:ordering) do |f| %>
+          <li>
+            <%= f.hidden_field :field_id %>
+            <%= f.check_box :enabled %>
+            <%= f.label :enabled, f.object.field.label %>
+            <% if description = f.object.field.description %>
+              <a tabindex="0" href="#" rel="popover" title="<% f.object.field.label %>" data-content='<p>When signing your agreement, the person signing will see helper text for this field:</p><blockquote><%= description %></blockquote>'>What's this?</a>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
 
 
-  <div class='form-actions'>
-    <%= form.button 'Create agreement', :class => 'btn btn-primary' %>
-  </div>
-<% end %>
+    <div class='form-actions'>
+      <%= form.button 'Create agreement', :class => 'btn btn-primary' %>
+    </div>
+  <% end %>
+</div>
 
 <% content_for :javascript do %>
   <script type="text/javascript">

@@ -30,16 +30,27 @@ class GithubRepos
     @github.pull_requests.commits(user_name, repo_name, pull_id)
   end
   
-  private
+  def organization_members
+    @github.orgs.members.list(ORGANIZATION).collect(&:login)
+  end
+  
+  def organizations
+    @github.orgs.list
+  end
 
   def user_repos
     @github.repos.list(per_page: REPOS_PER_PAGE).sort_by(&:name)
   end
 
-  def org_repos
+  def org_repos(options = {})
+    options = {must_be_admin: true}.merge!(options)
     repos = []
     @github.repos.list(org: ORGANIZATION, per_page: REPOS_PER_PAGE).each do |repo|
-      if repo.permissions.admin
+      if options[:must_be_admin]
+        if repo.permissions.admin
+          repos.push(repo)
+        end
+      else
         repos.push(repo)
       end
     end
