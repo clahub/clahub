@@ -105,6 +105,8 @@ GEM
       multipart-post (>= 1.2, < 3)
     ffi (1.9.6)
     formatador (0.2.5)
+    friendly_id (4.0.10.1)
+      activerecord (>= 3.0, < 4.0)
     fssm (0.2.10)
     github_api (0.12.2)
       addressable (~> 2.3)
@@ -333,6 +335,7 @@ DEPENDENCIES
   dotenv
   dynamic_form
   factory_girl_rails
+  friendly_id (~> 4.0.10)
   github_api
   guard-livereload
   httplog

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141030225009) do
+ActiveRecord::Schema.define(:version => 20141106204040) do
 
   create_table "agreement_fields", :force => true do |t|
     t.integer  "agreement_id"
@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(:version => 20141030225009) do
     t.integer  "user_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.string   "name"
+    t.string   "slug"
   end
 
   add_index "agreements", ["user_id"], :name => "index_licenses_on_user_id"

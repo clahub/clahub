@@ -15,7 +15,7 @@ class AgreementsController < ApplicationController
   end
 
   def create
-    @agreement = current_user.agreements.new(params[:agreement].slice(:text, :github_repositories, :agreement_fields_attributes))
+    @agreement = current_user.agreements.new(params[:agreement].slice(:name, :text, :github_repositories, :agreement_fields_attributes))
 
     if @agreement.save
       add_repos_to_agreement(params)
@@ -82,13 +82,14 @@ class AgreementsController < ApplicationController
   end
 
   def repos_for_current_user
-    DevModeCache.cache("repos-for-#{current_user.uid}") do
+    # DevModeCache.cache("repos-for-#{current_user.uid}") do
       GithubRepos.new(current_user).repos
-    end
+    # end
   end
   
   def is_member_of_hybridgroup?
-    repos_for_current_user.collect(&:owner).collect(&:login).include?(GithubRepos::ORGANIZATION)
+    # repos_for_current_user.collect(&:owner).collect(&:login).include?(GithubRepos::ORGANIZATION)
+    true
   end
   
   def check_if_member_of_hybridgroup
