@@ -3,6 +3,7 @@ class SignaturesController < ApplicationController
     @agreement = Agreement.find(params[:id])
     @signature = Signature.new(params[:signature])
     @signature.agreement = @agreement
+    @signature.ip = request.env["HTTP_X_FORWARDED_FOR"]
     @signature.user = current_user
 
     if @signature.save

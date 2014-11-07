@@ -7,8 +7,7 @@ class GithubRepos
   end
 
   def repos
-    # org_repos # show only org repos
-    user_repos
+    org_repos # show only org repos
   end
 
   def create_hook(user_name, repo_name, hook_inputs)

@@ -37,7 +37,7 @@ class AgreementsController < ApplicationController
     respond_to do |format|
       format.html do
         @rendered_agreement_html = Kramdown::Document.new(@agreement.text).to_html
-        @signature = @agreement.signatures.build
+        @signature = Signature.new(agreement: @agreement)
         @signature.build_default_field_entries
       end
 
@@ -88,8 +88,7 @@ class AgreementsController < ApplicationController
   end
   
   def is_member_of_hybridgroup?
-    # repos_for_current_user.collect(&:owner).collect(&:login).include?(GithubRepos::ORGANIZATION)
-    true
+    repos_for_current_user.collect(&:owner).collect(&:login).include?(GithubRepos::ORGANIZATION)
   end
   
   def check_if_member_of_hybridgroup
