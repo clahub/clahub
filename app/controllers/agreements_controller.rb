@@ -6,6 +6,7 @@ class AgreementsController < ApplicationController
   def index
     @agreements = current_user.agreements
     @signatures = current_user.signatures
+    @pending = Agreement.all - current_user.signed_agreements
   end
 
   def new
