@@ -3,7 +3,7 @@ class Signature < ActiveRecord::Base
   belongs_to :agreement
   has_many :field_entries, inverse_of: :signature
 
-  attr_accessible :user, :agreement, :field_entries_attributes
+  attr_accessible :ip, :user, :agreement, :field_entries_attributes
   accepts_nested_attributes_for :field_entries
 
   validates :user_id, presence: true

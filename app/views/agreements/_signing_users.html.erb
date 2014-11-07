@@ -1,11 +1,11 @@
 <div id="signing-users">
-  <% if @agreement.signing_users.none? %>
+  <% if @agreement.signatures.none? %>
     <h2>No one has signed yet.</h2>
   <% else %>
     <h2>Users who have signed:</h2>
     <ul>
-      <% @agreement.signing_users.each do |user| %>
-        <li><a href="https://github.com/<%= user.nickname %>"><%= user.nickname %></a></li>
+      <% @agreement.signatures.each do |sign| %>
+        <li><a href="https://github.com/<%= sign.user.nickname %>"><%= sign.user.nickname %></a> - <span><%=sign.ip.to_s %></span></li>
       <% end %>
     </ul>
     <p><%= link_to 'Download CSV', agreement_path(@agreement, format: 'csv') %>.</p>

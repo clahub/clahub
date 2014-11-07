@@ -3,6 +3,7 @@ class SignaturesController < ApplicationController
     @agreement = Agreement.find(params[:id])
     @signature = Signature.new(params[:signature])
     @signature.agreement = @agreement
+    @signature.ip = request.env['REMOTE_ADDR']
     @signature.user = current_user
 
     if @signature.save
