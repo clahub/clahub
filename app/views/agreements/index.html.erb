@@ -38,3 +38,20 @@
     <% end %>
   </div>
 </div>
+
+<% unless current_user.admin_of_repos? %>
+  <div class="row-fluid">
+    <legend>Pending to Sign</legend>
+    <% if @pending.any? %>
+      <ul id="my-agreements">
+        <% @pending.each do |agreement| %>
+          <li>
+            <%= link_to agreement.name, agreement_path(agreement) %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>There's no agreements to sign.</p>
+    <% end %>
+  </div>
+<% end %>
