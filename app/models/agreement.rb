@@ -6,11 +6,15 @@ class Agreement < ActiveRecord::Base
   has_many :fields, through: :agreement_fields
   has_many :repositories
 
-  attr_accessible :text, :agreement_fields_attributes, :github_repositories, :repositories
+  attr_accessible :name, :text, :agreement_fields_attributes, :github_repositories, :repositories
   attr_accessor :github_repositories
-  
+
+  extend FriendlyId
+  friendly_id :name, use: :slugged
+
   before_validation :remove_blanks_from_github_repositories, if: "!github_repositories.blank?"
   
+  validates :name, presence: true
   validates :text, presence: true
   # validates :github_repositories, presence: true
   # validate :one_agreement_per_user_repo
@@ -20,15 +24,16 @@ class Agreement < ActiveRecord::Base
 
   accepts_nested_attributes_for :agreement_fields, :repositories
 
-  def name
-    tmp = []
-    
-    repositories.group_by(&:user_name).each do |k, v|
-      tmp << "#{k}/[#{v.collect(&:repo_name).join(", ")}]"
-    end
 
-    "#{tmp.join(", ")}"
-  end
+  # def name
+  #   tmp = []
+    
+  #   repositories.group_by(&:user_name).each do |k, v|
+  #     tmp << "#{k}/[#{v.collect(&:repo_name).join(", ")}]"
+  #   end
+
+  #   "#{tmp.join(", ")}"
+  # end
 
   def owned_by?(candidate)
     candidate == self.user

@@ -5,10 +5,13 @@
   <%= form_for @agreement, html: {class: "form-horizontal", role: "form"} do |form| %>
     <%= form.error_messages %>
 
+    <%= form.label :name, "Name for the agreement" %>
+    <%= form.text_field :name %>
+    
     <%= form.label :github_repositories, "Select one or more repositories" %>
     <%= form.select :github_repositories, @repos.collect { |repo| [owner_slash_name(repo), owner_slash_name(repo)] }, { include_blank: false }, { multiple: true, class: 'select-chosen', data: {placeholder: "GitHub repositories for #{current_user.nickname}"}, style: "width:350px;", tabindex: "1" } %>
 
-    <a tabindex="0" href="#" rel="popover" title="Public and organization repos" data-content='CLAHub can see your public repos.  It can also see organization repos if you have <a href="https://help.github.com/articles/permission-levels-for-an-organization-repository/">admin permissions for the repo</a> and your organization role is <a href="https://help.github.com/articles/publicizing-or-concealing-organization-membership/">publicized</a>.'>Why don't I see my repos?</a>
+    <a tabindex="0" href="#" rel="popover" title="Public and organization repos" data-content='CLAHub can see organization repos if you have <a href="https://help.github.com/articles/permission-levels-for-an-organization-repository/">admin permissions for the repo</a> and your organization role is <a href="https://help.github.com/articles/publicizing-or-concealing-organization-membership/">publicized</a>.'>Why don't I see any repos?</a>
 
     <br/><br/><br/>
 

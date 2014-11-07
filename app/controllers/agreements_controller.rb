@@ -15,7 +15,7 @@ class AgreementsController < ApplicationController
 
   def create
     # CHECK IF USER IS OWNER OR ADMIN OF THE SELECTED REPO
-    @agreement = current_user.agreements.new(params[:agreement].slice(:text, :github_repositories, :agreement_fields_attributes))
+    @agreement = current_user.agreements.new(params[:agreement].slice(:name, :text, :github_repositories, :agreement_fields_attributes))
 
     if selected_repos_are_valid?
       if @agreement.save
@@ -32,7 +32,7 @@ class AgreementsController < ApplicationController
   end
 
   def show
-    @agreement = Agreement.find_by_id(params[:id])
+    @agreement = Agreement.find_by_slug(params[:id])
 
     if signed_out?
       session[:redirect_after_github_oauth_url] = request.url
@@ -42,10 +42,9 @@ class AgreementsController < ApplicationController
       respond_to do |format|
         format.html do
           @rendered_agreement_html = Kramdown::Document.new(@agreement.text).to_html
-          @signature = @agreement.signatures.build
+          @signature = Signature.new(agreement: @agreement)
           @signature.build_default_field_entries
         end
-
         format.csv do
           if @agreement.owned_by?(current_user)
             filename = "#{@agreement.repository_names_for_csv}-contributor-agreement-signatures-#{Time.now.strftime("%Y%m%d-%H%M%S")}.csv"
@@ -110,7 +109,7 @@ class AgreementsController < ApplicationController
       end
     end
   end
-  
+    
   def check_if_admin_of_repos
     unless current_user.admin_of_repos?
       redirect_to home_url

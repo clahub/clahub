@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141030225009) do
+ActiveRecord::Schema.define(:version => 20141106215145) do
 
   create_table "agreement_fields", :force => true do |t|
     t.integer  "agreement_id"
@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(:version => 20141030225009) do
     t.integer  "user_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.string   "name"
+    t.string   "slug"
   end
 
   add_index "agreements", ["user_id"], :name => "index_licenses_on_user_id"
@@ -67,8 +69,9 @@ ActiveRecord::Schema.define(:version => 20141030225009) do
   create_table "signatures", :force => true do |t|
     t.integer  "user_id"
     t.integer  "agreement_id"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+    t.string   "ip",           :limit => nil
   end
 
   add_index "signatures", ["user_id", "agreement_id"], :name => "index_agreements_on_user_id_and_license_id"

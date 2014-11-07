@@ -141,20 +141,3 @@ Use SimpleCov to build code coverage:
 Deployment
 ================
 See DEPLOY.md for information on deploying.
-
-License
-================
-
-See [LICENSE](https://github.com/clahub/clahub/blob/master/LICENSE) for the project license.
-
-The "Clipboard and pencil" graphic used in the homepage logo is
-licensed from iStockPhoto.com:
-
-<http://www.istockphoto.com/stock-illustration-16006726-clipboard-and-pencil.php>
-
-The graphic is licensed for a single-seat install and is in use at
-http://www.clahub.com.  It is not licensed for multi-seat use, so any
-other installations should purchase a separate license or use a different
-image.
-
-<http://www.istockphoto.com/help/licenses>
