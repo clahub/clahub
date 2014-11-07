@@ -1,40 +1,40 @@
-<div class="row">
-  <h2>Agreements you have created:</h2>
-  <% if @agreements.any? %>
-    <ul id="my-agreements">
-      <% @agreements.each do |agreement| %>
-        <li>
-          <%= link_to agreement.name, agreement_path(agreement) %> <%= link_to "Edit", edit_agreement_path(agreement), class: 'btn btn-default btn-small' %>
-        </li>
+<div class="col-lg-12">
+  <div class="page-header">
+    <h1>
+      Agreements
+      <% if current_user.admin_of_repos? %>
+        <%= link_to "Add", new_agreement_path, class: 'btn btn-primary float-right' %>
       <% end %>
-    </ul>
-  <% else %>
-    <p>You haven't created any agreements.</p>
-  <% end %>
-</div>
-
-<div class="row">
-  <h2>Agreements you have signed:</h2>
-  <% if @signatures.any? %>
-    <ul>
-      <% @signatures.each do |signature| %>
-        <% agreement = signature.agreement %>
-        <li>
-          <%= link_to agreement_path(agreement) do %>
-            <% agreement.repositories.each do |r| %>
-              <%= r.user_name %>/<%= r.repo_name %>
-            <% end %>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  <% else %>
-    <p>You haven't signed any agreements.</p>
-  <% end %>
-</div>
-
-<% if @member_of_hybridgroup %>
-  <div class="row form-actions">
-    <p><%= link_to "Create a new agreement", new_agreement_path, class: 'btn btn-primary' %></p>
+    </h1>
   </div>
-<% end %>
+  
+  <% if current_user.admin_of_repos? %>
+    <div class="row-fluid">
+      <legend>Created</legend>
+      <% if @agreements.any? %>
+        <ul id="my-agreements">
+          <% @agreements.each do |agreement| %>
+            <li>
+              <%= link_to agreement.name, agreement_path(agreement) %> <%= link_to "Edit", edit_agreement_path(agreement), class: 'btn btn-default btn-small' %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>You haven't created any agreements.</p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="row-fluid">
+    <legend>Signed</legend>
+    <% if @signatures.any? %>
+      <ul>
+        <% @signatures.each do |signature| %>
+          <li><%= link_to signature.agreement.name, agreement_path(signature.agreement) %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>You haven't signed any agreements.</p>
+    <% end %>
+  </div>
+</div>

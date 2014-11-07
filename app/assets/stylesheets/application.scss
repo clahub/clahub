@@ -191,3 +191,9 @@ form.form-horizontal .field_with_errors {
 .field_with_errors {
   @include formFieldState($errorText, $errorText, $errorBackground);
 }
+
+.float-left { float: left; }
+.float-right { float: right; }
+.align-right { text-align: right; }
+.align-left { text-align: left; }
+.align-center { text-align: center; }

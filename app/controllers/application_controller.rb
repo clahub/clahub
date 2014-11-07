@@ -24,4 +24,11 @@ class ApplicationController < ActionController::Base
   def sign_out
     session[:user_id] = nil
   end
+  
+  def check_if_member_of_hybridgroup
+    unless current_user.member_of_hybridgroup?
+      redirect_to home_url
+    end
+  end
+  
 end
