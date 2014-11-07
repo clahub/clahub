@@ -11,7 +11,8 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141106204040) do
+ActiveRecord::Schema.define(:version => 20141106215145) do
+
   create_table "agreement_fields", :force => true do |t|
     t.integer  "agreement_id"
     t.integer  "field_id"
