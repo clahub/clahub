@@ -30,5 +30,8 @@ class ApplicationController < ActionController::Base
       redirect_to home_url
     end
   end
-  
+
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    redirect_to home_url, notice: 'The page you were trying to visit is not valid'
+  end
 end

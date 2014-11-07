@@ -3,6 +3,7 @@ class AgreementsController < ApplicationController
   before_filter :check_if_member_of_hybridgroup, except: [:index, :show]
   before_filter :check_if_admin_of_repos, only: [:new, :create, :edit, :update]
   before_filter :load_repos, only: [:new, :create, :edit, :update]
+  before_filter :load_agreement, only: [:show, :edit, :update]
   
   def index
     @agreements = current_user.agreements
@@ -33,8 +34,6 @@ class AgreementsController < ApplicationController
   end
 
   def show
-    @agreement = Agreement.find_by_slug(params[:id])
-
     if signed_out?
       session[:redirect_after_github_oauth_url] = request.url
     end
@@ -64,14 +63,12 @@ class AgreementsController < ApplicationController
 
   def edit
     session[:redirect_after_github_oauth_url] = request.url if signed_out?
-    @agreement = Agreement.find(params[:id])
     user_repos = @agreement.repositories.collect(&:name)
     @repos = @repos.reject{ |repo| user_repos.include?(repo.full_name) }
     @rendered_agreement_html = Kramdown::Document.new(@agreement.text).to_html
   end
 
   def update
-    @agreement = Agreement.find(params[:id])
     if selected_repos_are_valid?
       add_repos_to_agreement
       redirect_to @agreement, notice: 'Agreement updated successfully!'
@@ -115,5 +112,9 @@ class AgreementsController < ApplicationController
     unless current_user.admin_of_repos?
       redirect_to home_url
     end
+  end
+
+  def load_agreement
+    @agreement = Agreement.find(params[:id])
   end
 end
