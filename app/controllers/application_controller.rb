@@ -25,10 +25,4 @@ class ApplicationController < ActionController::Base
     session[:user_id] = nil
   end
   
-  def check_if_member_of_hybridgroup
-    unless current_user.member_of_hybridgroup?
-      redirect_to home_url
-    end
-  end
-  
 end

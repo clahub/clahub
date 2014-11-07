@@ -1,6 +1,5 @@
 class AgreementsController < ApplicationController
   
-  before_filter :check_if_member_of_hybridgroup, except: [:index, :show]
   before_filter :check_if_admin_of_repos, only: [:new, :create, :edit, :update]
   before_filter :load_repos, only: [:new, :create, :edit, :update]
   
