@@ -1,6 +1,5 @@
 class AgreementsController < ApplicationController
   
-  before_filter :check_if_member_of_hybridgroup, except: [:index, :show]
   before_filter :check_if_admin_of_repos, only: [:new, :create, :edit, :update]
   before_filter :load_repos, only: [:new, :create, :edit, :update]
   before_filter :load_agreement, only: [:show, :edit, :update]
@@ -8,6 +7,7 @@ class AgreementsController < ApplicationController
   def index
     @agreements = current_user.agreements
     @signatures = current_user.signatures
+    @pending = Agreement.all - current_user.signed_agreements
   end
 
   def new
