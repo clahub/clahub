@@ -18,12 +18,8 @@ class User < ActiveRecord::Base
   end
   
   def repos
-    if Rails.env.development?
-      true
-    else
-      DevModeCache.cache("repos-for-#{uid}") do
-        GithubRepos.new(self).repos
-      end
+    DevModeCache.cache("repos-for-#{uid}") do
+      GithubRepos.new(self).repos
     end
   end
   
