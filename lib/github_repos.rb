@@ -7,7 +7,11 @@ class GithubRepos
   end
 
   def repos
-    org_repos # show only org repos
+    if Rails.env.development?
+      user_repos
+    else
+      org_repos
+    end
   end
 
   def create_hook(user_name, repo_name, hook_inputs)
