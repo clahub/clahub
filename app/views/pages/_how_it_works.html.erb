@@ -1,9 +1,10 @@
 <div id="how-it-works" class="carousel slide">
   <%
     steps = [
-      'When new pull request is marked as needing a CLA signature..',
-      'The contributor signs in with GitHub..',
-      'and signs your agreement.',
+      'When new pull request is marked as needing a CLA signature',
+      'Sign in with GitHub',
+      'Fill up the needed fields',
+      'Sign the agreement',
       'Done! The pull request is automatically marked ready for merge.'
     ]
   %>
@@ -11,7 +12,7 @@
   <div class="carousel-inner">
     <% steps.each_with_index do |step, index| %>
       <div class="item <%= 'active' if index == 0 %>">
-        <%= image_tag "how-it-works/#{ index + 1}.png" %>
+        <%= image_tag "how-it-works/#{ index + 1}.jpg" %>
         <div class="carousel-caption">
           <h4>Step <%= index + 1%></h4>
           <p><%= step %></p>
