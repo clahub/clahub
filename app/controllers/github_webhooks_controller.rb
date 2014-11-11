@@ -2,6 +2,7 @@ class GithubWebhooksController < ApplicationController
   def repo_hook
     event = request.headers['X-GitHub-Event']
 
+    Rails.logger.info('PAYLOAD INSPECT')
     Rails.logger.info(event.inspect)
     Rails.logger.info(params)
 
