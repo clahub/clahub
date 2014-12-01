@@ -53,6 +53,14 @@ class AgreementsController < ApplicationController
     end
   end
 
+  def destroy
+    agreement = current_user.agreements.find_by_user_name_and_repo_name!(params[:user_name], params[:repo_name])
+    agreement.destroy_including_signatures_and_hook
+
+    notice = "You have deleted the agreement #{agreement.user_name}/#{agreement.repo_name}."
+    redirect_to agreements_url, notice: notice
+  end
+
   private
 
   def repos_for_current_user

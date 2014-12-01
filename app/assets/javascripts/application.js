@@ -17,6 +17,7 @@
 //= require bootstrap-tab
 //= require bootstrap-tooltip
 //= require bootstrap-popover
+//= require bootstrap-modal
 //= require chosen-jquery
 //= require announcements
 //= require_tree .

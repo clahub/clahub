@@ -1,0 +1,36 @@
+<div id="delete-agreement">
+  <h2>Delete agreement</h2>
+
+  <a id="delete-agreement-button" class="btn btn-danger" role="button" data-toggle="modal" data-target="#delete-modal">Delete this agreement</a>
+
+  <div id="delete-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="delete-modal-label">Confirm deletion of <%= @agreement.user_name %>/<%= @agreement.repo_name %></h3>
+    </div>
+    <div class="modal-body">
+      <p>
+        Are you sure you would like to delete this agreement?  This will also delete all signatures and remove
+        the GitHub webhook integration.
+      </p>
+      <p>
+        Note that this will not retroactively change the status of any existing commits or Pull Requests.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <%= form_tag agreement_path(@agreement.user_name, @agreement.repo_name), method: 'DELETE' do %>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">No, do not delete</button>
+        <button type="submit" id="confirm-delete" class="btn btn-danger">Yes, delete this agreement</button>
+      <% end %>
+    </div>
+  </div>
+
+  <% content_for :javascript do %>
+    <script type="text/javascript">
+      $(function() {
+        $('#confirm-delete').click(function() {
+        });
+      });
+    </script>
+  <% end %>
+</div>

@@ -89,6 +89,18 @@ body.signatures-create {
     }
   }
 
+  div#delete-agreement {
+    margin-top: 27px;
+
+    h2 {
+      @extend .row;
+    }
+
+    form {
+      margin: 0;
+    }
+  }
+
   div#contributing-guidelines {
     @extend .row;
     margin-bottom: 20px;

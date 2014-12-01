@@ -34,6 +34,12 @@ class Agreement < ActiveRecord::Base
     end
   end
 
+  def destroy_including_signatures_and_hook
+    self.signatures.each(&:destroy)
+    self.delete_github_repo_hook
+    self.destroy
+  end
+
   def owned_by?(candidate)
     candidate == self.user
   end

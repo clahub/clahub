@@ -87,6 +87,27 @@ describe Agreement do
     expect(agreement.github_repo_hook_id).to be_nil
   end
 
+  it "deletes its signature, github repo hook, and self during #destroy_including_signatures_and_hook" do
+    agreement = build(:agreement, github_repo_hook_id: 7890)
+
+    hook_inputs = {
+      'name' => 'web',
+      'config' => {
+        'url' => "#{HOST}/repo_hook"
+      }
+    }
+
+    github_repos = double(delete_hook: nil) # on not-found, raises Github::Error::NotFound
+    GithubRepos.stub(new: github_repos)
+    github_repos.should_receive(:delete_hook).with(agreement.user_name, agreement.repo_name, agreement.github_repo_hook_id)
+
+    signature = stub(destroy: true)
+    agreement.stub(signatures: [signature])
+    signature.should_receive(:destroy)
+
+    agreement.destroy_including_signatures_and_hook
+  end
+
   it "knows who owns it" do
     owner = build(:user)
     non_owner = build(:user)

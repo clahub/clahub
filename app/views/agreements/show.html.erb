@@ -43,4 +43,5 @@
 <% if @agreement.owned_by?(current_user) %>
   <%= render partial: 'agreements/contributing_file_link' %>
   <%= render partial: 'agreements/signing_users' %>
+  <%= render partial: 'agreements/delete' %>
 <% end %>
