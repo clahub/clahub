@@ -20,7 +20,7 @@ feature "Agreeing to a CLA" do
   end
 
   scenario "Allow a user to sign in with GitHub and agree to a CLA" do
-    mock_github_oauth(info: { nickname: 'jasonm' })
+    mock_github_limited_oauth(info: { nickname: 'jasonm' })
     visit '/agreements/the_owner/the_project'
     click_link 'Sign in with GitHub to agree to this CLA'
 
@@ -42,7 +42,7 @@ feature "Agreeing to a CLA" do
     agreement.build_default_fields
     agreement.save
 
-    mock_github_oauth(info: { nickname: 'jasonm' })
+    mock_github_limited_oauth(info: { nickname: 'jasonm' })
     visit '/agreements/the_owner/the_project'
     click_link 'Sign in with GitHub to agree to this CLA'
 
@@ -63,7 +63,7 @@ feature "Agreeing to a CLA" do
   end
 
   scenario "Do not allow me to agree twice" do
-    mock_github_oauth(info: { nickname: 'jasonm' })
+    mock_github_limited_oauth(info: { nickname: 'jasonm' })
     visit '/agreements/the_owner/the_project'
     click_link 'Sign in with GitHub to agree to this CLA'
 
@@ -156,7 +156,7 @@ feature "Agreeing to a CLA" do
     end
 
     github_uid ||= github_uid_for_nickname(contributor_nickname)
-    mock_github_oauth(info: { nickname: contributor_nickname }, uid: github_uid)
+    mock_github_limited_oauth(info: { nickname: contributor_nickname }, uid: github_uid)
 
     visit '/sign_out'
     visit "/agreements/#{repo_owner}/#{repo_name}"

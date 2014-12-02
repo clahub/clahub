@@ -59,7 +59,7 @@ feature 'Viewing signatures for an agreement' do
   def view_license_as(github_nickname, github_uid = nil)
     github_uid ||= github_uid_for_nickname(github_nickname)
 
-    mock_github_oauth(info: { nickname: github_nickname }, uid: github_uid)
+    mock_github_limited_oauth(info: { nickname: github_nickname }, uid: github_uid)
     visit '/sign_out'
     visit '/agreements/oswald_owner/the_project'
     click_link 'Sign in with GitHub to agree to this CLA'

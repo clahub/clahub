@@ -16,6 +16,7 @@ feature 'Deleting an agreement' do
     create(:signature, user: alice, agreement: Agreement.find_by_user_name_and_repo_name('jasonm', 'jam'))
     create(:signature, user: alice, agreement: Agreement.find_by_user_name_and_repo_name('jasonm', 'jelly'))
 
+    mock_github_limited_oauth(info: { nickname: 'jasonm' }, credentials: { token: 'token' }, uid: github_uid_for_nickname('jasonm'))
     mock_github_oauth(info: { nickname: 'jasonm' }, credentials: { token: 'token' }, uid: github_uid_for_nickname('jasonm'))
     mock_github_user_repos(oauth_token: 'token', repos: [])
     mock_github_user_orgs(oauth_token: 'token', orgs: [])

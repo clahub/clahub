@@ -1,7 +1,7 @@
 require 'digest/md5'
 
 module GithubMockHelpers
-  def mock_github_oauth(options={})
+  def set_default_github_oauth_options(options)
     options[:uid] ||= '12345'
     options[:info] ||= {}
     options[:info][:email] ||= 'jason.p.morrison@gmail.com'
@@ -9,8 +9,17 @@ module GithubMockHelpers
     options[:info][:nickname] ||= 'jasonm'
     options[:credentials] ||= {}
     options[:credentials][:token] ||= 'token-abcdef123456'
+  end
 
+  def mock_github_oauth(options={})
+    set_default_github_oauth_options(options)
     OmniAuth.config.add_mock(:github, options)
+    OmniAuth.config.test_mode = true
+  end
+
+  def mock_github_limited_oauth(options={})
+    set_default_github_oauth_options(options)
+    OmniAuth.config.add_mock(:github_limited, options)
     OmniAuth.config.test_mode = true
   end
 
