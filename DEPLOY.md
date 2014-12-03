@@ -3,7 +3,7 @@ Heroku
 
 After checking out this repostiory, install [Heroku toolbelt](https://toolbelt.heroku.com/) and follow their "Getting started" instructions.
 
-Then, for an app named "my-clahub":
+Now, ensure you are inside the checked out directory and then, for an app named "my-clahub":
 
     heroku apps:create my-clahub
     heroku config:add SECRET_TOKEN=some-random-key-with-plenty-of-entropy-here
