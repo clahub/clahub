@@ -23,11 +23,12 @@ Migrate the database:
     heroku run rake db:migrate
     heroku run rake db:seed
 
-Register for a new [GitHub application](https://github.com/settings/applications/new)
-OAuth key/secret pair, and add it to the Heroku environment:
+Register for two new [GitHub applications](https://github.com/settings/applications/new), one will be used for project owner signups and one for contributors signups. From the applications' page, copy the client keys and secrets, and add it to the Heroku environment:
 
     heroku config:add GITHUB_KEY=aaa111bbb GITHUB_SECRET=ccc222ddd
-    heroku restart
+    heroku config:add GITHUB_LIMITED_KEY=aaa111bbb GITHUB_LIMTIED_SECRET=ccc222ddd
+
+The "limited" application will be used for the contributor signups. It will only be used for authorization and hence won't require any permissions to the contributor's account.
 
 If you have problems, try running `heroku logs`.
 
