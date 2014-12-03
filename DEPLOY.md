@@ -1,8 +1,7 @@
 Heroku
 ===============
 
-First, install [Heroku toolbelt](https://toolbelt.heroku.com/) and follow their
-"Getting started" instructions.
+After checking out this repostiory, install [Heroku toolbelt](https://toolbelt.heroku.com/) and follow their "Getting started" instructions.
 
 Then, for an app named "my-clahub":
 
