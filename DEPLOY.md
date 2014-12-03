@@ -44,7 +44,12 @@ At your DNS provider, add a CNAME from www.my-clahub.com to my-clahub.herokuapp.
 
 Host name
 ----------------
-You also need to edit `config/initializers/host.rb` and add your host name (either the domain name supplied by heroku or your custom domain) to the `production` key. For example,
+You also need to set your hostname as a `HOST` environment variable:
+
+    heroku config:set HOST=https://my-cla.herokuapp.com
+
+or edit `config/initializers/host.rb` and add your host name (either the domain name supplied by Heroku or your custom domain) to the `production` key. For example:
+
     'production'  => 'http://my-clahub.herokuapp.com'
 
 HTTPS
