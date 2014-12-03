@@ -1,10 +1,9 @@
 Heroku
 ===============
 
-First, install [Heroku toolbelt](https://toolbelt.heroku.com/) and follow their
-"Getting started" instructions.
+After checking out this repostiory, install [Heroku toolbelt](https://toolbelt.heroku.com/) and follow their "Getting started" instructions.
 
-Then, for an app named "my-clahub":
+Now, ensure you are inside the checked out directory and then, for an app named "my-clahub":
 
     heroku apps:create my-clahub
     heroku config:add SECRET_TOKEN=some-random-key-with-plenty-of-entropy-here
@@ -23,11 +22,12 @@ Migrate the database:
     heroku run rake db:migrate
     heroku run rake db:seed
 
-Register for a new [GitHub application](https://github.com/settings/applications/new)
-OAuth key/secret pair, and add it to the Heroku environment:
+Register for two new [GitHub applications](https://github.com/settings/applications/new), one will be used for project owner signups and one for contributors signups. From the applications' page, copy the client keys and secrets, and add it to the Heroku environment:
 
     heroku config:add GITHUB_KEY=aaa111bbb GITHUB_SECRET=ccc222ddd
-    heroku restart
+    heroku config:add GITHUB_LIMITED_KEY=aaa111bbb GITHUB_LIMTIED_SECRET=ccc222ddd
+
+The "limited" application will be used for the contributor signups. It will only be used for authorization and hence won't require any permissions to the contributor's account.
 
 If you have problems, try running `heroku logs`.
 
@@ -42,6 +42,10 @@ redirect my-clahub.herokuapp.com to www.my-clahub.com):
 
 At your DNS provider, add a CNAME from www.my-clahub.com to my-clahub.herokuapp.com
 
+Host name
+----------------
+You also need to edit `config/initializers/host.rb` and add your host name (either the domain name supplied by heroku or your custom domain) to the `production` key. For example,
+    'production'  => 'http://my-clahub.herokuapp.com'
 
 HTTPS
 ------------------
