@@ -43,6 +43,10 @@ redirect my-clahub.herokuapp.com to www.my-clahub.com):
 
 At your DNS provider, add a CNAME from www.my-clahub.com to my-clahub.herokuapp.com
 
+Host name
+----------------
+You also need to edit `config/initializers/host.rb` and add your host name (either the domain name supplied by heroku or your custom domain) to the `production` key. For example,
+    'production'  => 'http://my-clahub.herokuapp.com'
 
 HTTPS
 ------------------
