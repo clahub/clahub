@@ -11,9 +11,10 @@ module OmniAuth
 end
 
 if Rails.env.development?
-  if ENV['GITHUB_KEY'].blank? || ENV['GITHUB_SECRET'].blank? || ENV['GITHUB_LIMITED_KEY'].blank? || ENV['GITHUB_LIMITED_SECRET'].blank?
-    raise "Provide ENV['GITHUB_KEY'], ENV['GITHUB_SECRET'], ENV['GITHUB_LIMITED_KEY'] and ENV['GITHUB_LIMITED_SECRET']"
+  missing = %w(GITHUB_KEY GITHUB_SECRET GITHUB_LIMITED_KEY GITHUB_LIMITED_SECRET).select do |key|
+    ENV[key].blank?
   end
+  raise "Provide #{missing.to_sentence}" if missing.any?
 end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
