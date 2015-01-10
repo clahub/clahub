@@ -25,7 +25,7 @@ Migrate the database:
 Register for two new [GitHub applications](https://github.com/settings/applications/new), one will be used for project owner signups and one for contributors signups. From the applications' page, copy the client keys and secrets, and add it to the Heroku environment:
 
     heroku config:add GITHUB_KEY=aaa111bbb GITHUB_SECRET=ccc222ddd
-    heroku config:add GITHUB_LIMITED_KEY=aaa111bbb GITHUB_LIMTIED_SECRET=ccc222ddd
+    heroku config:add GITHUB_LIMITED_KEY=aaa111bbb GITHUB_LIMITED_SECRET=ccc222ddd
 
 The "limited" application will be used for the contributor signups. It will only be used for authorization and hence won't require any permissions to the contributor's account.
 
