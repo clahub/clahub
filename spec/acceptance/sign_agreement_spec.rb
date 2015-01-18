@@ -143,7 +143,7 @@ feature "Agreeing to a CLA" do
     status_params = {
       state: status,
       target_url: "#{HOST}/agreements/#{user_name}/#{repo_name}",
-      description: PushStatusChecker::STATUS_DESCRIPTIONS[status],
+      description: CommitGroup::STATUS_DESCRIPTIONS[status],
       context: "clahub"
     }
 
