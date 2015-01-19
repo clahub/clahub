@@ -17,6 +17,7 @@ class Agreement < ActiveRecord::Base
   def create_github_repo_hook
     hook_inputs = {
       'name' => 'web',
+      'events' => ['push', 'pull_request'],
       'config' => {
         'url' => "#{HOST}/repo_hook"
       }

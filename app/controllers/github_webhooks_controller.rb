@@ -6,19 +6,19 @@ class GithubWebhooksController < ApplicationController
     Rails.logger.info(event.inspect)
     Rails.logger.info(params)
 
-    owner_name = payload.repository_.owner_.name
-    repo_name = payload.repository_.name
 
-    if owner_name && repo_name
-      commit_group = CommitGroup.new(owner_name, repo_name)
+    if event == 'push'
+      commit_group = CommitGroup.new(
+        payload.repository.owner.name, payload.repository.name)
+      commit_group.set_from_payload(payload)
+    elsif event == 'pull_request'
+      commit_group = CommitGroup.new(
+        payload.repository.owner.login, payload.repository.name)
+      commit_group.fetch_from_pull_request(payload.pull_request.number)
+    end
 
-      if event == 'push'
-        commit_group.set_from_payload(payload)
-      end
-
-      if commit_group.length > 0
-        commit_group.check_and_update
-      end
+    unless commit_group.nil?
+      commit_group.check_and_update
     end
 
     render text: "OK", status: 200

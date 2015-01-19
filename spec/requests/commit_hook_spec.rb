@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'receiving github repo webhook callbacks' do
+describe 'receiving github repo "Commit" webhook callbacks' do
   let(:token) { 'abc123' }
 
   before do

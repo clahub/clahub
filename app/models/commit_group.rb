@@ -41,7 +41,7 @@ class CommitGroup
   end
 
   def length
-    @commits.length
+    @commits && @commits.length || 0
   end
 
   private
