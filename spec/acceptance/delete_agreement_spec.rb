@@ -39,6 +39,7 @@ feature 'Deleting an agreement' do
     Agreement.count.should == 4
     page.find("#confirm-delete", match: :first).click
 
+    current_path.should == '/agreements'
     page.should have_content('You have deleted the agreement jasonm/jelly')
 
     Signature.count.should == 3
