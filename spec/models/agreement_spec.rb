@@ -101,7 +101,7 @@ describe Agreement do
     GithubRepos.stub(new: github_repos)
     github_repos.should_receive(:delete_hook).with(agreement.user_name, agreement.repo_name, agreement.github_repo_hook_id)
 
-    signature = stub(destroy: true)
+    signature = double(destroy: true)
     agreement.stub(signatures: [signature])
     signature.should_receive(:destroy)
 
@@ -129,7 +129,7 @@ describe Agreement do
 
   it "checks on open pull reqs for its repo when told" do
     owner = create(:user, nickname: 'the_owner')
-    job = stub('update commit status on open pull requests job', run: true)
+    job = double('update commit status on open pull requests job', run: true)
     CheckOpenPullsJob.stub(:new => job)
 
     CheckOpenPullsJob.should_receive(:new).with(owner: owner, repo_name: 'the_repo', user_name: 'the_owner')
