@@ -72,10 +72,14 @@ class CommitGroup
   end
 
   def commit_contributors(commit)
-    author_email = commit.author.email
-    author_username = commit.author.username
-    author = User.find_by_email_or_nickname(author_email, author_username)
-    contributors = [author]
+    contributors = []
+
+    if commit.author
+      author_email = commit.author.email
+      author_username = commit.author.username
+      author = User.find_by_email_or_nickname(author_email, author_username)
+      contributors << author
+    end
 
     if commit.committer
       committer_email = commit.committer.email
