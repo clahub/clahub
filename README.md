@@ -62,6 +62,8 @@ You can also specify an HTTP port for local foreman:
 
     GITHUB_KEY=abc123
     GITHUB_SECRET=234897239872394832478
+    GITHUB_LIMITED_KEY=abc123
+    GITHUB_LIMITED_SECRET=234897239872394832478
     PORT=3000
 
 This file is .gitignored so it's private.
