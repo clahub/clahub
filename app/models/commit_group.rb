@@ -50,7 +50,13 @@ class CommitGroup
   def check_commit(commit)
     contributors = commit_contributors(commit)
     all_contributors_signed = contributors.all? { |contributor|
-      signed_agreement?(contributor)
+      signed = signed_agreement?(contributor)
+      if contributor
+        Rails.logger.info("check_commit for #{commit.id}: #{contributor.id} #{contributor.email}: #{signed}")
+      else
+        Rails.logger.info("check_commit for #{commit.id}: nil: #{signed}")
+      end
+      signed
     }
 
     if all_contributors_signed
