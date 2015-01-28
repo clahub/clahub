@@ -19,7 +19,7 @@ gem 'paul_revere'
 gem 'kramdown'
 gem 'newrelic_rpm'
 gem 'rack-ssl-enforcer'
-gem 'dotenv'
+gem 'dotenv-rails'
 
 group :development do
   gem 'pry'
