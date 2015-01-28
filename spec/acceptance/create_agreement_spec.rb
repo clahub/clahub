@@ -106,6 +106,7 @@ feature "Creating a CLA for a repo" do
 
     inputs = {
       'name' => 'web',
+      'events' => ['push', 'pull_request'],
       'config' => {
         'url' => "#{HOST}/repo_hook"
       }
@@ -126,6 +127,7 @@ feature "Creating a CLA for a repo" do
 
     inputs = {
       'name' => 'web',
+      'events' => ['push', 'pull_request'],
       'config' => {
         'url' => "#{HOST}/repo_hook"
       }

@@ -12,32 +12,19 @@ class CheckOpenPullsJob
   def run
     return true if !self.enabled
 
-    pushes.each do |push|
-      PushStatusChecker.new(push).check_and_update
+    pull_request_commit_groups.each do |commit_group|
+      commit_group.check_and_update
     end
   end
 
   private
 
-  def pushes
+  def pull_request_commit_groups
     pull_mashes.map do |pull_mash|
-      commit_mashes = github_repos.get_pull_commits(
-        @user_name, @repo_name, pull_mash.number)
+      commit_group = CommitGroup.new(@user_name, @repo_name)
+      commit_group.fetch_from_pull_request(pull_mash.number)
 
-      # TODO this is a weird adapter, unweird it
-      GithubPush.new({
-        repository: {
-          owner: { name: @user_name },
-          name: @repo_name
-        },
-        commits: commit_mashes.map { |mash|
-          # TODO: Add test case for no author only committer on this phase
-          commit_hash = { id: mash.sha }
-          commit_hash[:author] = { username: mash.author.login } if mash.author
-          commit_hash[:committer] = { username: mash.committer.login } if mash.committer
-          commit_hash
-        }
-      }.to_json)
+      commit_group
     end
   end
 

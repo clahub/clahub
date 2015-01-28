@@ -51,6 +51,7 @@ describe Agreement do
 
     hook_inputs = {
       'name' => 'web',
+      'events' => ['push', 'pull_request'],
       'config' => {
         'url' => "#{HOST}/repo_hook"
       }
