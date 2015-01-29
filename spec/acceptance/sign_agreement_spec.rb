@@ -129,10 +129,11 @@ feature "Agreeing to a CLA" do
     expect_commit_status_to_be_set('the_owner', 'alpha', 'bbb222', 'success')
     expect_commit_status_to_be_set('the_owner', 'alpha', 'ccc333', 'failure')
     expect_commit_status_to_be_set('the_owner', 'beta',  'ddd444', 'failure')
-    expect_commit_status_to_be_set('the_owner', 'beta',  'eee555', 'failure')
+    expect_commit_status_to_be_set('the_owner', 'beta',  'eee555', 'ancestor_failure')
 
-    sign_agreement('the_owner', 'beta', 'caterina_committer')
-    expect_commit_status_to_be_set('the_owner', 'beta',  'eee555', 'success')
+    sign_agreement('the_owner', 'beta', 'nancy_no_signature')
+    expect_commit_status_to_be_set('the_owner', 'beta',  'ddd444', 'success')
+    expect_commit_status_to_be_set('the_owner', 'beta',  'eee555', 'failure')
   end
 
   def expect_commit_status_to_be_set(user_name, repo_name, sha, status)

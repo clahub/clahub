@@ -1,7 +1,8 @@
 class CommitGroup
   STATUS_DESCRIPTIONS = {
     'success' => 'All contributors have signed the Contributor License Agreement.',
-    'failure' => 'Not all contributors have signed the Contributor License Agreement.'
+    'failure' => 'Not all contributors have signed the Contributor License Agreement.',
+    'ancestor_failure' => 'One or more of this commit\'s parents has contributors who have not signed the Contributor License Agreement.'
   }
 
   def initialize(repo_owner_name, repo_name)
@@ -15,8 +16,13 @@ class CommitGroup
       "PushStatusChecker#check_and_update for push #{@repo_owner_name}/#{@repo_name}:#{ids}")
     return unless repo_agreement
 
-    @commits.each do |commit|
-      check_commit(commit)
+    @commits.reduce(false) do |ancestor_has_failed, commit|
+      if ancestor_has_failed
+        mark(commit, 'ancestor_failure')
+        true
+      else
+        not check_commit(commit)
+      end
     end
   end
 
@@ -61,8 +67,10 @@ class CommitGroup
 
     if all_contributors_signed
       mark(commit, 'success')
+      true
     else
       mark(commit, 'failure')
+      false
     end
   end
 
