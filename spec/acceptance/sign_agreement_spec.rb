@@ -136,15 +136,15 @@ feature "Agreeing to a CLA" do
     expect_commit_status_to_be_set('the_owner', 'beta',  'eee555', 'failure')
   end
 
-  def expect_commit_status_to_be_set(user_name, repo_name, sha, status)
+  def expect_commit_status_to_be_set(user_name, repo_name, sha, status_name)
     raise "no agreement made for repo" unless agreement = Agreement.find_by_user_name_and_repo_name(user_name, repo_name)
     raise "no oauth token for creator" unless oauth_token = agreement.user.oauth_token
 
     status_url = "https://api.github.com/repos/#{user_name}/#{repo_name}/statuses/#{sha}?access_token=#{oauth_token}"
     status_params = {
-      state: status,
+      state: CommitGroup::STATUS_TYPES[status_name]['state'],
       target_url: "#{HOST}/agreements/#{user_name}/#{repo_name}",
-      description: CommitGroup::STATUS_DESCRIPTIONS[status],
+      description: CommitGroup::STATUS_TYPES[status_name]['description'],
       context: "clahub"
     }
 

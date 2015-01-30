@@ -1,8 +1,17 @@
 class CommitGroup
-  STATUS_DESCRIPTIONS = {
-    'success' => 'All contributors have signed the Contributor License Agreement.',
-    'failure' => 'Not all contributors have signed the Contributor License Agreement.',
-    'ancestor_failure' => 'One or more of this commit\'s parents has contributors who have not signed the Contributor License Agreement.'
+  STATUS_TYPES = {
+    'success' => {
+      'state' => 'success',
+      'description' => 'All contributors have signed the Contributor License Agreement.',
+    },
+    'failure' => {
+      'state' => 'failure',
+      'description' => 'Not all contributors have signed the Contributor License Agreement.'
+    },
+    'ancestor_failure' => {
+      'state' => 'failure',
+      'description' => 'One or more of this commit\'s parents has contributors who have not signed the Contributor License Agreement.'
+    }
   }
 
   def initialize(repo_owner_name, repo_name)
@@ -18,8 +27,7 @@ class CommitGroup
 
     @commits.reduce(false) do |ancestor_has_failed, commit|
       if ancestor_has_failed
-        mark(commit, 'ancestor_failure')
-        true
+        not mark(commit, 'ancestor_failure')
       else
         not check_commit(commit)
       end
@@ -67,22 +75,22 @@ class CommitGroup
 
     if all_contributors_signed
       mark(commit, 'success')
-      true
     else
       mark(commit, 'failure')
-      false
     end
   end
 
-  def mark(commit, state)
+  def mark(commit, status_name)
     target_url = "#{HOST}/agreements/#{@repo_owner_name}/#{@repo_name}"
 
     github_repos.set_status(@repo_owner_name, @repo_name, commit.id, {
-      state: state,
+      state: STATUS_TYPES[status_name]['state'],
       target_url: target_url,
-      description: STATUS_DESCRIPTIONS[state],
+      description: STATUS_TYPES[status_name]['description'],
       context: "clahub"
     })
+
+    STATUS_TYPES[status_name]['state'] == 'success'
   end
 
   def commit_contributors(commit)
