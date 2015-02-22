@@ -22,7 +22,14 @@ Migrate the database:
     heroku run rake db:migrate
     heroku run rake db:seed
 
-Register for two new [GitHub applications](https://github.com/settings/applications/new), one will be used for project owner signups and one for contributors signups. From the applications' page, copy the client keys and secrets, and add it to the Heroku environment:
+Register for two new [GitHub applications](https://github.com/settings/applications/new), one will be used for project owner signups and one for contributors signups.
+
+You will need to configure the authorization callback URL for each:
+
+    * Full access: https://my-clahub.herokuapp.com/auth/github/callback
+    * Limited-access signature-only callback: https://my-clahub.herokuapp.com/auth/github_limited/callback
+
+From the applications' page, copy the client keys and secrets, and add it to the Heroku environment:
 
     heroku config:add GITHUB_KEY=aaa111bbb GITHUB_SECRET=ccc222ddd
     heroku config:add GITHUB_LIMITED_KEY=aaa111bbb GITHUB_LIMITED_SECRET=ccc222ddd
