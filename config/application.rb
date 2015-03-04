@@ -61,7 +61,13 @@ module Clahub
 
     # Enable the asset pipeline
     config.assets.enabled = true
-    
+    # Add the fonts path
+    # Add the fonts path
+    config.assets.paths << "#{Rails.root}/app/assets/fonts"
+
+    # Precompile additional assets
+    config.assets.precompile += %w( .svg .eot .woff .ttf )
+
     # Heroku requirement
     config.assets.initialize_on_precompile = false
 
