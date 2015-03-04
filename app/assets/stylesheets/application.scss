@@ -37,7 +37,7 @@
 body {
   padding-top: 80px;
   padding-bottom: 40px;
-  font-size:14px;
+  font-size:16px;
   font-family: 'Open Sans', sans-serif;
 }
 
@@ -224,6 +224,11 @@ form.form-horizontal .field_with_errors {
 
 .field_with_errors {
   @include formFieldState($errorText, $errorText, $errorBackground);
+}
+
+h2 {
+  margin-top: 25px;
+  margin-bottom: 15px;
 }
 
 .float-left { float: left; }
