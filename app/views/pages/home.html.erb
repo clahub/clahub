@@ -1,9 +1,11 @@
 <div class="hero-unit">
   <%= image_tag 'thg-logo.png', class: 'logo' %>
-  <h1>The Hybrid Group</h1>
-  <h2>Contributor License Agreements</h2>
-  <p><a class="btn btn-primary btn-large" href="/auth/github">Sign in with GitHub to get started &raquo;</a></p>
-  <p>Or, read more about <%= link_to 'what CLAs are and why you might use one', page_path('why_cla') %>&hellip;</p>
+  <div class="text">
+    <h1>The Hybrid Group</h1>
+    <h2>Contributor License Agreements</h2>
+    <p><a class="btn btn-primary btn-large" href="/auth/github">Sign in with GitHub to get started &raquo;</a></p>
+    <p>Or, read more about <%= link_to 'what CLAs are and why you might use one', page_path('why_cla') %>&hellip;</p>
+  </div>
 </div>
 
 <%= render partial: 'how_it_works' %>

@@ -53,11 +53,15 @@ body.pages-home div.hero-unit {
   padding: 60px 60px 60px 60px;
 
   img.logo {
-    display:block;
+    display:inline-block;
     float:left;
     margin:0 60px 0 0;
 
     position: relative;
+  }
+
+  .text {
+    display: inline-block;
   }
 }
 
