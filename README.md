@@ -148,7 +148,7 @@ See DEPLOY.md for information on deploying.
 License
 ================
 
-See [LICENSE](https://github.com/clahub/clahub/blob/master/LICENSE) for the project license.
+See [LICENSE](https://github.com/clahub/clahub/blob/master/LICENSE.md) for the project license.
 
 The "Clipboard and pencil" graphic used in the homepage logo is
 licensed from iStockPhoto.com:
