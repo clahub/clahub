@@ -57,7 +57,7 @@ Register a new app at GitHub to get an OAuth key and secret:
 
 https://github.com/settings/applications/new
 
-Set up a .env file with your GITHUB_KEY and GITHUB_SECRET. See 
+Set up a .env file with your GITHUB_KEY and GITHUB_SECRET. 
 You can also specify an HTTP port for local foreman:
 
     GITHUB_KEY=abc123
