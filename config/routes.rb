@@ -14,6 +14,7 @@ Clahub::Application.routes.draw do
     get 'agreements/:user_name/:repo_name.csv' => 'agreements#show', :as => :agreement, :format => :csv
     get 'agreements/:user_name/:repo_name' => 'agreements#show', :as => :agreement
     delete 'agreements/:user_name/:repo_name' => 'agreements#destroy', :as => :agreement
+    put 'agreements/:user_name/:repo_name' => 'agreements#update', :as => :agreement
     post 'agreements/:user_name/:repo_name/signatures' => 'signatures#create', :as => :agreement_signature
   end
 

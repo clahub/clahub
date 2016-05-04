@@ -53,6 +53,14 @@ class AgreementsController < ApplicationController
     end
   end
 
+  def update
+    agreement = current_user.agreements.find_by_user_name_and_repo_name!(params[:user_name], params[:repo_name])
+    new_user = User.where(["id = ?", params[:agreement][:user_id]]).first
+    agreement.update_attribute(:user_name, new_user.nickname)
+    agreement.update_attribute(:user_id, params[:agreement][:user_id])
+    redirect_to agreements_url
+  end
+
   def destroy
     agreement = current_user.agreements.find_by_user_name_and_repo_name!(params[:user_name], params[:repo_name])
     agreement.destroy_including_signatures_and_hook

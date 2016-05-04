@@ -1,0 +1,12 @@
+<div id="transfer-ownership">
+  <h2>Transfer Agreement Ownership</h2>
+  <%= form_for @agreement, url: {:controller => 'agreements', :action => 'update'} do |f| %>
+  <div class="field">
+    <%= f.label :user_id, "Owner:" %>
+    <%= f.collection_select :user_id, User.all, :id, :nickname %>
+  </div>
+  <div class="actions">
+    <%= f.submit :class => 'update' %>
+  </div>
+  <% end %>
+</div>

@@ -67,7 +67,8 @@ body.signatures-create {
     margin-top: 27px;
   }
 
-  button#agreement-submit {
+  button#agreement-submit,
+  input.update {
     @extend .btn, .btn-primary, .btn-large;
     @extend .span4;
   }
@@ -89,7 +90,8 @@ body.signatures-create {
     }
   }
 
-  div#delete-agreement {
+  div#delete-agreement,
+  div#transfer-ownership {
     margin-top: 27px;
 
     h2 {
