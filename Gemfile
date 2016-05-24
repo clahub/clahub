@@ -20,6 +20,7 @@ gem 'kramdown'
 gem 'newrelic_rpm'
 gem 'rack-ssl-enforcer'
 gem 'dotenv-rails'
+gem 'sidekiq'
 
 group :development do
   gem 'pry'
