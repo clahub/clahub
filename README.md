@@ -57,14 +57,21 @@ Register a new app at GitHub to get an OAuth key and secret:
 
 https://github.com/settings/applications/new
 
-Set up a .env file with your GITHUB_KEY and GITHUB_SECRET.
+Set up a .env file with your GITHUB_KEY and GITHUB_SECRET. 
 You can also specify an HTTP port for local foreman:
 
     GITHUB_KEY=abc123
     GITHUB_SECRET=234897239872394832478
-    GITHUB_LIMITED_KEY=abc123
-    GITHUB_LIMITED_SECRET=234897239872394832478
+    GITHUB_LIMITED_KEY=xyz789
+    GITHUB_LIMITED_SECRET=2390482390482
     PORT=3000
+
+Register for two new GitHub applications, one will be used for project owner signups and one for contributors signups.
+
+You will need to configure the authorization callback URL for each:
+
+* Full access: http://127.0.0.1:3000/auth/github/callback
+* Limited-access signature-only callback: https://127.0.0.1:3000/auth/github_limited/callback
 
 This file is .gitignored so it's private.
 
