@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'sidekiq/testing'
+Sidekiq::Testing.inline!
 
 describe 'receiving github repo "Commit" webhook callbacks' do
   let(:token) { 'abc123' }
