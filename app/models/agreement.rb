@@ -30,7 +30,11 @@ class Agreement < ActiveRecord::Base
 
   def delete_github_repo_hook
     if github_repo_hook_id
-      GithubRepos.new(self.user).delete_hook(user_name, repo_name, github_repo_hook_id)
+      begin
+        GithubRepos.new(self.user).delete_hook(user_name, repo_name, github_repo_hook_id)
+      rescue
+        self.update_attribute(:github_repo_hook_id, nil)
+      end
       self.update_attribute(:github_repo_hook_id, nil)
     end
   end
