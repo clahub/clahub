@@ -2,13 +2,13 @@ source 'https://rubygems.org'
 
 ruby "2.1.9" # make sure .ruby-version agrees
 
-gem 'rails', '3.2.19'
+gem 'rails', '~> 3.2'
 
 gem 'pg'
 gem 'jquery-rails'
 gem 'thin'
 gem 'bootstrap-sass', "~> 2.0"
-gem 'sass', "~> 3.2.0"
+gem 'sass', "~> 3.2"
 gem 'chosen-rails'
 gem 'omniauth'
 gem 'omniauth-github'
