@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby "2.1.9" # make sure .ruby-version agrees
+ruby "2.2.5" # make sure .ruby-version agrees
 
 gem 'rails', '~> 3.2'
 
@@ -24,7 +24,6 @@ gem 'dotenv-rails'
 group :development do
   gem 'pry'
   gem 'pry-rails'
-  # gem 'pry-debugger'
   gem 'pry-remote'
   gem 'debugger-linecache', '1.2.0'
   gem 'httplog'
@@ -38,6 +37,7 @@ group :test do
   gem 'webmock'
   gem 'poltergeist'
   gem 'database_cleaner'
+  gem 'test-unit', '~> 3.0'
 end
 
 group :test, :development do
