@@ -103,7 +103,7 @@ class CommitGroup
       contributors << author
     end
 
-    if commit.committer
+    if commit.committer && commit.committer.username != 'web-flow'
       committer_email = commit.committer.email
       committer_username = commit.committer.username
       committer = User.find_by_email_or_nickname(committer_email, committer_username)
