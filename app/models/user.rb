@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
       oauth.slice(*attributes_to_update).each do |key, value|
         user.send("#{key}=", value)
       end
+      Rails.logger.info "Updated oauth token for #{user.email}"
       user.save
     end
   end
