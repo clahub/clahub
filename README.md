@@ -18,7 +18,7 @@ such discussion in [GitHub issues](https://github.com/clahub/clahub/issues).
 
 Build status
 ------------
-[![Build Status](https://secure.travis-ci.org/clahub/clahub.png)](http://travis-ci.org/clahub/clahub)
+[![Build Status](https://secure.travis-ci.org/clahub/clahub.svg)](http://travis-ci.org/clahub/clahub)
 
 What's a CLA?
 -------------
