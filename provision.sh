@@ -18,7 +18,7 @@ sudo apt-get install -y libxslt1-dev
 # Required to install the `pg` gem
 sudo apt-get install -y libpq-dev
 cd /tmp
-wget http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.4.tar.gz
+wget https://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.4.tar.gz
 tar -xvzf ruby-2.1.4.tar.gz
 cd ruby-2.1.4/
 ./configure --prefix=/usr/local
@@ -42,7 +42,7 @@ echo "Installing gems"
 
 echo "Preparing database"
 # "Force Postgres to install with UTF8 encoding, not LATIN1?"
-# http://stackoverflow.com/questions/20815440/force-postgres-to-install-with-utf8-encoding-not-latin1
+# https://stackoverflow.com/questions/20815440/force-postgres-to-install-with-utf8-encoding-not-latin1
 sudo pg_dropcluster --stop 9.1 main
 sudo pg_createcluster --locale en_US.UTF-8 --start 9.1 main
 
