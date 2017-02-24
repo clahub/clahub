@@ -57,7 +57,7 @@ You also need to set your hostname as a `HOST` environment variable:
 
 or edit `config/initializers/host.rb` and add your host name (either the domain name supplied by Heroku or your custom domain) to the `production` key. For example:
 
-    'production'  => 'http://my-clahub.herokuapp.com'
+    'production'  => 'https://my-clahub.herokuapp.com'
 
 HTTPS
 ------------------
