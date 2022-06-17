@@ -59,6 +59,7 @@ GEM
       execjs
     coffee-script-source (1.10.0)
     colorize (0.7.7)
+    concurrent-ruby (1.1.10)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     daemons (1.2.3)
@@ -109,7 +110,8 @@ GEM
     http_parser.rb (0.5.3)
     httplog (0.3.2)
       colorize
-    i18n (0.7.0)
+    i18n (0.9.5)
+      concurrent-ruby (~> 1.0)
     journey (1.0.4)
     jquery-rails (3.1.4)
       railties (>= 3.0, < 5.0)
