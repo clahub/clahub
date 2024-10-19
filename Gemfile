@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby "2.2.5" # make sure .ruby-version agrees
+ruby "3.3.4" # make sure .ruby-version agrees
 
 gem 'rails', '~> 3.2'
 
