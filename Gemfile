@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 ruby "3.3.4" # make sure .ruby-version agrees
 
-gem 'rails', '~> 3.2'
+gem 'rails', '~> 5'
 
 gem 'pg'
 gem 'jquery-rails'
