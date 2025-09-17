@@ -307,7 +307,7 @@ GEM
     rb-fsevent (0.9.4)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
-    rexml (3.3.9)
+    rexml (3.4.2)
     rspec-collection_matchers (1.1.2)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (2.99.2)
