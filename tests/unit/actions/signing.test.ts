@@ -94,6 +94,7 @@ describe("signAgreement", () => {
     expect(result).toEqual({
       success: false,
       error: "You must be signed in to sign this agreement",
+      code: "UNAUTHORIZED",
     });
   });
 
@@ -109,6 +110,7 @@ describe("signAgreement", () => {
     expect(result).toEqual({
       success: false,
       error: "Agreement not found",
+      code: "NOT_FOUND",
     });
   });
 
@@ -124,6 +126,7 @@ describe("signAgreement", () => {
     expect(result).toEqual({
       success: false,
       error: "Agreement not found",
+      code: "NOT_FOUND",
     });
   });
 
@@ -139,6 +142,7 @@ describe("signAgreement", () => {
     expect(result).toEqual({
       success: false,
       error: "Agreement has no published version",
+      code: "NOT_FOUND",
     });
   });
 
@@ -176,6 +180,7 @@ describe("signAgreement", () => {
     expect(result).toEqual({
       success: false,
       error: "You have already signed this agreement",
+      code: "CONFLICT",
     });
   });
 
@@ -223,6 +228,7 @@ describe("signAgreement", () => {
     expect(result).toEqual({
       success: false,
       error: "You have already signed this agreement",
+      code: "CONFLICT",
     });
   });
 
