@@ -21,12 +21,16 @@ export const metadata: Metadata = {
   },
   description:
     "Manage Contributor License Agreements for your GitHub projects. Automate CLA signing with GitHub Checks integration.",
+  icons: {
+    apple: "/apple-icon.png",
+  },
   openGraph: {
     title: "CLAHub",
     description:
       "Manage Contributor License Agreements for your GitHub projects.",
     siteName: "CLAHub",
     type: "website",
+    images: [{ url: "/cla-logo.png" }],
   },
 };
 
