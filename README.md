@@ -1,170 +1,194 @@
-Overview
-================
+# CLAHub
 
-CLAHub provides a low-friction way to have a Contributor License Agreement for
-your open source project that's hosted on GitHub.  Contributors digitally sign
-your CLA by signing in with GitHub.  Then, it automatically marks up your pull
-requests based on whether the contributors have all signed your CLA.
+CLAHub provides a low-friction way to have a Contributor License Agreement for your open source project on GitHub. Contributors digitally sign your CLA by signing in with GitHub, and pull requests are automatically marked with a status check based on whether all commit authors have signed.
 
-Right now it's running at <https://www.clahub.com>
+Running at [clahub.com](https://www.clahub.com)
 
-I don't intend for this to lead to a proliferation of CLAs.  But when they're
-appropriate, I hope it can reduce the friction of contribution.
+## Features
 
-This project is a work-in-progress.  Any and all feedback is welcome!
+**For project owners:**
 
-It currently works, but could use UI and functionality improvement.  Find
-such discussion in [GitHub issues](https://github.com/clahub/clahub/issues).
+- Create CLAs from templates (Apache ICLA, DCO) or write custom ones in Markdown
+- Version control for CLA text with changelogs
+- Custom form fields (text, email, URL, checkbox, date)
+- Automatic GitHub Check Runs on pull requests
+- Bot auto-detection — accounts like `dependabot[bot]` and `renovate[bot]` are excluded automatically
+- Per-user exclusions — manually bypass CLA for specific GitHub accounts
+- Dashboard with signature tracking
+- Full audit log of all changes
 
-Build status
-------------
-[![Build Status](https://secure.travis-ci.org/clahub/clahub.svg)](https://travis-ci.org/clahub/clahub)
+**For contributors:**
 
-What's a CLA?
--------------
-Contributor Agreements are a way to prove intellectual property (IP) provenance
-of contributions to an open-source project.  They generally say that:
+- Sign in with GitHub (minimal permissions)
+- View rendered CLA, fill required fields, sign digitally
+- Automatic PR re-check after signing — no need to re-push
 
-> 1. The code I’m contributing is mine, and I have the right to license it.
+## How it works
 
-> 2. I’m granting you a license to distribute said code under the terms of this
-> agreement (typically “as you see fit” or “under an OSI-approved license” or
-> whatever).
+1. Owner installs the CLAHub GitHub App on a repository
+2. Owner creates a CLA agreement for that repo
+3. When a pull request is opened, CLAHub receives a webhook
+4. CLAHub extracts commit authors and checks each one:
+   - **Excluded** (bot pattern or manual exclusion) — skipped
+   - **Signed** — has a valid, non-revoked signature on file
+   - **Unsigned** — needs to sign the CLA
+5. A GitHub Check Run is posted with the result and a link to the signing page
+6. After a contributor signs, all open PRs for that repo are re-checked
 
--- From [_Contributor License Agreements_ by Jacob Kaplan-Moss](https://jacobian.org/writing/contributor-license-agreements/)
+## Tech stack
 
-Here's some more background on CLAs:
+- [Next.js](https://nextjs.org) 16 (App Router, React 19)
+- [Prisma](https://www.prisma.io) v7 with SQLite (better-sqlite3 adapter)
+- [Auth.js](https://authjs.dev) (NextAuth v5) with dual GitHub OAuth providers
+- [Tailwind CSS](https://tailwindcss.com) v4 + [shadcn/ui](https://ui.shadcn.com) components
+- [Octokit](https://github.com/octokit) for GitHub App / Checks API
+- [Zod](https://zod.dev) v4 + [React Hook Form](https://react-hook-form.com) for validation
+- [Vitest](https://vitest.dev) + [Playwright](https://playwright.dev) for testing
 
-* [Wikipedia page](https://en.wikipedia.org/wiki/Contributor_License_Agreement) for CLAs
-* [_A CLA By Any Other Name_ on Groklaw](http://www.groklaw.net/article.php?story=20110524120303815)
+## Getting started
 
-Want to choose a CLA?  Harmony Agreements is a web tool that helps you quickly select a CLA:
-* <http://www.harmonyagreements.org/>
+### Prerequisites
 
-Legal disclaimer
-----------------
-I am not a lawyer, and none of the CLAhub documentation, functionality, or
-other communication constitutes legal advice.  Consult your lawyer about
-contributor agreements for your project.
+You need **Node.js 18+** and **npm**. You also need to set up three things on GitHub:
 
-Development
-================
+1. **GitHub App** — for webhook events and Check Runs
+2. **GitHub OAuth App (owner)** — full scope for project owners
+3. **GitHub OAuth App (contributor)** — minimal scope for CLA signers
 
-Prerequisites
-----------------
+### 1. Clone and install
 
-Register a new app at GitHub to get an OAuth key and secret:
+```bash
+git clone https://github.com/clahub/clahub.git
+cd clahub
+npm install
+```
 
-https://github.com/settings/applications/new
+### 2. Configure environment
 
-Set up a .env file with your GITHUB_KEY and GITHUB_SECRET.
-You can also specify an HTTP port for local foreman:
+```bash
+cp .env.local.example .env.local
+```
 
-    GITHUB_KEY=abc123
-    GITHUB_SECRET=234897239872394832478
-    GITHUB_LIMITED_KEY=xyz789
-    GITHUB_LIMITED_SECRET=2390482390482
-    PORT=3000
+Fill in the values:
 
-Register for two new GitHub applications, one will be used for project owner signups and one for contributors signups.
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | Yes | SQLite path, e.g. `file:./clahub.db` |
+| `NEXTAUTH_SECRET` | Yes | Generate with `openssl rand -base64 32` |
+| `GITHUB_APP_ID` | Yes | GitHub App ID |
+| `GITHUB_APP_PRIVATE_KEY` | Yes | GitHub App private key (PEM) |
+| `GITHUB_WEBHOOK_SECRET` | Yes | Webhook secret configured on the GitHub App |
+| `GITHUB_OWNER_CLIENT_ID` | Yes | OAuth App for owners — Client ID |
+| `GITHUB_OWNER_CLIENT_SECRET` | Yes | OAuth App for owners — Client secret |
+| `GITHUB_CONTRIBUTOR_CLIENT_ID` | Yes | OAuth App for contributors — Client ID |
+| `GITHUB_CONTRIBUTOR_CLIENT_SECRET` | Yes | OAuth App for contributors — Client secret |
+| `APP_URL` | Yes | Public URL, e.g. `http://localhost:3000` |
+| `SENTRY_DSN` | No | Sentry error tracking |
+| `RESEND_API_KEY` | No | Email via Resend |
+| `EMAIL_FROM` | No | Sender address for emails |
 
-You will need to configure the authorization callback URL for each:
+### 3. Set up the database
 
-* Full access: http://127.0.0.1:3000/auth/github/callback
-* Limited-access signature-only callback: https://127.0.0.1:3000/auth/github_limited/callback
+```bash
+npm run db:push
+npm run db:seed    # optional — creates sample data
+```
 
-This file is .gitignored so it's private.
+### 4. Run the dev server
 
-We use the `dotenv` gem to provide these variables to the test environment as
-well.
+```bash
+npm run dev
+```
 
-JavaScript acceptance tests use
-[poltergeist](https://github.com/jonleighton/poltergeist) which requires
-installing [PhantomJS](http://phantomjs.org).  Follow the PhantomJS
-installation instructions on the [poltergeist
-README](https://github.com/jonleighton/poltergeist).
+Open [http://localhost:3000](http://localhost:3000).
 
-Getting set up
-----------------
+### Webhooks in development
 
-Install gems and initialize databases:
+GitHub can't reach `localhost`, so use a tunnelling service like [ngrok](https://ngrok.com):
 
-    bundle
-    rake db:create db:migrate db:test:prepare
+```bash
+ngrok http 3000
+```
 
-Run the tests to make sure things are working:
+Set the forwarding URL as your GitHub App's webhook URL and update `APP_URL` in `.env.local`.
 
-    rake
+## Scripts
 
-Running the app
-----------------
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format with Prettier |
+| `npm test` | Run unit tests (Vitest) |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:e2e` | Run E2E tests (Playwright) |
+| `npm run db:push` | Push Prisma schema to database |
+| `npm run db:seed` | Seed database with sample data |
+| `npm run db:studio` | Open Prisma Studio |
 
-Run with Foreman if you like:
+## Project structure
 
-    foreman start
+```
+src/
+  app/
+    (marketing)/        Landing, privacy, terms, why-cla pages
+    agreements/         Dashboard, create, edit, public signing page
+    api/auth/           NextAuth endpoints
+    api/webhooks/       GitHub App webhook handler
+    auth/signin/        Sign-in page
+  components/
+    ui/                 shadcn/ui primitives
+    agreements/         Agreement form, signing form, exclusion manager, etc.
+  lib/
+    actions/            Server actions (agreement, exclusion, signing)
+    schemas/            Zod validation schemas
+    auth.ts             NextAuth configuration (dual providers)
+    cla-check.ts        Core CLA verification + exclusion logic
+    github.ts           GitHub App / Octokit setup
+    prisma.ts           Prisma client singleton
+    templates.ts        CLA templates (Apache ICLA, DCO)
+prisma/
+  schema.prisma         Database schema (8 models)
+  seed.ts               Sample data
+tests/
+  api/                  API route tests
+  components/           Component tests
+  e2e/                  Playwright E2E tests
+```
 
-Or as normal (.env is loaded by `dotenv` gem):
+## Database models
 
-    rails server
-    rails console
+| Model | Purpose |
+|---|---|
+| `User` | GitHub users (owners and contributors) |
+| `Agreement` | CLA definitions linked to a GitHub repo |
+| `AgreementVersion` | Versioned CLA text with changelogs |
+| `AgreementField` | Custom form fields on a CLA |
+| `Signature` | User signatures (soft-deletable via `revokedAt`) |
+| `FieldEntry` | Field values submitted with a signature |
+| `Exclusion` | Bot/user exclusions per agreement |
+| `AuditLog` | Complete change history |
 
-Coverage
-----------------
+## What's a CLA?
 
-Use SimpleCov to build code coverage:
+Contributor License Agreements prove intellectual property provenance of contributions to an open-source project. They generally say:
 
-    COVERAGE=true rake
+> 1. The code I'm contributing is mine, and I have the right to license it.
+> 2. I'm granting you a license to distribute said code under the terms of this agreement.
 
-LiveReload
-----------------
+From [*Contributor License Agreements* by Jacob Kaplan-Moss](https://jacobian.org/writing/contributor-license-agreements/)
 
-When working on display-heavy features, [LiveReload](http://livereload.com/)
-saves valuable keystrokes and time.  We use
-[guard-livereload](https://github.com/guard/guard-livereload) to watch
-templates and assets and reload when they change.
+More background:
 
-To take advantage of this:
+- [Wikipedia: Contributor License Agreement](https://en.wikipedia.org/wiki/Contributor_License_Agreement)
+- [Harmony Agreements](http://www.harmonyagreements.org/) — a tool to help choose a CLA
 
-* Install a [LiveReload browser extension](http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-)
-* Run `guard` on the command line.
+## Legal disclaimer
 
-Development and Webhooks
-------------------------
+None of the CLAHub documentation, functionality, or other communication constitutes legal advice. Consult your lawyer about contributor agreements for your project.
 
-As part of the app, we sign up to receive GitHub webhooks (HTTP requests to
-`/repo_hook`) to be notified when stuff happens to repos we care about.  (In
-particular, we want to know about new pushes so we can assess whether their
-contributors have agreed to the relevant CLA.)
+## License
 
-When you're developing locally, GitHub can't send webhook events
-to you at `localhost:3000`, so use a local tunnelling service like
-[ngrok](https://ngrok.com) or [localtunnel.me](https://localtunnel.me).
-
-Then, you should run the Rails server with the `HOST` environment variable
-set, like `HOST=http://my.fancy.dynamic.host.name rails server`, or set it in `.env`
-if using `foreman`.  This is read in `config/initializers/host.rb`
-
-*Note* that the dynamic hostname you use is saved in the GitHub webhook
-registrations.  If your dynamic hostname changes, you will need to update the
-webhooks in GitHub so that it knows where to send the requests.
-
-Deployment
-================
-See DEPLOY.md for information on deploying.
-
-License
-================
-
-See [LICENSE](https://github.com/clahub/clahub/blob/master/LICENSE.md) for the project license.
-
-The "Clipboard and pencil" graphic used in the homepage logo is
-licensed from iStockPhoto.com:
-
-<http://www.istockphoto.com/stock-illustration-16006726-clipboard-and-pencil.php>
-
-The graphic is licensed for a single-seat install and is in use at
-https://www.clahub.com.  It is not licensed for multi-seat use, so any
-other installations should purchase a separate license or use a different
-image.
-
-<http://www.istockphoto.com/help/licenses>
+[MIT](LICENSE.md) — Copyright (c) 2013 Jason Morrison
