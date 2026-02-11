@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getInstallationOctokit } from "@/lib/github";
+import { logger } from "@/lib/logger";
 import type { Exclusion } from "@/generated/prisma/client";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -233,7 +234,7 @@ async function withRetry<T>(
     } catch (err) {
       if (i === attempts - 1) throw err;
       const delay = baseDelayMs * 2 ** i;
-      console.warn(`[cla-check] Retry ${i + 1}/${attempts - 1} after ${delay}ms`, err);
+      logger.warn(`Retry ${i + 1}/${attempts - 1} after ${delay}ms`, { action: "cla-check.retry" });
       await new Promise((r) => setTimeout(r, delay));
     }
   }
@@ -266,7 +267,7 @@ export async function recheckOpenPRs(agreementId: number): Promise<void> {
     }),
   );
 
-  console.log(`[cla-check] Rechecking ${pulls.length} open PR(s) for ${owner}/${repo}`);
+  logger.info(`Rechecking ${pulls.length} open PR(s) for ${owner}/${repo}`, { action: "cla-check.recheck" });
 
   for (const pr of pulls) {
     const start = Date.now();
@@ -282,13 +283,15 @@ export async function recheckOpenPRs(agreementId: number): Promise<void> {
         ),
       );
       const duration = Date.now() - start;
-      console.log(
-        `[cla-check] PR #${pr.number}: ${result.allSigned ? "success" : "action_required"} (${duration}ms)`,
+      logger.info(
+        `PR #${pr.number}: ${result.allSigned ? "success" : "action_required"} (${duration}ms)`,
+        { action: "cla-check.recheck" },
       );
     } catch (err) {
       const duration = Date.now() - start;
-      console.error(
-        `[cla-check] PR #${pr.number}: failed after retries (${duration}ms)`,
+      logger.error(
+        `PR #${pr.number}: failed after retries (${duration}ms)`,
+        { action: "cla-check.recheck" },
         err,
       );
     }

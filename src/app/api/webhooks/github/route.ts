@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getGitHubApp } from "@/lib/github";
+import { apiError, ErrorCode } from "@/lib/api-error";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: Request) {
   const signature = request.headers.get("x-hub-signature-256");
@@ -7,9 +9,10 @@ export async function POST(request: Request) {
   const delivery = request.headers.get("x-github-delivery");
 
   if (!signature || !event || !delivery) {
-    return NextResponse.json(
-      { error: "Missing required GitHub webhook headers" },
-      { status: 400 },
+    return apiError(
+      ErrorCode.VALIDATION_ERROR,
+      "Missing required GitHub webhook headers",
+      400,
     );
   }
 
@@ -32,16 +35,18 @@ export async function POST(request: Request) {
       error instanceof Error ? error.message : "Unknown error";
 
     if (message.includes("signature")) {
-      return NextResponse.json(
-        { error: "Invalid signature" },
-        { status: 401 },
+      return apiError(
+        ErrorCode.UNAUTHORIZED,
+        "Invalid signature",
+        401,
       );
     }
 
-    console.error("Webhook handler error:", error);
-    return NextResponse.json(
-      { error: "Webhook handler failed" },
-      { status: 500 },
+    logger.error("Webhook handler failed", { route: "/api/webhooks/github", method: "POST" }, error);
+    return apiError(
+      ErrorCode.INTERNAL_ERROR,
+      "Webhook handler failed",
+      500,
     );
   }
 }
