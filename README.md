@@ -191,4 +191,4 @@ None of the CLAHub documentation, functionality, or other communication constitu
 
 ## License
 
-[MIT](LICENSE.md) — Copyright (c) 2013 Jason Morrison
+[MIT](LICENSE.md) — Copyright (c) 2013-2026 Jason Morrison, Tony Guntharp
