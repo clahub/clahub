@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AgreementForm } from "@/components/agreements/agreement-form";
+import { ExclusionManager } from "@/components/agreements/exclusion-manager";
 import type { AgreementFieldInput } from "@/lib/schemas/agreement";
 
 export const metadata = {
@@ -30,6 +31,7 @@ export default async function EditAgreementPage({
         where: { enabled: true },
         orderBy: { sortOrder: "asc" },
       },
+      exclusions: true,
     },
   });
 
@@ -48,6 +50,12 @@ export default async function EditAgreementPage({
     enabled: f.enabled,
   }));
 
+  const exclusions = agreement.exclusions.map((e) => ({
+    id: e.id,
+    type: e.type,
+    githubLogin: e.githubLogin,
+  }));
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
@@ -62,6 +70,11 @@ export default async function EditAgreementPage({
         agreementId={agreement.id}
         initialText={latestText}
         initialFields={fields}
+      />
+
+      <ExclusionManager
+        agreementId={agreement.id}
+        initialExclusions={exclusions}
       />
     </div>
   );
