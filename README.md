@@ -128,6 +128,46 @@ Set the forwarding URL as your GitHub App's webhook URL and update `APP_URL` in 
 | `npm run db:seed` | Seed database with sample data |
 | `npm run db:studio` | Open Prisma Studio |
 
+## Testing
+
+### Unit tests (Vitest)
+
+Unit tests live in `tests/unit/` and cover pure functions, Zod schema validation, and business logic with mocked dependencies.
+
+```bash
+npm test              # run all unit tests once
+npm run test:watch    # run in watch mode during development
+```
+
+Tests are organized by layer:
+
+| Directory | What's tested |
+|---|---|
+| `tests/unit/schemas/` | Zod schemas — agreement, signing, exclusion |
+| `tests/unit/cla-check.test.ts` | `extractPushAuthors()` pure function |
+| `tests/unit/cla-check-integration.test.ts` | `checkClaForCommitAuthors`, `createCheckRun`, `extractPRAuthors` with mocked Prisma/Octokit |
+| `tests/unit/actions/signing.test.ts` | `signAgreement` server action with mocked auth, Prisma, and cla-check |
+
+### E2E tests (Playwright)
+
+E2E tests live in `tests/e2e/` and test the signing flow, dashboard, and webhook endpoint through a real browser.
+
+```bash
+npm run test:e2e      # run all E2E tests
+```
+
+**Local development:** Playwright reuses your running dev server on port 3000. Make sure `npm run dev` is running and the database is seeded (`npm run db:seed`).
+
+**CI:** Playwright starts its own dev server using `.env.test` and runs `prisma db push --force-reset` + `prisma db seed` against a disposable `test.db` via the global setup script.
+
+**Authentication in tests:** E2E tests inject real JWT session cookies using `@auth/core/jwt` `encode()` with the same secret as the running server. See `tests/e2e/auth-helpers.ts` for the `authenticateAs()` helper.
+
+**First time setup:**
+
+```bash
+npx playwright install chromium   # download browser binary (one-time)
+```
+
 ## Project structure
 
 ```
@@ -153,9 +193,9 @@ prisma/
   schema.prisma         Database schema (8 models)
   seed.ts               Sample data
 tests/
-  api/                  API route tests
-  components/           Component tests
-  e2e/                  Playwright E2E tests
+  unit/                 Vitest unit tests (schemas, cla-check, actions)
+  e2e/                  Playwright E2E tests (signing flow, dashboard, webhook)
+  setup.ts              Vitest setup (jest-dom matchers)
 ```
 
 ## Database models
