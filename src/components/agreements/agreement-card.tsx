@@ -54,7 +54,7 @@ export function AgreementCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href={`/agreements/${id}`}>
+                  <Link href={`/agreements/edit/${id}`}>
                     <Pencil className="size-4" />
                     Edit
                   </Link>
