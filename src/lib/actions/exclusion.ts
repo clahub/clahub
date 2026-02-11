@@ -1,31 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   createExclusionSchema,
   deleteExclusionSchema,
 } from "@/lib/schemas/exclusion";
-
-type ActionResult =
-  | { success: true }
-  | { success: false; error: string };
-
-async function requireOwner() {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "owner") {
-    throw new Error("Unauthorized");
-  }
-  return session.user;
-}
+import { type ActionResult, requireOwner } from "./result";
 
 export async function addExclusion(input: unknown): Promise<ActionResult> {
   const user = await requireOwner();
   const parsed = createExclusionSchema.safeParse(input);
 
   if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? "Validation failed" };
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Validation failed", code: "VALIDATION_ERROR" };
   }
 
   const data = parsed.data;
@@ -36,7 +24,7 @@ export async function addExclusion(input: unknown): Promise<ActionResult> {
   });
 
   if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
-    return { success: false, error: "Agreement not found" };
+    return { success: false, error: "Agreement not found", code: "NOT_FOUND" };
   }
 
   // Prevent duplicate bot_auto exclusions
@@ -45,7 +33,7 @@ export async function addExclusion(input: unknown): Promise<ActionResult> {
       where: { agreementId: data.agreementId, type: "bot_auto" },
     });
     if (existing) {
-      return { success: false, error: "Bot auto-detection is already enabled" };
+      return { success: false, error: "Bot auto-detection is already enabled", code: "CONFLICT" };
     }
   }
 
@@ -59,7 +47,7 @@ export async function addExclusion(input: unknown): Promise<ActionResult> {
       },
     });
     if (existing) {
-      return { success: false, error: "This user is already excluded" };
+      return { success: false, error: "This user is already excluded", code: "CONFLICT" };
     }
   }
 
@@ -95,7 +83,7 @@ export async function removeExclusion(input: unknown): Promise<ActionResult> {
   const parsed = deleteExclusionSchema.safeParse(input);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid input" };
+    return { success: false, error: "Invalid input", code: "VALIDATION_ERROR" };
   }
 
   const data = parsed.data;
@@ -106,7 +94,7 @@ export async function removeExclusion(input: unknown): Promise<ActionResult> {
   });
 
   if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
-    return { success: false, error: "Agreement not found" };
+    return { success: false, error: "Agreement not found", code: "NOT_FOUND" };
   }
 
   const exclusion = await prisma.exclusion.findFirst({
@@ -114,7 +102,7 @@ export async function removeExclusion(input: unknown): Promise<ActionResult> {
   });
 
   if (!exclusion) {
-    return { success: false, error: "Exclusion not found" };
+    return { success: false, error: "Exclusion not found", code: "NOT_FOUND" };
   }
 
   await prisma.$transaction(async (tx) => {

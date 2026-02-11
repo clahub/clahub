@@ -5,14 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buildSigningSchema, type SerializedField } from "@/lib/schemas/signing";
 import { recheckOpenPRs } from "@/lib/cla-check";
-
-type ActionResult =
-  | { success: true }
-  | {
-      success: false;
-      error: string;
-      fieldErrors?: Record<string, string[]>;
-    };
+import { type ActionResult, validationError } from "./result";
 
 async function getClientIp(): Promise<string | null> {
   const h = await headers();
@@ -29,7 +22,7 @@ export async function signAgreement(input: {
 }): Promise<ActionResult> {
   const session = await auth();
   if (!session?.user) {
-    return { success: false, error: "You must be signed in to sign this agreement" };
+    return { success: false, error: "You must be signed in to sign this agreement", code: "UNAUTHORIZED" };
   }
 
   const userId = parseInt(session.user.id, 10);
@@ -43,12 +36,12 @@ export async function signAgreement(input: {
   });
 
   if (!agreement || agreement.deletedAt) {
-    return { success: false, error: "Agreement not found" };
+    return { success: false, error: "Agreement not found", code: "NOT_FOUND" };
   }
 
   const latestVersion = agreement.versions[0];
   if (!latestVersion) {
-    return { success: false, error: "Agreement has no published version" };
+    return { success: false, error: "Agreement has no published version", code: "NOT_FOUND" };
   }
 
   // Build and validate fields server-side
@@ -65,13 +58,7 @@ export async function signAgreement(input: {
   const parsed = schema.safeParse(input.fields);
 
   if (!parsed.success) {
-    const fieldErrors: Record<string, string[]> = {};
-    for (const issue of parsed.error.issues) {
-      const key = issue.path.join(".");
-      if (!fieldErrors[key]) fieldErrors[key] = [];
-      fieldErrors[key].push(issue.message);
-    }
-    return { success: false, error: "Validation failed", fieldErrors };
+    return validationError(parsed.error);
   }
 
   // Check for existing signature
@@ -82,7 +69,7 @@ export async function signAgreement(input: {
   });
 
   if (existingSignature && !existingSignature.revokedAt) {
-    return { success: false, error: "You have already signed this agreement" };
+    return { success: false, error: "You have already signed this agreement", code: "CONFLICT" };
   }
 
   const ipAddress = await getClientIp();
@@ -134,7 +121,7 @@ export async function signAgreement(input: {
       error instanceof Error &&
       error.message.includes("Unique constraint")
     ) {
-      return { success: false, error: "You have already signed this agreement" };
+      return { success: false, error: "You have already signed this agreement", code: "CONFLICT" };
     }
     throw error;
   }
