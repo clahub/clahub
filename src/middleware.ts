@@ -13,7 +13,7 @@ export default auth((req) => {
       .replace(/^\/agreements\/?/, "")
       .split("/")
       .filter(Boolean);
-    if (segments.length === 2) {
+    if (segments.length === 2 && segments[0] !== "edit") {
       return NextResponse.next();
     }
 

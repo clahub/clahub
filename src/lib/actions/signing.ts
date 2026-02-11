@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buildSigningSchema, type SerializedField } from "@/lib/schemas/signing";
+import { recheckOpenPRs } from "@/lib/cla-check";
 
 type ActionResult =
   | { success: true }
@@ -146,9 +147,3 @@ export async function signAgreement(input: {
   return { success: true };
 }
 
-// Stub — full implementation in #211/#212
-async function recheckOpenPRs(agreementId: number): Promise<void> {
-  console.log(
-    `[TODO #211/#212] Re-check open PRs for agreement ${agreementId}`
-  );
-}

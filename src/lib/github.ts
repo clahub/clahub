@@ -1,5 +1,11 @@
 import { App } from "@octokit/app";
 import { prisma } from "@/lib/prisma";
+import {
+  checkClaForCommitAuthors,
+  createCheckRun,
+  extractPRAuthors,
+  extractPushAuthors,
+} from "@/lib/cla-check";
 
 const globalForGitHub = globalThis as unknown as { githubApp: App };
 
@@ -86,4 +92,121 @@ function registerWebhookHandlers(app: App) {
       }
     },
   );
+
+  // -------------------------------------------------------------------------
+  // Pull request events — CLA check
+  // -------------------------------------------------------------------------
+
+  app.webhooks.on(
+    ["pull_request.opened", "pull_request.synchronize", "pull_request.reopened"],
+    async ({ payload }) => {
+      try {
+        const repoId = String(payload.repository.id);
+        const agreement = await prisma.agreement.findUnique({
+          where: { githubRepoId: repoId },
+        });
+
+        if (!agreement || agreement.deletedAt || !agreement.installationId) {
+          return;
+        }
+
+        const octokit = await getInstallationOctokit(
+          Number(agreement.installationId),
+        );
+        const owner = payload.repository.owner.login;
+        const repo = payload.repository.name;
+        const headSha = payload.pull_request.head.sha;
+
+        const authors = await extractPRAuthors(
+          octokit,
+          owner,
+          repo,
+          payload.pull_request.number,
+        );
+        const result = await checkClaForCommitAuthors(agreement.id, authors);
+        await createCheckRun(
+          octokit,
+          owner,
+          repo,
+          headSha,
+          result,
+          agreement.ownerName,
+          agreement.repoName,
+        );
+      } catch (err) {
+        console.error("Error handling pull_request event:", err);
+      }
+    },
+  );
+
+  // -------------------------------------------------------------------------
+  // Push events — CLA check
+  // -------------------------------------------------------------------------
+
+  app.webhooks.on("push", async ({ payload }) => {
+    try {
+      if (payload.commits.length === 0) return;
+
+      const repoId = String(payload.repository.id);
+      const agreement = await prisma.agreement.findUnique({
+        where: { githubRepoId: repoId },
+      });
+
+      if (!agreement || agreement.deletedAt || !agreement.installationId) {
+        return;
+      }
+
+      const octokit = await getInstallationOctokit(
+        Number(agreement.installationId),
+      );
+      const owner = payload.repository.owner?.login ?? payload.repository.owner?.name ?? agreement.ownerName;
+      const repo = payload.repository.name;
+
+      const authors = extractPushAuthors(payload.commits);
+      const result = await checkClaForCommitAuthors(agreement.id, authors);
+      await createCheckRun(
+        octokit,
+        owner,
+        repo,
+        payload.after,
+        result,
+        agreement.ownerName,
+        agreement.repoName,
+      );
+    } catch (err) {
+      console.error("Error handling push event:", err);
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // Repository rename / transfer — keep denormalized names in sync
+  // -------------------------------------------------------------------------
+
+  app.webhooks.on("repository.renamed", async ({ payload }) => {
+    try {
+      await prisma.agreement.updateMany({
+        where: { githubRepoId: String(payload.repository.id) },
+        data: {
+          ownerName: payload.repository.owner.login,
+          repoName: payload.repository.name,
+        },
+      });
+    } catch (err) {
+      console.error("Error handling repository.renamed event:", err);
+    }
+  });
+
+  app.webhooks.on("repository.transferred", async ({ payload }) => {
+    try {
+      await prisma.agreement.updateMany({
+        where: { githubRepoId: String(payload.repository.id) },
+        data: {
+          ownerName: payload.repository.owner.login,
+          repoName: payload.repository.name,
+        },
+      });
+    } catch (err) {
+      console.error("Error handling repository.transferred event:", err);
+    }
+  });
 }
