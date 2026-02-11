@@ -18,17 +18,21 @@ function isPortInUse(port: number): Promise<boolean> {
 export default async function globalSetup() {
   const root = path.resolve(__dirname, "../..");
 
-  // If a dev server is already running (local dev), skip DB setup —
-  // the developer's database already has seed data.
-  if (await isPortInUse(3000)) {
+  // In CI, Playwright starts the webServer before globalSetup runs, so
+  // port 3000 is always in use. Use process.env.CI to distinguish CI from
+  // local dev where the developer's own server (with a seeded DB) is running.
+  if (!process.env.CI && (await isPortInUse(3000))) {
     console.log("[global-setup] Reusing existing dev server on :3000, skipping DB reset.");
     return;
   }
 
-  // CI path: push schema to test DB and seed it
+  console.log("[global-setup] Setting up test database...");
+
+  // Use DATABASE_URL from the environment (CI sets an absolute path) or
+  // fall back to the relative path for local runs.
   const testEnv = {
     ...process.env,
-    DATABASE_URL: "file:./test.db",
+    DATABASE_URL: process.env.DATABASE_URL || "file:./test.db",
     PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION: "Yes, proceed",
   };
 
