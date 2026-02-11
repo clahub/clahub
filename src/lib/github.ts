@@ -1,5 +1,6 @@
 import { App } from "@octokit/app";
 import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 import {
   checkClaForCommitAuthors,
   createCheckRun,
@@ -134,7 +135,7 @@ function registerWebhookHandlers(app: App) {
           agreement.repoName,
         );
       } catch (err) {
-        console.error("Error handling pull_request event:", err);
+        logger.error("Error handling pull_request event", { action: "webhook.pull_request" }, err);
       }
     },
   );
@@ -174,7 +175,7 @@ function registerWebhookHandlers(app: App) {
         agreement.repoName,
       );
     } catch (err) {
-      console.error("Error handling push event:", err);
+      logger.error("Error handling push event", { action: "webhook.push" }, err);
     }
   });
 
@@ -192,7 +193,7 @@ function registerWebhookHandlers(app: App) {
         },
       });
     } catch (err) {
-      console.error("Error handling repository.renamed event:", err);
+      logger.error("Error handling repository.renamed event", { action: "webhook.repository.renamed" }, err);
     }
   });
 
@@ -206,7 +207,7 @@ function registerWebhookHandlers(app: App) {
         },
       });
     } catch (err) {
-      console.error("Error handling repository.transferred event:", err);
+      logger.error("Error handling repository.transferred event", { action: "webhook.repository.transferred" }, err);
     }
   });
 }

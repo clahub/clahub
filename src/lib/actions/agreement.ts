@@ -1,29 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   createAgreementSchema,
   updateAgreementSchema,
   deleteAgreementSchema,
 } from "@/lib/schemas/agreement";
-
-type ActionResult =
-  | { success: true }
-  | {
-      success: false;
-      error: string;
-      fieldErrors?: Record<string, string[]>;
-    };
-
-async function requireOwner() {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "owner") {
-    throw new Error("Unauthorized");
-  }
-  return session.user;
-}
+import {
+  type ActionResult,
+  requireOwner,
+  validationError,
+} from "./result";
 
 interface InstallationRepo {
   id: number;
@@ -108,13 +96,7 @@ export async function createAgreement(
   const parsed = createAgreementSchema.safeParse(input);
 
   if (!parsed.success) {
-    const fieldErrors: Record<string, string[]> = {};
-    for (const issue of parsed.error.issues) {
-      const key = issue.path.join(".");
-      if (!fieldErrors[key]) fieldErrors[key] = [];
-      fieldErrors[key].push(issue.message);
-    }
-    return { success: false, error: "Validation failed", fieldErrors };
+    return validationError(parsed.error);
   }
 
   const data = parsed.data;
@@ -127,6 +109,7 @@ export async function createAgreement(
     return {
       success: false,
       error: "An agreement already exists for this repository",
+      code: "CONFLICT",
     };
   }
 
@@ -191,13 +174,7 @@ export async function updateAgreement(
   const parsed = updateAgreementSchema.safeParse(input);
 
   if (!parsed.success) {
-    const fieldErrors: Record<string, string[]> = {};
-    for (const issue of parsed.error.issues) {
-      const key = issue.path.join(".");
-      if (!fieldErrors[key]) fieldErrors[key] = [];
-      fieldErrors[key].push(issue.message);
-    }
-    return { success: false, error: "Validation failed", fieldErrors };
+    return validationError(parsed.error);
   }
 
   const data = parsed.data;
@@ -212,7 +189,7 @@ export async function updateAgreement(
   });
 
   if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
-    return { success: false, error: "Agreement not found" };
+    return { success: false, error: "Agreement not found", code: "NOT_FOUND" };
   }
 
   await prisma.$transaction(async (tx) => {
@@ -315,7 +292,7 @@ export async function deleteAgreement(input: unknown): Promise<ActionResult> {
   });
 
   if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
-    return { success: false, error: "Agreement not found" };
+    return { success: false, error: "Agreement not found", code: "NOT_FOUND" };
   }
 
   await prisma.$transaction(async (tx) => {

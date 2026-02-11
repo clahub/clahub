@@ -11,7 +11,7 @@ test.describe("Webhook endpoint", () => {
 
     expect(response.status()).toBe(400);
     const body = await response.json();
-    expect(body.error).toContain("Missing required GitHub webhook headers");
+    expect(body.error.message).toContain("Missing required GitHub webhook headers");
   });
 
   test("rejects requests with invalid signature", async ({ request }) => {
