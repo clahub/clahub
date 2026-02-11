@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle, GitPullRequest, Shield, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <section className="container flex flex-col items-center gap-8 px-4 py-24 text-center md:py-32">
+        <Image src="/cla-logo.png" alt="CLAHub" width={64} height={64} priority />
         <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
           Contributor License Agreements,{" "}
           <span className="text-primary">simplified</span>
