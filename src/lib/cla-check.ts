@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getInstallationOctokit } from "@/lib/github";
+import type { Exclusion } from "@/generated/prisma/client";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -17,7 +18,21 @@ export type CheckResult = {
   allSigned: boolean;
   signed: AuthorInfo[];
   unsigned: AuthorInfo[];
+  excluded: AuthorInfo[];
 };
+
+// ---------------------------------------------------------------------------
+// Exclusion helpers
+// ---------------------------------------------------------------------------
+
+function isExcluded(author: AuthorInfo, exclusions: Exclusion[]): boolean {
+  return exclusions.some((ex) => {
+    if (ex.type === "bot_auto") return author.login?.endsWith("[bot]") ?? false;
+    if (ex.type === "user" && ex.githubLogin)
+      return author.login === ex.githubLogin;
+    return false;
+  });
+}
 
 // ---------------------------------------------------------------------------
 // CLA verification
@@ -27,10 +42,20 @@ export async function checkClaForCommitAuthors(
   agreementId: number,
   authors: AuthorInfo[],
 ): Promise<CheckResult> {
+  const exclusions = await prisma.exclusion.findMany({
+    where: { agreementId },
+  });
+
   const signed: AuthorInfo[] = [];
   const unsigned: AuthorInfo[] = [];
+  const excluded: AuthorInfo[] = [];
 
   for (const author of authors) {
+    if (isExcluded(author, exclusions)) {
+      excluded.push(author);
+      continue;
+    }
+
     // Try to find the user: by githubId first, then email, then nickname
     let user = null;
     if (author.githubId) {
@@ -68,7 +93,7 @@ export async function checkClaForCommitAuthors(
     }
   }
 
-  return { allSigned: unsigned.length === 0, signed, unsigned };
+  return { allSigned: unsigned.length === 0, signed, unsigned, excluded };
 }
 
 // ---------------------------------------------------------------------------
@@ -108,6 +133,13 @@ export async function createCheckRun(
       .map((a) => `- ${a.login ?? a.email ?? "Unknown"}`)
       .join("\n");
     summary += `\n\n**Signed:**\n${signedList}`;
+  }
+
+  if (result.excluded.length > 0) {
+    const excludedList = result.excluded
+      .map((a) => `- ${a.login ?? a.email ?? "Unknown"}`)
+      .join("\n");
+    summary += `\n\n**Excluded (bots/bypassed):**\n${excludedList}`;
   }
 
   await octokit.request("POST /repos/{owner}/{repo}/check-runs", {
