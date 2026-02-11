@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +45,7 @@ export function ExclusionManager({
           setExclusions((prev) => prev.filter((e) => e.id !== botExclusion.id));
         } else {
           setError(result.error);
+          toast.error(result.error);
         }
       } else {
         const result = await addExclusion({
@@ -55,6 +57,7 @@ export function ExclusionManager({
           window.location.reload();
         } else {
           setError(result.error);
+          toast.error(result.error);
         }
       }
     });
@@ -75,6 +78,7 @@ export function ExclusionManager({
         window.location.reload();
       } else {
         setError(result.error);
+        toast.error(result.error);
       }
     });
   }
@@ -90,6 +94,7 @@ export function ExclusionManager({
         setExclusions((prev) => prev.filter((e) => e.id !== exclusionId));
       } else {
         setError(result.error);
+        toast.error(result.error);
       }
     });
   }
