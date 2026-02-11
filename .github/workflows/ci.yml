@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  DATABASE_URL: "file:./test.db"
+  DATABASE_URL: "file:${{ github.workspace }}/test.db"
   NEXTAUTH_SECRET: "test-secret-that-is-at-least-32-characters-long"
   NEXT_PUBLIC_APP_URL: "http://localhost:3000"
   GITHUB_APP_ID: "999999"
