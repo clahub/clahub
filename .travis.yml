@@ -1,8 +1,0 @@
-language: ruby
-script: 'bundle exec rake db:create db:test:load default'
-rvm:
-  - 2.2.5
-env:
-notifications:
-  email: false
-bundler_args: --without development

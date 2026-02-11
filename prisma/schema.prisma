@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  githubId   String      @unique
+  nickname   String
+  email      String?
+  name       String?
+  avatarUrl  String?
+  oauthToken String?
+  role       String      @default("contributor")
+  agreements Agreement[] @relation("AgreementOwner")
+  signatures Signature[]
+  auditLogs  AuditLog[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Agreement {
+  id             Int                @id @default(autoincrement())
+  scope          String             @default("repo")
+  githubRepoId   String?            @unique
+  githubOrgId    String?
+  ownerName      String
+  repoName       String?
+  owner          User               @relation("AgreementOwner", fields: [ownerId], references: [id])
+  ownerId        Int
+  versions       AgreementVersion[]
+  signatures     Signature[]
+  fields         AgreementField[]
+  exclusions     Exclusion[]
+  installationId String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  deletedAt      DateTime?
+
+  @@index([ownerId])
+  @@index([githubOrgId])
+}
+
+model AgreementVersion {
+  id          Int         @id @default(autoincrement())
+  agreement   Agreement   @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  agreementId Int
+  version     Int
+  text        String
+  changelog   String?
+  signatures  Signature[]
+  createdAt   DateTime    @default(now())
+
+  @@unique([agreementId, version])
+}
+
+model AgreementField {
+  id          Int          @id @default(autoincrement())
+  agreement   Agreement    @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  agreementId Int
+  label       String
+  dataType    String
+  required    Boolean      @default(true)
+  description String?
+  sortOrder   Int          @default(0)
+  enabled     Boolean      @default(true)
+  entries     FieldEntry[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([agreementId])
+}
+
+model Signature {
+  id          Int              @id @default(autoincrement())
+  user        User             @relation(fields: [userId], references: [id])
+  userId      Int
+  agreement   Agreement        @relation(fields: [agreementId], references: [id])
+  agreementId Int
+  version     AgreementVersion @relation(fields: [versionId], references: [id])
+  versionId   Int
+  source      String           @default("online")
+  ipAddress   String?
+  signedAt    DateTime         @default(now())
+  revokedAt   DateTime?
+  entries     FieldEntry[]
+
+  @@unique([userId, agreementId])
+  @@index([agreementId])
+}
+
+model FieldEntry {
+  id          Int            @id @default(autoincrement())
+  signature   Signature      @relation(fields: [signatureId], references: [id], onDelete: Cascade)
+  signatureId Int
+  field       AgreementField @relation(fields: [fieldId], references: [id])
+  fieldId     Int
+  value       String?
+
+  @@unique([signatureId, fieldId])
+}
+
+model Exclusion {
+  id           Int       @id @default(autoincrement())
+  agreement    Agreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  agreementId  Int
+  type         String
+  githubLogin  String?
+  githubTeamId String?
+  createdAt    DateTime  @default(now())
+
+  @@index([agreementId])
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
+  action     String
+  entityType String
+  entityId   Int
+  before     String?
+  after      String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+}
