@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,8 +15,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CLAHub",
-  description: "GitHub CLA management platform",
+  title: {
+    default: "CLAHub",
+    template: "%s | CLAHub",
+  },
+  description:
+    "Manage Contributor License Agreements for your GitHub projects. Automate CLA signing with GitHub Checks integration.",
+  openGraph: {
+    title: "CLAHub",
+    description:
+      "Manage Contributor License Agreements for your GitHub projects.",
+    siteName: "CLAHub",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -24,11 +36,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
