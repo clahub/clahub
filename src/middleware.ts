@@ -8,6 +8,16 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith("/agreements")) {
+    // /agreements/[owner]/[repo] is the public signing route (2 segments)
+    const segments = pathname
+      .replace(/^\/agreements\/?/, "")
+      .split("/")
+      .filter(Boolean);
+    if (segments.length === 2) {
+      return NextResponse.next();
+    }
+
+    // All other /agreements/* routes require owner auth
     if (!req.auth) {
       const signInUrl = new URL("/auth/signin", req.url);
       signInUrl.searchParams.set("callbackUrl", pathname);
