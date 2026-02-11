@@ -188,6 +188,27 @@ export function extractPushAuthors(
 }
 
 // ---------------------------------------------------------------------------
+// Retry helper
+// ---------------------------------------------------------------------------
+
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  { attempts = 3, baseDelayMs = 1000 } = {},
+): Promise<T> {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i === attempts - 1) throw err;
+      const delay = baseDelayMs * 2 ** i;
+      console.warn(`[cla-check] Retry ${i + 1}/${attempts - 1} after ${delay}ms`, err);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw new Error("unreachable");
+}
+
+// ---------------------------------------------------------------------------
 // Recheck open PRs (called after a new signature)
 // ---------------------------------------------------------------------------
 
@@ -201,38 +222,41 @@ export async function recheckOpenPRs(agreementId: number): Promise<void> {
   const octokit = await getInstallationOctokit(
     Number(agreement.installationId),
   );
+  const owner = agreement.ownerName;
+  const repo = agreement.repoName!;
 
-  const { data: pulls } = await octokit.request(
-    "GET /repos/{owner}/{repo}/pulls",
-    {
-      owner: agreement.ownerName,
-      repo: agreement.repoName!,
+  const { data: pulls } = await withRetry(() =>
+    octokit.request("GET /repos/{owner}/{repo}/pulls", {
+      owner,
+      repo,
       state: "open",
       per_page: 100,
-    },
+    }),
   );
 
+  console.log(`[cla-check] Rechecking ${pulls.length} open PR(s) for ${owner}/${repo}`);
+
   for (const pr of pulls) {
+    const start = Date.now();
     try {
-      const authors = await extractPRAuthors(
-        octokit,
-        agreement.ownerName,
-        agreement.repoName!,
-        pr.number,
+      const authors = await withRetry(() =>
+        extractPRAuthors(octokit, owner, repo, pr.number),
       );
       const result = await checkClaForCommitAuthors(agreement.id, authors);
-      await createCheckRun(
-        octokit,
-        agreement.ownerName,
-        agreement.repoName!,
-        pr.head.sha,
-        result,
-        agreement.ownerName,
-        agreement.repoName,
+      await withRetry(() =>
+        createCheckRun(
+          octokit, owner, repo, pr.head.sha,
+          result, owner, agreement.repoName,
+        ),
+      );
+      const duration = Date.now() - start;
+      console.log(
+        `[cla-check] PR #${pr.number}: ${result.allSigned ? "success" : "action_required"} (${duration}ms)`,
       );
     } catch (err) {
+      const duration = Date.now() - start;
       console.error(
-        `Failed to recheck PR #${pr.number} for agreement ${agreementId}:`,
+        `[cla-check] PR #${pr.number}: failed after retries (${duration}ms)`,
         err,
       );
     }

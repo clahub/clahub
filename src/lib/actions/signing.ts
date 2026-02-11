@@ -139,10 +139,8 @@ export async function signAgreement(input: {
     throw error;
   }
 
-  // Trigger async re-check of open PRs (stub — #211/#212)
-  recheckOpenPRs(agreement.id).catch(() => {
-    // Fire-and-forget; errors are non-critical
-  });
+  // Trigger async re-check of open PRs (fire-and-forget)
+  recheckOpenPRs(agreement.id).catch(() => {});
 
   return { success: true };
 }
