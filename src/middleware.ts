@@ -8,12 +8,19 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith("/agreements")) {
-    // /agreements/[owner]/[repo] is the public signing route (2 segments)
+    // Public signing routes:
+    // /agreements/[owner] (org signing, 1 segment)
+    // /agreements/[owner]/[repo] (repo signing, 2 segments)
     const segments = pathname
       .replace(/^\/agreements\/?/, "")
       .split("/")
       .filter(Boolean);
-    if (segments.length === 2 && segments[0] !== "edit") {
+    if (
+      (segments.length === 1 &&
+        segments[0] !== "new" &&
+        segments[0] !== "edit") ||
+      (segments.length === 2 && segments[0] !== "edit")
+    ) {
       return NextResponse.next();
     }
 
