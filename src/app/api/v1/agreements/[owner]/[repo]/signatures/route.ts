@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { apiError, ErrorCode } from "@/lib/api-error";
+import { applyRateLimit } from "@/lib/api-rate-limit";
 import { parsePagination, paginatedResponse } from "@/lib/api-pagination";
 import { apiSignAgreementSchema } from "@/lib/schemas/api";
 import { buildSigningSchema, type SerializedField } from "@/lib/schemas/signing";
@@ -17,6 +18,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   if (!user) {
     return apiError(ErrorCode.UNAUTHORIZED, "Authentication required", 401);
   }
+
+  const rl = applyRateLimit(request, user);
+  if (rl.response) return rl.response;
 
   const agreement = await prisma.agreement.findFirst({
     where: { ownerName: owner, repoName: repo, deletedAt: null },
@@ -71,6 +75,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   if (!user) {
     return apiError(ErrorCode.UNAUTHORIZED, "Authentication required", 401);
   }
+
+  const rlPost = applyRateLimit(request, user);
+  if (rlPost.response) return rlPost.response;
 
   const agreement = await prisma.agreement.findFirst({
     where: { ownerName: owner, repoName: repo, deletedAt: null },

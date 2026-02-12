@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { apiError, ErrorCode } from "@/lib/api-error";
+import { applyRateLimit } from "@/lib/api-rate-limit";
 import { apiCreateAgreementSchema } from "@/lib/schemas/api";
 import { getClientIp, logAudit } from "@/lib/audit";
 
@@ -10,6 +11,10 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return apiError(ErrorCode.UNAUTHORIZED, "Authentication required", 401);
   }
+
+  const rl = applyRateLimit(request, user);
+  if (rl.response) return rl.response;
+
   if (user.role !== "owner") {
     return apiError(ErrorCode.FORBIDDEN, "Owner role required", 403);
   }

@@ -1,7 +1,12 @@
 openapi: "3.0.3"
 info:
   title: CLAHub API
-  description: Programmatic access to CLAHub agreements and signatures.
+  description: >-
+    Programmatic access to CLAHub agreements and signatures.
+    All endpoints are rate limited: API key auth 100 req/min,
+    session auth 60 req/min, unauthenticated 30 req/min.
+    Rate limit headers (X-RateLimit-Limit, X-RateLimit-Remaining,
+    X-RateLimit-Reset) are included on 429 responses.
   version: "1.0.0"
   contact:
     name: CLAHub
@@ -45,6 +50,8 @@ paths:
           $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /agreements/{owner}:
     parameters:
@@ -720,6 +727,29 @@ components:
             $ref: "#/components/schemas/Error"
     ValidationError:
       description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    RateLimited:
+      description: Too many requests
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Max requests per 60-second window
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Requests remaining in current window
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+          description: UTC epoch seconds when the window resets
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds until the rate limit resets
       content:
         application/json:
           schema:
