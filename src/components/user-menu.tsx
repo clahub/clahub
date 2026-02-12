@@ -3,7 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { LogOut, ScrollText, User } from "lucide-react";
+import { KeyRound, LogOut, ScrollText, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -63,12 +63,20 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {user.role === "owner" && (
-          <DropdownMenuItem asChild>
-            <Link href="/agreements">
-              <ScrollText className="mr-2 size-4" />
-              My Agreements
-            </Link>
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem asChild>
+              <Link href="/agreements">
+                <ScrollText className="mr-2 size-4" />
+                My Agreements
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings/api-keys">
+                <KeyRound className="mr-2 size-4" />
+                API Keys
+              </Link>
+            </DropdownMenuItem>
+          </>
         )}
         <DropdownMenuItem
           onClick={() => signOut({ callbackUrl: "/" })}
