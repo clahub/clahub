@@ -12,8 +12,14 @@ Running at [clahub.com](https://www.clahub.com)
 - Version control for CLA text with changelogs
 - Custom form fields (text, email, URL, checkbox, date)
 - Automatic GitHub Check Runs on pull requests
-- Bot auto-detection — accounts like `dependabot[bot]` and `renovate[bot]` are excluded automatically
-- Per-user exclusions — manually bypass CLA for specific GitHub accounts
+- **Org-wide agreements** — create a single CLA that covers all repos in a GitHub organization
+- **Role-based access** — org admins can view agreements and signatories without full owner permissions
+- **Exclusion management** — exclude individual users, GitHub teams, or bots from CLA requirements
+- **Manual signature entry** — add signatures by GitHub username or email
+- **CSV import** — bulk-import signatures with preview, validation, and duplicate detection
+- **Signature revocation** — revoke and restore signatures with automatic PR status re-check
+- **Ownership transfer** — transfer agreement ownership to another registered owner
+- **Email notifications** — opt-in email when contributors sign, powered by Resend
 - Dashboard with signature tracking
 - Full audit log of all changes
 
@@ -25,8 +31,8 @@ Running at [clahub.com](https://www.clahub.com)
 
 ## How it works
 
-1. Owner installs the CLAHub GitHub App on a repository
-2. Owner creates a CLA agreement for that repo
+1. Owner installs the CLAHub GitHub App on a repository (or organization)
+2. Owner creates a CLA agreement for that repo or org
 3. When a pull request is opened, CLAHub receives a webhook
 4. CLAHub extracts commit authors and checks each one:
    - **Excluded** (bot pattern or manual exclusion) — skipped
@@ -43,6 +49,7 @@ Running at [clahub.com](https://www.clahub.com)
 - [Tailwind CSS](https://tailwindcss.com) v4 + [shadcn/ui](https://ui.shadcn.com) components
 - [Octokit](https://github.com/octokit) for GitHub App / Checks API
 - [Zod](https://zod.dev) v4 + [React Hook Form](https://react-hook-form.com) for validation
+- [Resend](https://resend.com) for transactional email (optional)
 - [Sentry](https://sentry.io) via `@sentry/nextjs` for error tracking (optional)
 - [Vitest](https://vitest.dev) + [Playwright](https://playwright.dev) for testing
 
@@ -187,14 +194,16 @@ src/
     not-found.tsx       Custom 404 page
   components/
     ui/                 shadcn/ui primitives
-    agreements/         Agreement form, signing form, exclusion manager, etc.
+    agreements/         Agreement form, signing form, exclusion manager, signature manager, notification toggle, etc.
   lib/
-    actions/            Server actions (agreement, exclusion, signing)
+    actions/            Server actions (agreement, exclusion, signing, signature)
     schemas/            Zod validation schemas
     api-error.ts        Structured API error responses with error codes
     audit.ts            Shared audit logging utility
     auth.ts             NextAuth configuration (dual providers)
+    access.ts           Role-based access control (owner, org_admin)
     cla-check.ts        Core CLA verification + exclusion logic
+    email.ts            Resend email wrapper + notification templates
     github.ts           GitHub App / Octokit setup + webhook handlers
     logger.ts           Structured JSON logger with level filtering
     prisma.ts           Prisma client singleton
@@ -216,7 +225,7 @@ tests/
 | Model | Purpose |
 |---|---|
 | `User` | GitHub users (owners and contributors) |
-| `Agreement` | CLA definitions linked to a GitHub repo |
+| `Agreement` | CLA definitions linked to a GitHub repo or org |
 | `AgreementVersion` | Versioned CLA text with changelogs |
 | `AgreementField` | Custom form fields on a CLA |
 | `Signature` | User signatures (soft-deletable via `revokedAt`) |
