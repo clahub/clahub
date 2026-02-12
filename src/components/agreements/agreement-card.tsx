@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -28,6 +28,7 @@ interface AgreementCardProps {
   signatureCount: number;
   version: number;
   createdAt: Date;
+  accessLevel: "owner" | "org_admin";
 }
 
 export function AgreementCard({
@@ -38,6 +39,7 @@ export function AgreementCard({
   signatureCount,
   version,
   createdAt,
+  accessLevel,
 }: AgreementCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const displayName = repoName ? `${ownerName}/${repoName}` : ownerName;
@@ -48,28 +50,36 @@ export function AgreementCard({
         <CardHeader>
           <CardTitle className="truncate">{displayName}</CardTitle>
           <CardAction>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon-sm">
-                  <MoreHorizontal className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href={`/agreements/edit/${id}`}>
-                    <Pencil className="size-4" />
-                    Edit
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() => setDeleteOpen(true)}
-                >
-                  <Trash2 className="size-4" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {accessLevel === "owner" ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon-sm">
+                    <MoreHorizontal className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href={`/agreements/edit/${id}`}>
+                      <Pencil className="size-4" />
+                      Edit
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => setDeleteOpen(true)}
+                  >
+                    <Trash2 className="size-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="ghost" size="icon-sm" asChild>
+                <Link href={`/agreements/edit/${id}`}>
+                  <Eye className="size-4" />
+                </Link>
+              </Button>
+            )}
           </CardAction>
         </CardHeader>
         <CardContent>
