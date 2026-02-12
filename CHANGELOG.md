@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.1.0] - 2026-02-12
+
+Phase 2: Admin tools and agreement management. Adds org-wide agreements,
+role-based access, exclusion management, ownership transfer, manual/CSV
+signature entry, revocation, and email notifications.
+
+### Added
+
+- **Org-wide CLA agreements**: Create CLA agreements scoped to an entire GitHub organization, not just individual repositories (#217)
+- **Role-based access control**: Org admins can view agreements and signatories for their organization without full owner permissions (#218)
+- **Exclusion management UI**: Manage CLA exclusions for individual users, GitHub teams, and bot accounts with auto-detection toggle (#219)
+- **Ownership transfer**: Transfer agreement ownership to another registered owner with transactional safety and audit logging (#220)
+- **Manual signature entry**: Add individual signatures manually by GitHub username or email with GitHub API user resolution (#221)
+- **CSV signature import**: Bulk-import signatures from CSV files with preview, validation, duplicate detection, and error reporting (#221)
+- **Signature revocation**: Revoke and restore signatures with confirmation dialog, automatic PR status re-check on revocation (#222)
+- **Email notifications**: Per-agreement toggle to receive email when contributors sign, powered by Resend with graceful no-op when unconfigured (#223)
+
+### Issues Closed
+
+- [#217](https://github.com/clahub/clahub/issues/217): Org-wide CLA agreements
+- [#218](https://github.com/clahub/clahub/issues/218): Role-based access control for org members
+- [#219](https://github.com/clahub/clahub/issues/219): Exclusion management UI: users, teams, bots
+- [#220](https://github.com/clahub/clahub/issues/220): Ownership transfer with transactional safety
+- [#221](https://github.com/clahub/clahub/issues/221): Manual signature entry and CSV import
+- [#222](https://github.com/clahub/clahub/issues/222): Signature revocation with PR status re-check
+- [#223](https://github.com/clahub/clahub/issues/223): Email notifications for new signatures
+
 ## [2.0.0] - 2026-02-12
 
 Complete rewrite from Ruby on Rails to Next.js. The v1 Rails application has been
