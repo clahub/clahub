@@ -7,6 +7,7 @@ import {
   createExclusionSchema,
   deleteExclusionSchema,
 } from "@/lib/schemas/exclusion";
+import { recheckOpenPRs } from "@/lib/cla-check";
 import { type ActionResult, requireOwner } from "./result";
 
 export async function addExclusion(input: unknown): Promise<ActionResult> {
@@ -53,12 +54,27 @@ export async function addExclusion(input: unknown): Promise<ActionResult> {
     }
   }
 
+  // Prevent duplicate team exclusions
+  if (data.type === "team" && data.githubTeamSlug) {
+    const existing = await prisma.exclusion.findFirst({
+      where: {
+        agreementId: data.agreementId,
+        type: "team",
+        githubTeamId: data.githubTeamSlug,
+      },
+    });
+    if (existing) {
+      return { success: false, error: "This team is already excluded", code: "CONFLICT" };
+    }
+  }
+
   await prisma.$transaction(async (tx) => {
     await tx.exclusion.create({
       data: {
         agreementId: data.agreementId,
         type: data.type,
         githubLogin: data.githubLogin ?? null,
+        githubTeamId: data.type === "team" ? (data.githubTeamSlug ?? null) : null,
       },
     });
 
@@ -70,12 +86,14 @@ export async function addExclusion(input: unknown): Promise<ActionResult> {
       after: {
         type: data.type,
         githubLogin: data.githubLogin ?? null,
+        githubTeamSlug: data.githubTeamSlug ?? null,
       },
       ipAddress,
     });
   });
 
   revalidatePath(`/agreements/edit/${data.agreementId}`);
+  recheckOpenPRs(data.agreementId).catch(() => {});
   return { success: true };
 }
 
@@ -124,5 +142,6 @@ export async function removeExclusion(input: unknown): Promise<ActionResult> {
   });
 
   revalidatePath(`/agreements/edit/${data.agreementId}`);
+  recheckOpenPRs(data.agreementId).catch(() => {});
   return { success: true };
 }
