@@ -7,6 +7,24 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
+  // API v1 routes handle their own authentication
+  if (pathname.startsWith("/api/v1/")) {
+    return NextResponse.next();
+  }
+
+  // Settings routes require owner auth
+  if (pathname.startsWith("/settings/")) {
+    if (!req.auth) {
+      const signInUrl = new URL("/auth/signin", req.url);
+      signInUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(signInUrl);
+    }
+    if (req.auth.user.role !== "owner") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+    return NextResponse.next();
+  }
+
   if (pathname.startsWith("/agreements")) {
     // Public signing routes:
     // /agreements/[owner] (org signing, 1 segment)
@@ -40,5 +58,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/agreements/:path*"],
+  matcher: ["/agreements/:path*", "/api/v1/:path*", "/settings/:path*"],
 };

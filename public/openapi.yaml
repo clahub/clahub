@@ -1,0 +1,655 @@
+openapi: "3.0.3"
+info:
+  title: CLAHub API
+  description: Programmatic access to CLAHub agreements and signatures.
+  version: "1.0.0"
+  contact:
+    name: CLAHub
+servers:
+  - url: /api/v1
+    description: API v1
+
+security:
+  - BearerAuth: []
+
+paths:
+  /agreements:
+    post:
+      summary: Create an agreement
+      tags: [Agreements]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/CreateRepoAgreement"
+                - $ref: "#/components/schemas/CreateOrgAgreement"
+              discriminator:
+                propertyName: scope
+      responses:
+        "201":
+          description: Agreement created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Agreement"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /agreements/{owner}:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+    get:
+      summary: Get org-wide agreement
+      tags: [Agreements]
+      security: []
+      responses:
+        "200":
+          description: Agreement details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Agreement"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update org-wide agreement
+      tags: [Agreements]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAgreement"
+      responses:
+        "200":
+          description: Agreement updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Agreement"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      summary: Delete org-wide agreement
+      tags: [Agreements]
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Agreement deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /agreements/{owner}/{repo}:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+      - $ref: "#/components/parameters/repo"
+    get:
+      summary: Get repo agreement
+      tags: [Agreements]
+      security: []
+      responses:
+        "200":
+          description: Agreement details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Agreement"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update repo agreement
+      tags: [Agreements]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAgreement"
+      responses:
+        "200":
+          description: Agreement updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Agreement"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      summary: Delete repo agreement
+      tags: [Agreements]
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Agreement deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /agreements/{owner}/signatures:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+    get:
+      summary: List org-wide signatures
+      tags: [Signatures]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/per_page"
+      responses:
+        "200":
+          description: Paginated signature list
+          headers:
+            Link:
+              schema:
+                type: string
+              description: Pagination links
+            X-Total-Count:
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Signature"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Sign org-wide agreement
+      tags: [Signatures]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignAgreement"
+      responses:
+        "201":
+          description: Signature created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/SignatureResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /agreements/{owner}/{repo}/signatures:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+      - $ref: "#/components/parameters/repo"
+    get:
+      summary: List repo signatures
+      tags: [Signatures]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/per_page"
+      responses:
+        "200":
+          description: Paginated signature list
+          headers:
+            Link:
+              schema:
+                type: string
+            X-Total-Count:
+              schema:
+                type: integer
+            X-Total-Pages:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Signature"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Sign repo agreement
+      tags: [Signatures]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignAgreement"
+      responses:
+        "201":
+          description: Signature created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/SignatureResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /agreements/{owner}/check/{username}:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+      - $ref: "#/components/parameters/username"
+    get:
+      summary: Check org-wide signature status
+      tags: [Signatures]
+      security: []
+      responses:
+        "200":
+          description: Signature check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/SignatureCheck"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /agreements/{owner}/{repo}/check/{username}:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+      - $ref: "#/components/parameters/repo"
+      - $ref: "#/components/parameters/username"
+    get:
+      summary: Check repo signature status
+      tags: [Signatures]
+      security: []
+      responses:
+        "200":
+          description: Signature check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/SignatureCheck"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: "API key with `clahub_` prefix"
+
+  parameters:
+    owner:
+      name: owner
+      in: path
+      required: true
+      schema:
+        type: string
+      description: GitHub owner (user or org)
+    repo:
+      name: repo
+      in: path
+      required: true
+      schema:
+        type: string
+      description: GitHub repository name
+    username:
+      name: username
+      in: path
+      required: true
+      schema:
+        type: string
+      description: GitHub username to check
+    page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    per_page:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 50
+        minimum: 1
+        maximum: 100
+
+  schemas:
+    Agreement:
+      type: object
+      properties:
+        id:
+          type: integer
+        scope:
+          type: string
+          enum: [repo, org]
+        ownerName:
+          type: string
+        repoName:
+          type: string
+          nullable: true
+        version:
+          type: integer
+        text:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgreementField"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AgreementField:
+      type: object
+      properties:
+        id:
+          type: integer
+        label:
+          type: string
+        dataType:
+          type: string
+          enum: [text, email, url, checkbox, date]
+        required:
+          type: boolean
+        description:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+
+    CreateRepoAgreement:
+      type: object
+      required: [scope, ownerName, repoName, githubRepoId, text]
+      properties:
+        scope:
+          type: string
+          enum: [repo]
+        ownerName:
+          type: string
+        repoName:
+          type: string
+        githubRepoId:
+          type: string
+        text:
+          type: string
+          minLength: 10
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgreementFieldInput"
+
+    CreateOrgAgreement:
+      type: object
+      required: [scope, ownerName, githubOrgId, text]
+      properties:
+        scope:
+          type: string
+          enum: [org]
+        ownerName:
+          type: string
+        githubOrgId:
+          type: string
+        text:
+          type: string
+          minLength: 10
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgreementFieldInput"
+
+    AgreementFieldInput:
+      type: object
+      required: [label, dataType]
+      properties:
+        label:
+          type: string
+        dataType:
+          type: string
+          enum: [text, email, url, checkbox, date]
+        required:
+          type: boolean
+          default: true
+        description:
+          type: string
+        sortOrder:
+          type: integer
+          default: 0
+
+    UpdateAgreement:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+          minLength: 10
+        changelog:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgreementFieldInput"
+
+    SignAgreement:
+      type: object
+      required: [fields]
+      properties:
+        fields:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: boolean
+
+    Signature:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          type: object
+          properties:
+            nickname:
+              type: string
+            email:
+              type: string
+              nullable: true
+            avatarUrl:
+              type: string
+              nullable: true
+        version:
+          type: integer
+        signedAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    SignatureResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        agreementId:
+          type: integer
+        version:
+          type: integer
+        signedAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+
+    SignatureCheck:
+      type: object
+      properties:
+        signed:
+          type: boolean
+        username:
+          type: string
+        signedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+        total_pages:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            fields:
+              type: object
+              additionalProperties:
+                type: string
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
