@@ -722,6 +722,23 @@ components:
       type: object
       required: [fields]
       properties:
+        signatureType:
+          type: string
+          enum: [individual, corporate]
+          default: individual
+          description: Type of signature — individual or corporate (on behalf of company)
+        companyName:
+          type: string
+          description: Required when signatureType is corporate
+        companyDomain:
+          type: string
+          description: >-
+            Company email domain (e.g. acme.com). Contributors with matching
+            verified email are automatically covered. Required when signatureType
+            is corporate.
+        companyTitle:
+          type: string
+          description: Signer's title/role at the company. Required when signatureType is corporate.
         fields:
           type: object
           additionalProperties:
@@ -747,6 +764,9 @@ components:
               nullable: true
         version:
           type: integer
+        signatureType:
+          type: string
+          enum: [individual, corporate]
         signedAt:
           type: string
           format: date-time
@@ -756,6 +776,18 @@ components:
           type: string
           format: date-time
           nullable: true
+        companyName:
+          type: string
+          nullable: true
+          description: Present only for corporate signatures
+        companyDomain:
+          type: string
+          nullable: true
+          description: Present only for corporate signatures
+        companyTitle:
+          type: string
+          nullable: true
+          description: Present only for corporate signatures
 
     SignatureResult:
       type: object
@@ -784,6 +816,16 @@ components:
           format: date-time
         version:
           type: integer
+        signatureType:
+          type: string
+          enum: [individual, corporate]
+          description: Present when signed is true
+        corporateCovered:
+          type: boolean
+          description: True when the user is covered by a corporate CLA signature
+        companyName:
+          type: string
+          description: Present when corporateCovered is true
 
     Pagination:
       type: object
