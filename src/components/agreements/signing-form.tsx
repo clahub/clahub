@@ -38,6 +38,10 @@ export function SigningForm({
 }: SigningFormProps) {
   const [isPending, startTransition] = useTransition();
   const [signed, setSigned] = useState(false);
+  const [sigType, setSigType] = useState<"individual" | "corporate">("individual");
+  const [companyName, setCompanyName] = useState("");
+  const [companyDomain, setCompanyDomain] = useState("");
+  const [companyTitle, setCompanyTitle] = useState("");
 
   const schema = buildSigningSchema(fields);
   const form = useForm({
@@ -46,10 +50,23 @@ export function SigningForm({
   });
 
   function onSubmit(values: Record<string, unknown>) {
+    if (sigType === "corporate") {
+      if (!companyName.trim() || !companyDomain.trim() || !companyTitle.trim()) {
+        toast.error("Company name, email domain, and title are required for corporate signing");
+        return;
+      }
+    }
+
     startTransition(async () => {
       const result = await signAgreement({
         agreementId,
         fields: values as Record<string, string | boolean>,
+        signatureType: sigType,
+        ...(sigType === "corporate" && {
+          companyName: companyName.trim(),
+          companyDomain: companyDomain.trim().toLowerCase(),
+          companyTitle: companyTitle.trim(),
+        }),
       });
 
       if (result.success) {
@@ -91,6 +108,76 @@ export function SigningForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold">Signing as</h3>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="sigType"
+                value="individual"
+                checked={sigType === "individual"}
+                onChange={() => setSigType("individual")}
+                className="accent-primary"
+              />
+              <span>Individual</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="sigType"
+                value="corporate"
+                checked={sigType === "corporate"}
+                onChange={() => setSigType("corporate")}
+                className="accent-primary"
+              />
+              <span>On behalf of my company</span>
+            </label>
+          </div>
+        </div>
+
+        {sigType === "corporate" && (
+          <div className="space-y-4 rounded-md border p-4">
+            <h3 className="text-lg font-semibold">Company Information</h3>
+            <div>
+              <Label htmlFor="companyName">
+                Company Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="companyName"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Acme Corp"
+              />
+            </div>
+            <div>
+              <Label htmlFor="companyDomain">
+                Company Email Domain <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="companyDomain"
+                value={companyDomain}
+                onChange={(e) => setCompanyDomain(e.target.value)}
+                placeholder="acme.com"
+              />
+              <p className="text-muted-foreground mt-1 text-sm">
+                All contributors with a verified email at this domain will be covered.
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="companyTitle">
+                Your Title / Role <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="companyTitle"
+                value={companyTitle}
+                onChange={(e) => setCompanyTitle(e.target.value)}
+                placeholder="Engineering Manager"
+              />
+            </div>
+          </div>
+        )}
+
         {fields.length > 0 && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Required Information</h3>

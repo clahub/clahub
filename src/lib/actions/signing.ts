@@ -11,6 +11,10 @@ import { type ActionResult, validationError } from "./result";
 export async function signAgreement(input: {
   agreementId: number;
   fields: Record<string, string | boolean>;
+  signatureType?: "individual" | "corporate";
+  companyName?: string;
+  companyDomain?: string;
+  companyTitle?: string;
 }): Promise<ActionResult> {
   const session = await auth();
   if (!session?.user) {
@@ -69,13 +73,18 @@ export async function signAgreement(input: {
 
   try {
     await prisma.$transaction(async (tx) => {
+      const signatureType = input.signatureType ?? "individual";
       const signature = await tx.signature.create({
         data: {
           userId,
           agreementId: agreement.id,
           versionId: latestVersion.id,
+          signatureType,
           source: "online",
           ipAddress,
+          companyName: signatureType === "corporate" ? (input.companyName ?? null) : null,
+          companyDomain: signatureType === "corporate" ? (input.companyDomain ?? null) : null,
+          companyTitle: signatureType === "corporate" ? (input.companyTitle ?? null) : null,
         },
       });
 

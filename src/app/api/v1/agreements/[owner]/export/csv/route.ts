@@ -50,6 +50,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     ipAddress: s.ipAddress,
     source: s.source,
     revokedAt: s.revokedAt,
+    signatureType: s.signatureType,
+    companyName: s.companyName,
+    companyDomain: s.companyDomain,
+    companyTitle: s.companyTitle,
     fields: Object.fromEntries(
       s.entries.map((e) => [e.field.label, e.value]),
     ),

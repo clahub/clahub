@@ -20,6 +20,7 @@ export type CheckResult = {
   signed: AuthorInfo[];
   unsigned: AuthorInfo[];
   excluded: AuthorInfo[];
+  corporateCovered: AuthorInfo[];
 };
 
 // ---------------------------------------------------------------------------
@@ -38,6 +39,20 @@ function isExcluded(
     if (ex.type === "team") return !!author.login && teamExcludedLogins.has(author.login);
     return false;
   });
+}
+
+// ---------------------------------------------------------------------------
+// Corporate domain coverage
+// ---------------------------------------------------------------------------
+
+function isEmailCoveredByDomain(
+  email: string,
+  coveredDomains: Set<string>,
+): boolean {
+  const atIdx = email.lastIndexOf("@");
+  if (atIdx < 0) return false;
+  const domain = email.slice(atIdx + 1).toLowerCase();
+  return coveredDomains.has(domain);
 }
 
 // ---------------------------------------------------------------------------
@@ -87,9 +102,24 @@ export async function checkClaForCommitAuthors(
     }
   }
 
+  // Fetch active corporate signatures for domain-based coverage
+  const corporateSignatures = await prisma.signature.findMany({
+    where: {
+      agreementId,
+      signatureType: "corporate",
+      revokedAt: null,
+      companyDomain: { not: null },
+    },
+    select: { companyDomain: true },
+  });
+  const coveredDomains = new Set(
+    corporateSignatures.map((s) => s.companyDomain!.toLowerCase()),
+  );
+
   const signed: AuthorInfo[] = [];
   const unsigned: AuthorInfo[] = [];
   const excluded: AuthorInfo[] = [];
+  const corporateCovered: AuthorInfo[] = [];
 
   for (const author of authors) {
     if (isExcluded(author, exclusions, teamExcludedLogins)) {
@@ -116,11 +146,16 @@ export async function checkClaForCommitAuthors(
     }
 
     if (!user) {
-      unsigned.push(author);
+      // No user record — check corporate coverage by email domain
+      if (author.email && isEmailCoveredByDomain(author.email, coveredDomains)) {
+        corporateCovered.push(author);
+      } else {
+        unsigned.push(author);
+      }
       continue;
     }
 
-    // Check for non-revoked signature on this agreement
+    // Check for non-revoked individual signature on this agreement
     const signature = await prisma.signature.findUnique({
       where: {
         userId_agreementId: { userId: user.id, agreementId },
@@ -129,12 +164,20 @@ export async function checkClaForCommitAuthors(
 
     if (signature && !signature.revokedAt) {
       signed.push(author);
+    } else if (
+      author.email && isEmailCoveredByDomain(author.email, coveredDomains)
+    ) {
+      corporateCovered.push(author);
+    } else if (
+      user.email && isEmailCoveredByDomain(user.email, coveredDomains)
+    ) {
+      corporateCovered.push(author);
     } else {
       unsigned.push(author);
     }
   }
 
-  return { allSigned: unsigned.length === 0, signed, unsigned, excluded };
+  return { allSigned: unsigned.length === 0, signed, unsigned, excluded, corporateCovered };
 }
 
 // ---------------------------------------------------------------------------
@@ -176,6 +219,13 @@ export async function createCheckRun(
       .map((a) => `- ${a.login ?? a.email ?? "Unknown"}`)
       .join("\n");
     summary += `\n\n**Signed:**\n${signedList}`;
+  }
+
+  if (result.corporateCovered.length > 0) {
+    const corpList = result.corporateCovered
+      .map((a) => `- ${a.login ?? a.email ?? "Unknown"}`)
+      .join("\n");
+    summary += `\n\n**Corporate-covered:**\n${corpList}`;
   }
 
   if (result.excluded.length > 0) {

@@ -11,6 +11,10 @@ function makeRow(overrides: Partial<SignatureRow> = {}): SignatureRow {
     ipAddress: "192.168.1.1",
     source: "online",
     revokedAt: null,
+    signatureType: "individual",
+    companyName: null,
+    companyDomain: null,
+    companyTitle: null,
     fields: {},
     ...overrides,
   };
@@ -21,7 +25,7 @@ describe("generateSignaturesCsv", () => {
     const csv = generateSignaturesCsv([makeRow()]);
     const lines = csv.split(/\r?\n/);
     expect(lines[0]).toBe(
-      "Name,GitHub Username,Email,Date Signed,CLA Version,IP Address,Source",
+      "Name,GitHub Username,Email,Type,Date Signed,CLA Version,IP Address,Source,Company Name,Company Domain,Company Title",
     );
   });
 
@@ -102,5 +106,25 @@ describe("generateSignaturesCsv", () => {
     const csv = generateSignaturesCsv(rows);
     const lines = csv.split(/\r?\n/);
     expect(lines).toHaveLength(6); // header + 5 rows
+  });
+
+  it("includes Type column showing Individual for individual signatures", () => {
+    const csv = generateSignaturesCsv([makeRow()]);
+    expect(csv).toContain("Individual");
+  });
+
+  it("includes Type column showing Corporate for corporate signatures", () => {
+    const csv = generateSignaturesCsv([
+      makeRow({
+        signatureType: "corporate",
+        companyName: "Acme Corp",
+        companyDomain: "acme.com",
+        companyTitle: "CTO",
+      }),
+    ]);
+    expect(csv).toContain("Corporate");
+    expect(csv).toContain("Acme Corp");
+    expect(csv).toContain("acme.com");
+    expect(csv).toContain("CTO");
   });
 });
