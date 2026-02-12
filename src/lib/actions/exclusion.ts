@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { logAudit, getClientIp } from "@/lib/audit";
 import {
   createExclusionSchema,
   deleteExclusionSchema,
@@ -18,6 +19,7 @@ export async function addExclusion(input: unknown): Promise<ActionResult> {
 
   const data = parsed.data;
   const userId = parseInt(user.id, 10);
+  const ipAddress = await getClientIp();
 
   const agreement = await prisma.agreement.findUnique({
     where: { id: data.agreementId },
@@ -60,17 +62,16 @@ export async function addExclusion(input: unknown): Promise<ActionResult> {
       },
     });
 
-    await tx.auditLog.create({
-      data: {
-        userId,
-        action: "exclusion.create",
-        entityType: "Exclusion",
-        entityId: data.agreementId,
-        after: JSON.stringify({
-          type: data.type,
-          githubLogin: data.githubLogin ?? null,
-        }),
+    await logAudit(tx, {
+      userId,
+      action: "exclusion.create",
+      entityType: "Exclusion",
+      entityId: data.agreementId,
+      after: {
+        type: data.type,
+        githubLogin: data.githubLogin ?? null,
       },
+      ipAddress,
     });
   });
 
@@ -88,6 +89,7 @@ export async function removeExclusion(input: unknown): Promise<ActionResult> {
 
   const data = parsed.data;
   const userId = parseInt(user.id, 10);
+  const ipAddress = await getClientIp();
 
   const agreement = await prisma.agreement.findUnique({
     where: { id: data.agreementId },
@@ -108,17 +110,16 @@ export async function removeExclusion(input: unknown): Promise<ActionResult> {
   await prisma.$transaction(async (tx) => {
     await tx.exclusion.delete({ where: { id: data.id } });
 
-    await tx.auditLog.create({
-      data: {
-        userId,
-        action: "exclusion.delete",
-        entityType: "Exclusion",
-        entityId: data.agreementId,
-        before: JSON.stringify({
-          type: exclusion.type,
-          githubLogin: exclusion.githubLogin,
-        }),
+    await logAudit(tx, {
+      userId,
+      action: "exclusion.delete",
+      entityType: "Exclusion",
+      entityId: data.agreementId,
+      before: {
+        type: exclusion.type,
+        githubLogin: exclusion.githubLogin,
       },
+      ipAddress,
     });
   });
 

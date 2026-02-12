@@ -1,20 +1,11 @@
 "use server";
 
-import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logAudit, getClientIp } from "@/lib/audit";
 import { buildSigningSchema, type SerializedField } from "@/lib/schemas/signing";
 import { recheckOpenPRs } from "@/lib/cla-check";
 import { type ActionResult, validationError } from "./result";
-
-async function getClientIp(): Promise<string | null> {
-  const h = await headers();
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    h.get("x-real-ip") ??
-    null
-  );
-}
 
 export async function signAgreement(input: {
   agreementId: number;
@@ -100,19 +91,18 @@ export async function signAgreement(input: {
         await tx.fieldEntry.createMany({ data: fieldEntries });
       }
 
-      await tx.auditLog.create({
-        data: {
-          userId,
-          action: "signature.create",
-          entityType: "Signature",
-          entityId: signature.id,
-          after: JSON.stringify({
-            agreementId: agreement.id,
-            versionId: latestVersion.id,
-            version: latestVersion.version,
-            fieldsCount: fieldEntries.length,
-          }),
+      await logAudit(tx, {
+        userId,
+        action: "signature.sign",
+        entityType: "Signature",
+        entityId: signature.id,
+        after: {
+          agreementId: agreement.id,
+          versionId: latestVersion.id,
+          version: latestVersion.version,
+          fieldsCount: fieldEntries.length,
         },
+        ipAddress,
       });
     });
   } catch (error) {
