@@ -3,6 +3,7 @@ import { AgreementForm } from "@/components/agreements/agreement-form";
 import { ExclusionManager } from "@/components/agreements/exclusion-manager";
 import { ReadOnlyAgreementView } from "@/components/agreements/read-only-agreement-view";
 import { SignatoriesList } from "@/components/agreements/signatories-list";
+import { SignatureManager } from "@/components/agreements/signature-manager";
 import { TransferOwnershipSection } from "@/components/agreements/transfer-ownership-section";
 import { getAgreementAccessLevel } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
@@ -110,6 +111,8 @@ export default async function EditAgreementPage({
 			/>
 
 			<SignatoriesList signatures={agreement.signatures} />
+
+			<SignatureManager agreementId={agreement.id} />
 
 			<TransferOwnershipSection
 				agreementId={agreement.id}
