@@ -36,6 +36,7 @@ model Agreement {
   signatures     Signature[]
   fields         AgreementField[]
   exclusions     Exclusion[]
+  notifyOnSign   Boolean            @default(false)
   installationId String?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
