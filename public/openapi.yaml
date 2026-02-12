@@ -364,6 +364,55 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /{owner}:
+    servers:
+      - url: /api/badge
+    parameters:
+      - $ref: "#/components/parameters/owner"
+    get:
+      summary: Get org-wide CLA badge
+      description: Returns an SVG badge showing the CLA signing status for an org-wide agreement.
+      tags: [Badges]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/badgeStyle"
+        - $ref: "#/components/parameters/badgeLabel"
+        - $ref: "#/components/parameters/badgeColor"
+      responses:
+        "200":
+          description: SVG badge image
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+        "304":
+          description: Not modified (ETag match)
+
+  /{owner}/{repo}:
+    servers:
+      - url: /api/badge
+    parameters:
+      - $ref: "#/components/parameters/owner"
+      - $ref: "#/components/parameters/repo"
+    get:
+      summary: Get repo CLA badge
+      description: Returns an SVG badge showing the CLA signing status for a repo agreement.
+      tags: [Badges]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/badgeStyle"
+        - $ref: "#/components/parameters/badgeLabel"
+        - $ref: "#/components/parameters/badgeColor"
+      responses:
+        "200":
+          description: SVG badge image
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+        "304":
+          description: Not modified (ETag match)
+
 components:
   securitySchemes:
     BearerAuth:
@@ -408,6 +457,28 @@ components:
         default: 50
         minimum: 1
         maximum: 100
+    badgeStyle:
+      name: style
+      in: query
+      schema:
+        type: string
+        enum: [flat, flat-square]
+        default: flat
+      description: Badge style
+    badgeLabel:
+      name: label
+      in: query
+      schema:
+        type: string
+        default: CLA
+      description: Left-side badge label
+    badgeColor:
+      name: color
+      in: query
+      schema:
+        type: string
+        pattern: "^[0-9a-fA-F]{3,8}$"
+      description: Hex color override for the right side
 
   schemas:
     Agreement:
