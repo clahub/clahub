@@ -67,7 +67,7 @@ describe("agreementFieldSchema", () => {
   });
 });
 
-describe("createAgreementSchema", () => {
+describe("createAgreementSchema — repo scope", () => {
   const validInput = {
     githubRepoId: "12345",
     ownerName: "testowner",
@@ -75,8 +75,19 @@ describe("createAgreementSchema", () => {
     text: "This is a CLA agreement text that is long enough",
   };
 
-  it("accepts valid input", () => {
+  it("accepts valid input (scope defaults to repo)", () => {
     const result = createAgreementSchema.safeParse(validInput);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.scope).toBe("repo");
+    }
+  });
+
+  it("accepts explicit scope: repo", () => {
+    const result = createAgreementSchema.safeParse({
+      ...validInput,
+      scope: "repo",
+    });
     expect(result.success).toBe(true);
   });
 
@@ -132,6 +143,59 @@ describe("createAgreementSchema", () => {
       installationId: "99999",
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("createAgreementSchema — org scope", () => {
+  const validOrgInput = {
+    scope: "org" as const,
+    githubOrgId: "67890",
+    ownerName: "my-org",
+    text: "This is an org-wide CLA agreement text",
+  };
+
+  it("accepts valid org input", () => {
+    const result = createAgreementSchema.safeParse(validOrgInput);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.scope).toBe("org");
+    }
+  });
+
+  it("requires githubOrgId for org scope", () => {
+    const result = createAgreementSchema.safeParse({
+      ...validOrgInput,
+      githubOrgId: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("requires ownerName for org scope", () => {
+    const result = createAgreementSchema.safeParse({
+      ...validOrgInput,
+      ownerName: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("requires text min length for org scope", () => {
+    const result = createAgreementSchema.safeParse({
+      ...validOrgInput,
+      text: "Too short",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("defaults fields to empty array for org scope", () => {
+    const result = createAgreementSchema.parse(validOrgInput);
+    expect(result.fields).toEqual([]);
+  });
+
+  it("rejects org scope missing githubOrgId", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { githubOrgId, ...noOrgId } = validOrgInput;
+    const result = createAgreementSchema.safeParse(noOrgId);
+    expect(result.success).toBe(false);
   });
 });
 
