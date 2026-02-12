@@ -9,6 +9,10 @@ export interface SignatureRow {
   ipAddress: string | null;
   source: string;
   revokedAt: Date | null;
+  signatureType: string;
+  companyName: string | null;
+  companyDomain: string | null;
+  companyTitle: string | null;
   fields: Record<string, string | null>;
 }
 
@@ -32,10 +36,14 @@ export function generateSignaturesCsv(
       Name: row.name ?? "",
       "GitHub Username": row.username,
       Email: row.email ?? "",
+      Type: row.signatureType === "corporate" ? "Corporate" : "Individual",
       "Date Signed": row.signedAt.toISOString(),
       "CLA Version": String(row.version),
       "IP Address": row.ipAddress ?? "",
       Source: row.source,
+      "Company Name": row.companyName ?? "",
+      "Company Domain": row.companyDomain ?? "",
+      "Company Title": row.companyTitle ?? "",
     };
 
     if (includeRevoked) {

@@ -45,9 +45,32 @@ export const apiUpdateAgreementSchema = z.object({
   fields: z.array(agreementFieldSchema).default([]),
 });
 
-export const apiSignAgreementSchema = z.object({
-  fields: z.record(z.string(), z.string().or(z.boolean())),
-});
+const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)+$/;
+
+export const apiSignAgreementSchema = z
+  .object({
+    signatureType: z.enum(["individual", "corporate"]).default("individual"),
+    companyName: z.string().min(1).optional(),
+    companyDomain: z
+      .string()
+      .regex(domainRegex, "Must be a valid domain (e.g. example.com)")
+      .optional(),
+    companyTitle: z.string().min(1).optional(),
+    fields: z.record(z.string(), z.string().or(z.boolean())),
+  })
+  .refine(
+    (data) => {
+      if (data.signatureType === "corporate") {
+        return !!data.companyName && !!data.companyDomain && !!data.companyTitle;
+      }
+      return true;
+    },
+    {
+      message:
+        "companyName, companyDomain, and companyTitle are required for corporate signatures",
+      path: ["signatureType"],
+    },
+  );
 
 export type CreateApiKeyInput = z.infer<typeof createApiKeySchema>;
 export type RevokeApiKeyInput = z.infer<typeof revokeApiKeySchema>;
