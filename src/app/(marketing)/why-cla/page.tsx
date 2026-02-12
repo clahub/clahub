@@ -27,7 +27,7 @@ export default function WhyClaPage() {
       {/* Hero */}
       <section className="container flex flex-col items-center gap-4 px-4 py-16 text-center md:py-24">
         <h1 className="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-          Why Use a <span className="text-primary">CLA</span>?
+          Why Use a <span className="text-primary-accent">CLA</span>?
         </h1>
         <p className="text-muted-foreground max-w-2xl text-lg">
           A Contributor License Agreement (CLA) is a legal document that defines

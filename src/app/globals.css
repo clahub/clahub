@@ -124,3 +124,38 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Accessible primary accent for text on light backgrounds (WCAG AA 3:1+) */
+.text-primary-accent {
+  color: oklch(0.55 0.18 70);
+}
+.dark .text-primary-accent {
+  color: oklch(0.78 0.16 75);
+}
+
+/* Print styles */
+@media print {
+  header,
+  footer,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #555;
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
+  }
+}

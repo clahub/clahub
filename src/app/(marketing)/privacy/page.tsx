@@ -23,7 +23,7 @@ export default function PrivacyPage() {
       {/* Hero */}
       <section className="container flex flex-col items-center gap-4 px-4 py-16 text-center md:py-24">
         <h1 className="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-          Privacy <span className="text-primary">Policy</span>
+          Privacy <span className="text-primary-accent">Policy</span>
         </h1>
         <p className="text-muted-foreground max-w-2xl">
           We collect only what we need to run CLAHub and never sell your data.

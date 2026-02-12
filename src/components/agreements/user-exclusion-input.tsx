@@ -97,6 +97,10 @@ export function UserExclusionInput({
             }}
             disabled={disabled}
             className="max-w-xs"
+            role="combobox"
+            aria-expanded={showDropdown && suggestions.length > 0}
+            aria-controls="user-exclusion-listbox"
+            aria-autocomplete="list"
           />
           <Button
             type="button"
@@ -110,11 +114,13 @@ export function UserExclusionInput({
         </div>
 
         {showDropdown && suggestions.length > 0 && (
-          <div className="absolute z-50 mt-1 w-full max-w-xs rounded-md border bg-popover shadow-md">
+          <div id="user-exclusion-listbox" role="listbox" className="absolute z-50 mt-1 w-full max-w-xs rounded-md border bg-popover shadow-md">
             {suggestions.map((s) => (
               <button
                 key={s.login}
                 type="button"
+                role="option"
+                aria-selected={false}
                 className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent"
                 onClick={() => handleSelect(s.login)}
               >

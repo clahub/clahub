@@ -18,10 +18,12 @@ export default function RootError({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div role="alert" className="flex min-h-screen items-center justify-center p-4">
       <Card className="max-w-md w-full">
         <CardHeader>
-          <CardTitle>Something went wrong</CardTitle>
+          <CardTitle>
+            <h1 className="text-xl">Something went wrong</h1>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">

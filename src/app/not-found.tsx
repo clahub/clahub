@@ -7,7 +7,9 @@ export default function NotFound() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="max-w-md w-full">
         <CardHeader>
-          <CardTitle>Page not found</CardTitle>
+          <CardTitle>
+            <h1 className="text-xl">Page not found</h1>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
