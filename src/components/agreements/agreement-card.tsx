@@ -53,7 +53,7 @@ export function AgreementCard({
             {accessLevel === "owner" ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm">
+                  <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${displayName}`}>
                     <MoreHorizontal className="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -74,7 +74,7 @@ export function AgreementCard({
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="ghost" size="icon-sm" asChild>
+              <Button variant="ghost" size="icon-sm" asChild aria-label={`View ${displayName}`}>
                 <Link href={`/agreements/edit/${id}`}>
                   <Eye className="size-4" />
                 </Link>
