@@ -50,20 +50,20 @@ and a GitHub App integration model.
 
 ### Issues Closed
 
-- #204: Project scaffolding: Next.js 15, TypeScript, Tailwind, shadcn/ui
-- #205: Prisma schema and SQLite database setup
-- #206: GitHub App registration and configuration
-- #207: Auth.js setup with dual GitHub OAuth providers
-- #208: Landing page and static marketing pages
-- #209: Agreement CRUD: create, list, edit, delete
-- #210: CLA signing flow with form validation
-- #211: Webhook handler: process push and pull_request events
-- #212: Async open PR re-check after new signature
-- #213: Bot auto-detection and basic exclusions
-- #214: Structured error handling and API error responses
-- #215: Audit logging for all write operations
-- #216: E2E tests for the core signing flow
-- #232: Structured logging and error tracking (Sentry)
-- #235: CI/CD pipeline: lint, test, build on PR
-- #240: Restyle site around CLAHub logo and color palette
-- #243: Fix 4 moderate Dependabot vulnerabilities (hono, lodash)
+- [#204](https://github.com/clahub/clahub/issues/204): Project scaffolding: Next.js 15, TypeScript, Tailwind, shadcn/ui
+- [#205](https://github.com/clahub/clahub/issues/205): Prisma schema and SQLite database setup
+- [#206](https://github.com/clahub/clahub/issues/206): GitHub App registration and configuration
+- [#207](https://github.com/clahub/clahub/issues/207): Auth.js setup with dual GitHub OAuth providers
+- [#208](https://github.com/clahub/clahub/issues/208): Landing page and static marketing pages
+- [#209](https://github.com/clahub/clahub/issues/209): Agreement CRUD: create, list, edit, delete
+- [#210](https://github.com/clahub/clahub/issues/210): CLA signing flow with form validation
+- [#211](https://github.com/clahub/clahub/issues/211): Webhook handler: process push and pull_request events
+- [#212](https://github.com/clahub/clahub/issues/212): Async open PR re-check after new signature
+- [#213](https://github.com/clahub/clahub/issues/213): Bot auto-detection and basic exclusions
+- [#214](https://github.com/clahub/clahub/issues/214): Structured error handling and API error responses
+- [#215](https://github.com/clahub/clahub/issues/215): Audit logging for all write operations
+- [#216](https://github.com/clahub/clahub/issues/216): E2E tests for the core signing flow
+- [#232](https://github.com/clahub/clahub/issues/232): Structured logging and error tracking (Sentry)
+- [#235](https://github.com/clahub/clahub/issues/235): CI/CD pipeline: lint, test, build on PR
+- [#240](https://github.com/clahub/clahub/issues/240): Restyle site around CLAHub logo and color palette
+- [#243](https://github.com/clahub/clahub/issues/243): Fix 4 moderate Dependabot vulnerabilities (hono, lodash)
