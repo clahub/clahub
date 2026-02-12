@@ -43,6 +43,7 @@ Running at [clahub.com](https://www.clahub.com)
 - [Tailwind CSS](https://tailwindcss.com) v4 + [shadcn/ui](https://ui.shadcn.com) components
 - [Octokit](https://github.com/octokit) for GitHub App / Checks API
 - [Zod](https://zod.dev) v4 + [React Hook Form](https://react-hook-form.com) for validation
+- [Sentry](https://sentry.io) via `@sentry/nextjs` for error tracking (optional)
 - [Vitest](https://vitest.dev) + [Playwright](https://playwright.dev) for testing
 
 ## Getting started
@@ -83,7 +84,9 @@ Fill in the values:
 | `GITHUB_CONTRIBUTOR_CLIENT_ID` | Yes | OAuth App for contributors — Client ID |
 | `GITHUB_CONTRIBUTOR_CLIENT_SECRET` | Yes | OAuth App for contributors — Client secret |
 | `APP_URL` | Yes | Public URL, e.g. `http://localhost:3000` |
-| `SENTRY_DSN` | No | Sentry error tracking |
+| `SENTRY_DSN` | No | Sentry error tracking (server-side) |
+| `NEXT_PUBLIC_SENTRY_DSN` | No | Sentry error tracking (client-side) |
+| `LOG_LEVEL` | No | Log level: `debug`, `info` (default), `warn`, `error` |
 | `RESEND_API_KEY` | No | Email via Resend |
 | `EMAIL_FROM` | No | Sender address for emails |
 
@@ -144,6 +147,7 @@ Tests are organized by layer:
 | Directory | What's tested |
 |---|---|
 | `tests/unit/schemas/` | Zod schemas — agreement, signing, exclusion |
+| `tests/unit/lib/` | Utility modules — api-error, audit, logger, result, sentry scrubbing |
 | `tests/unit/cla-check.test.ts` | `extractPushAuthors()` pure function |
 | `tests/unit/cla-check-integration.test.ts` | `checkClaForCommitAuthors`, `createCheckRun`, `extractPRAuthors` with mocked Prisma/Octokit |
 | `tests/unit/actions/signing.test.ts` | `signAgreement` server action with mocked auth, Prisma, and cla-check |
@@ -178,22 +182,31 @@ src/
     api/auth/           NextAuth endpoints
     api/webhooks/       GitHub App webhook handler
     auth/signin/        Sign-in page
+    error.tsx           Error boundary with Sentry reporting
+    global-error.tsx    Global error boundary (outside root layout)
+    not-found.tsx       Custom 404 page
   components/
     ui/                 shadcn/ui primitives
     agreements/         Agreement form, signing form, exclusion manager, etc.
   lib/
     actions/            Server actions (agreement, exclusion, signing)
     schemas/            Zod validation schemas
+    api-error.ts        Structured API error responses with error codes
+    audit.ts            Shared audit logging utility
     auth.ts             NextAuth configuration (dual providers)
     cla-check.ts        Core CLA verification + exclusion logic
-    github.ts           GitHub App / Octokit setup
+    github.ts           GitHub App / Octokit setup + webhook handlers
+    logger.ts           Structured JSON logger with level filtering
     prisma.ts           Prisma client singleton
+    sentry.ts           Sensitive data scrubbing utility
     templates.ts        CLA templates (Apache ICLA, DCO)
+  instrumentation.ts    Server-side Sentry init (conditional on SENTRY_DSN)
+  instrumentation-client.ts  Client-side Sentry init
 prisma/
   schema.prisma         Database schema (8 models)
   seed.ts               Sample data
 tests/
-  unit/                 Vitest unit tests (schemas, cla-check, actions)
+  unit/                 Vitest unit tests (schemas, lib, cla-check, actions)
   e2e/                  Playwright E2E tests (signing flow, dashboard, webhook)
   setup.ts              Vitest setup (jest-dom matchers)
 ```
