@@ -110,7 +110,9 @@ export async function createCheckRun(
   agreementOwner: string,
   agreementRepo: string | null,
 ) {
-  const detailsUrl = `${APP_URL}/agreements/${agreementOwner}/${agreementRepo}`;
+  const detailsUrl = agreementRepo
+    ? `${APP_URL}/agreements/${agreementOwner}/${agreementRepo}`
+    : `${APP_URL}/agreements/${agreementOwner}`;
   const conclusion = result.allSigned ? "success" : "action_required";
 
   let summary: string;
@@ -251,6 +253,14 @@ export async function recheckOpenPRs(agreementId: number): Promise<void> {
   });
 
   if (!agreement || !agreement.installationId || agreement.deletedAt) return;
+
+  if (agreement.scope === "org") {
+    logger.info("Skipping PR recheck for org-wide agreement — PRs will update on next activity", {
+      action: "cla-check.recheck",
+      agreementId,
+    });
+    return;
+  }
 
   const octokit = await getInstallationOctokit(
     Number(agreement.installationId),
