@@ -10,6 +10,7 @@ import {
   unrevokeSignatureSchema,
 } from "@/lib/schemas/signature";
 import { recheckOpenPRs } from "@/lib/cla-check";
+import { notifyNewSignature, notifyImportComplete } from "@/lib/email";
 import { type ActionResult, requireOwner } from "./result";
 
 export type ImportResult =
@@ -124,7 +125,10 @@ export async function addManualSignature(
 
   const agreement = await prisma.agreement.findUnique({
     where: { id: data.agreementId },
-    include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+    include: {
+      versions: { orderBy: { version: "desc" }, take: 1 },
+      owner: { select: { email: true } },
+    },
   });
 
   if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
@@ -207,6 +211,21 @@ export async function addManualSignature(
 
   revalidatePath(`/agreements/edit/${data.agreementId}`);
   recheckOpenPRs(data.agreementId).catch(() => {});
+
+  if (agreement.notifyOnSign && agreement.owner.email) {
+    const agreementLabel =
+      agreement.scope === "org"
+        ? `${agreement.ownerName} (Org-wide)`
+        : `${agreement.ownerName}/${agreement.repoName}`;
+    notifyNewSignature({
+      agreementId: agreement.id,
+      signerName: data.name ?? null,
+      signerLogin: data.githubLogin ?? data.email ?? "unknown",
+      ownerEmail: agreement.owner.email,
+      agreementLabel,
+    }).catch(() => {});
+  }
+
   return { success: true };
 }
 
@@ -234,7 +253,10 @@ export async function importCsvSignatures(
 
   const agreement = await prisma.agreement.findUnique({
     where: { id: data.agreementId },
-    include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+    include: {
+      versions: { orderBy: { version: "desc" }, take: 1 },
+      owner: { select: { email: true } },
+    },
   });
 
   if (!agreement || agreement.ownerId !== ownerId || agreement.deletedAt) {
@@ -353,6 +375,19 @@ export async function importCsvSignatures(
 
   revalidatePath(`/agreements/edit/${data.agreementId}`);
   recheckOpenPRs(data.agreementId).catch(() => {});
+
+  if (imported > 0 && agreement.notifyOnSign && agreement.owner.email) {
+    const agreementLabel =
+      agreement.scope === "org"
+        ? `${agreement.ownerName} (Org-wide)`
+        : `${agreement.ownerName}/${agreement.repoName}`;
+    notifyImportComplete({
+      agreementId: agreement.id,
+      ownerEmail: agreement.owner.email,
+      agreementLabel,
+      importedCount: imported,
+    }).catch(() => {});
+  }
 
   return { success: true, imported, skipped, errors };
 }

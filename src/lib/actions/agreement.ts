@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getClientIp, logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import {
@@ -8,6 +9,7 @@ import {
 	deleteAgreementSchema,
 	transferAgreementSchema,
 	updateAgreementSchema,
+	updateNotificationSchema,
 } from "@/lib/schemas/agreement";
 import { getAppOctokit, getInstallationOctokit } from "@/lib/github";
 import { logger } from "@/lib/logger";
@@ -591,7 +593,48 @@ export async function transferAgreement(input: unknown): Promise<ActionResult> {
 		});
 	});
 
-	// TODO: Send email notification to new owner (#223)
+	return { success: true };
+}
 
+export async function updateNotificationPreference(
+	input: unknown,
+): Promise<ActionResult> {
+	const user = await requireOwner();
+	const parsed = updateNotificationSchema.safeParse(input);
+
+	if (!parsed.success) {
+		return validationError(parsed.error);
+	}
+
+	const data = parsed.data;
+	const userId = parseInt(user.id, 10);
+	const ipAddress = await getClientIp();
+
+	const agreement = await prisma.agreement.findUnique({
+		where: { id: data.agreementId },
+	});
+
+	if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
+		return { success: false, error: "Agreement not found", code: "NOT_FOUND" };
+	}
+
+	await prisma.$transaction(async (tx) => {
+		await tx.agreement.update({
+			where: { id: agreement.id },
+			data: { notifyOnSign: data.notifyOnSign },
+		});
+
+		await logAudit(tx, {
+			userId,
+			action: "agreement.update_notification",
+			entityType: "Agreement",
+			entityId: agreement.id,
+			before: { notifyOnSign: agreement.notifyOnSign },
+			after: { notifyOnSign: data.notifyOnSign },
+			ipAddress,
+		});
+	});
+
+	revalidatePath(`/agreements/edit/${data.agreementId}`);
 	return { success: true };
 }
