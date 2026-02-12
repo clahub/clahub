@@ -7,7 +7,6 @@
 [![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma)](https://prisma.io)
 [![GitHub issues](https://img.shields.io/github/issues/clahub/clahub)](https://github.com/clahub/clahub/issues)
 [![GitHub stars](https://img.shields.io/github/stars/clahub/clahub)](https://github.com/clahub/clahub/stargazers)
-[![CLA](https://clahub.com/api/badge/clahub/clahub)](https://clahub.com/agreements/clahub/clahub)
 
 CLAHub provides a low-friction way to have a Contributor License Agreement for your open source project on GitHub. Contributors digitally sign your CLA by signing in with GitHub, and pull requests are automatically marked with a status check based on whether all commit authors have signed.
 
