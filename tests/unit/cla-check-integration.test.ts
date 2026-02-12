@@ -7,6 +7,7 @@ vi.mock("@/lib/prisma", () => ({
     exclusion: { findMany: vi.fn() },
     user: { findUnique: vi.fn(), findFirst: vi.fn() },
     signature: { findUnique: vi.fn() },
+    agreement: { findUnique: vi.fn() },
   },
 }));
 
@@ -18,6 +19,7 @@ vi.mock("@/lib/github", () => ({
 
 import { checkClaForCommitAuthors, createCheckRun, extractPRAuthors } from "@/lib/cla-check";
 import { prisma } from "@/lib/prisma";
+import { getInstallationOctokit } from "@/lib/github";
 
 const mockPrisma = vi.mocked(prisma);
 
@@ -182,6 +184,90 @@ describe("checkClaForCommitAuthors", () => {
     expect(result.signed).toHaveLength(1);
     expect(result.unsigned).toHaveLength(1);
     expect(result.allSigned).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Team exclusions in checkClaForCommitAuthors
+// ---------------------------------------------------------------------------
+
+describe("checkClaForCommitAuthors — team exclusions", () => {
+  const mockGetInstallationOctokit = vi.mocked(getInstallationOctokit);
+
+  it("excludes team members via team exclusion", async () => {
+    mockPrisma.exclusion.findMany.mockResolvedValue([
+      { id: 3, agreementId: 1, type: "team", githubLogin: null, githubTeamId: "engineers", createdAt: new Date() },
+    ] as any);
+    mockPrisma.agreement.findUnique.mockResolvedValue({
+      id: 1,
+      installationId: "12345",
+      ownerName: "my-org",
+    } as any);
+    mockGetInstallationOctokit.mockResolvedValue({
+      request: vi.fn().mockResolvedValue({
+        data: [{ login: "alice" }, { login: "bob" }],
+      }),
+    } as any);
+
+    const authors: AuthorInfo[] = [
+      { githubId: "1", login: "alice", email: "alice@example.com" },
+    ];
+
+    const result = await checkClaForCommitAuthors(1, authors);
+    expect(result.excluded).toHaveLength(1);
+    expect(result.excluded[0].login).toBe("alice");
+    expect(result.unsigned).toHaveLength(0);
+  });
+
+  it("does not exclude non-team members", async () => {
+    mockPrisma.exclusion.findMany.mockResolvedValue([
+      { id: 3, agreementId: 1, type: "team", githubLogin: null, githubTeamId: "engineers", createdAt: new Date() },
+    ] as any);
+    mockPrisma.agreement.findUnique.mockResolvedValue({
+      id: 1,
+      installationId: "12345",
+      ownerName: "my-org",
+    } as any);
+    mockGetInstallationOctokit.mockResolvedValue({
+      request: vi.fn().mockResolvedValue({
+        data: [{ login: "bob" }, { login: "carol" }],
+      }),
+    } as any);
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findFirst.mockResolvedValue(null);
+
+    const authors: AuthorInfo[] = [
+      { githubId: "99", login: "alice", email: "alice@example.com" },
+    ];
+
+    const result = await checkClaForCommitAuthors(1, authors);
+    expect(result.excluded).toHaveLength(0);
+    expect(result.unsigned).toHaveLength(1);
+  });
+
+  it("degrades gracefully when team API fails", async () => {
+    mockPrisma.exclusion.findMany.mockResolvedValue([
+      { id: 3, agreementId: 1, type: "team", githubLogin: null, githubTeamId: "engineers", createdAt: new Date() },
+    ] as any);
+    mockPrisma.agreement.findUnique.mockResolvedValue({
+      id: 1,
+      installationId: "12345",
+      ownerName: "my-org",
+    } as any);
+    mockGetInstallationOctokit.mockResolvedValue({
+      request: vi.fn().mockRejectedValue(new Error("API error")),
+    } as any);
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findFirst.mockResolvedValue(null);
+
+    const authors: AuthorInfo[] = [
+      { githubId: "1", login: "alice", email: "alice@example.com" },
+    ];
+
+    const result = await checkClaForCommitAuthors(1, authors);
+    // Author should not be excluded when API fails
+    expect(result.excluded).toHaveLength(0);
+    expect(result.unsigned).toHaveLength(1);
   });
 });
 

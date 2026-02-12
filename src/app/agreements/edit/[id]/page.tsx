@@ -85,6 +85,7 @@ export default async function EditAgreementPage({
     id: e.id,
     type: e.type,
     githubLogin: e.githubLogin,
+    githubTeamSlug: e.githubTeamId,
   }));
 
   return (
@@ -103,6 +104,7 @@ export default async function EditAgreementPage({
 
       <ExclusionManager
         agreementId={agreement.id}
+        ownerName={agreement.ownerName}
         initialExclusions={exclusions}
       />
 

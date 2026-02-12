@@ -48,6 +48,32 @@ describe("createExclusionSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("accepts team type with githubTeamSlug", () => {
+    const result = createExclusionSchema.safeParse({
+      agreementId: 1,
+      type: "team",
+      githubTeamSlug: "engineering",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects team type without githubTeamSlug", () => {
+    const result = createExclusionSchema.safeParse({
+      agreementId: 1,
+      type: "team",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects team type with empty githubTeamSlug", () => {
+    const result = createExclusionSchema.safeParse({
+      agreementId: 1,
+      type: "team",
+      githubTeamSlug: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("rejects invalid type", () => {
     const result = createExclusionSchema.safeParse({
       agreementId: 1,
