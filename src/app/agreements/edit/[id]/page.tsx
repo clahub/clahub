@@ -7,6 +7,9 @@ import { NotificationToggle } from "@/components/agreements/notification-toggle"
 import { SignatureManager } from "@/components/agreements/signature-manager";
 import { TransferOwnershipSection } from "@/components/agreements/transfer-ownership-section";
 import { ContributingMdSection } from "@/components/agreements/contributing-md-section";
+import { HealthStatusCard } from "@/components/agreements/health-status-card";
+import { AuditLogViewer } from "@/components/agreements/audit-log-viewer";
+import { RecheckButton } from "@/components/agreements/recheck-button";
 import { getAgreementAccessLevel } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import type { AgreementFieldInput } from "@/lib/schemas/agreement";
@@ -127,6 +130,21 @@ export default async function EditAgreementPage({
 					repoName={agreement.repoName}
 				/>
 			)}
+
+			<HealthStatusCard
+				installationId={agreement.installationId}
+				scope={agreement.scope}
+				ownerName={agreement.ownerName}
+				repoName={agreement.repoName}
+				signatureCount={agreement.signatures.length}
+				createdAt={agreement.createdAt.toISOString()}
+			/>
+
+			{agreement.scope === "repo" && (
+				<RecheckButton agreementId={agreement.id} />
+			)}
+
+			<AuditLogViewer agreementId={agreement.id} />
 
 			<TransferOwnershipSection
 				agreementId={agreement.id}
