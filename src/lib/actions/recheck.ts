@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { recheckOpenPRs, type RecheckResult } from "@/lib/cla-check";
+import { logger } from "@/lib/logger";
 
 type RecheckResponse =
   | { success: true; result: RecheckResult }
@@ -37,8 +38,10 @@ export async function recheckAgreementPRs(input: {
 
   try {
     const result = await recheckOpenPRs(agreement.id);
+    logger.info("Manual recheck completed", { action: "recheck.manual", agreementId: agreement.id, result });
     return { success: true, result };
-  } catch {
+  } catch (err) {
+    logger.error("Manual recheck failed", { action: "recheck.manual", agreementId: agreement.id }, err);
     return { success: false, error: "Re-check failed. Please try again." };
   }
 }

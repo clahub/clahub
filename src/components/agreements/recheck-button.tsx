@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { RefreshCw, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,24 +17,29 @@ interface RecheckButtonProps {
 }
 
 export function RecheckButton({ agreementId }: RecheckButtonProps) {
-	const [isPending, startTransition] = useTransition();
+	const [loading, setLoading] = useState(false);
 	const [result, setResult] = useState<{
 		checked: number;
 		updated: number;
 	} | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
-	function handleRecheck() {
+	async function handleRecheck() {
 		setResult(null);
 		setError(null);
-		startTransition(async () => {
+		setLoading(true);
+		try {
 			const res = await recheckAgreementPRs({ agreementId });
 			if (res.success) {
 				setResult(res.result);
 			} else {
 				setError(res.error);
 			}
-		});
+		} catch {
+			setError("An unexpected error occurred.");
+		} finally {
+			setLoading(false);
+		}
 	}
 
 	return (
@@ -52,9 +57,9 @@ export function RecheckButton({ agreementId }: RecheckButtonProps) {
 				<Button
 					variant="outline"
 					onClick={handleRecheck}
-					disabled={isPending}
+					disabled={loading}
 				>
-					{isPending ? (
+					{loading ? (
 						<>
 							<RefreshCw className="mr-2 h-4 w-4 animate-spin" />
 							Checking PRs…
