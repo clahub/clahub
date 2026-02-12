@@ -38,18 +38,47 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     include: { version: { select: { version: true } } },
   });
 
-  if (!signature || signature.revokedAt) {
+  if (signature && !signature.revokedAt) {
     return NextResponse.json({
-      data: { signed: false, username },
+      data: {
+        signed: true,
+        username,
+        signedAt: signature.signedAt,
+        version: signature.version.version,
+        signatureType: signature.signatureType,
+      },
     });
   }
 
+  // Check corporate domain coverage
+  if (user.email) {
+    const atIdx = user.email.lastIndexOf("@");
+    if (atIdx > 0) {
+      const domain = user.email.slice(atIdx + 1).toLowerCase();
+      const corpSig = await prisma.signature.findFirst({
+        where: {
+          agreementId: agreement.id,
+          signatureType: "corporate",
+          companyDomain: domain,
+          revokedAt: null,
+        },
+        include: { version: { select: { version: true } } },
+      });
+      if (corpSig) {
+        return NextResponse.json({
+          data: {
+            signed: true,
+            username,
+            corporateCovered: true,
+            companyName: corpSig.companyName,
+            version: corpSig.version.version,
+          },
+        });
+      }
+    }
+  }
+
   return NextResponse.json({
-    data: {
-      signed: true,
-      username,
-      signedAt: signature.signedAt,
-      version: signature.version.version,
-    },
+    data: { signed: false, username },
   });
 }

@@ -61,9 +61,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       avatarUrl: s.user.avatarUrl,
     },
     version: s.version.version,
+    signatureType: s.signatureType,
     signedAt: s.signedAt,
     source: s.source,
     revokedAt: s.revokedAt,
+    ...(s.signatureType === "corporate" && {
+      companyName: s.companyName,
+      companyDomain: s.companyDomain,
+      companyTitle: s.companyTitle,
+    }),
   }));
 
   return paginatedResponse(data, total, page, per_page, request);
@@ -169,8 +175,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           userId: user.id,
           agreementId: agreement.id,
           versionId: latestVersion.id,
+          signatureType: parsed.data.signatureType ?? "individual",
           source: "api",
           ipAddress,
+          companyName: parsed.data.companyName ?? null,
+          companyDomain: parsed.data.companyDomain ?? null,
+          companyTitle: parsed.data.companyTitle ?? null,
         },
       });
 
