@@ -337,19 +337,26 @@ async function withRetry<T>(
 // Recheck open PRs (called after a new signature)
 // ---------------------------------------------------------------------------
 
-export async function recheckOpenPRs(agreementId: number): Promise<void> {
+export interface RecheckResult {
+  checked: number;
+  updated: number;
+}
+
+export async function recheckOpenPRs(agreementId: number): Promise<RecheckResult> {
   const agreement = await prisma.agreement.findUnique({
     where: { id: agreementId },
   });
 
-  if (!agreement || !agreement.installationId || agreement.deletedAt) return;
+  if (!agreement || !agreement.installationId || agreement.deletedAt) {
+    return { checked: 0, updated: 0 };
+  }
 
   if (agreement.scope === "org") {
     logger.info("Skipping PR recheck for org-wide agreement — PRs will update on next activity", {
       action: "cla-check.recheck",
       agreementId,
     });
-    return;
+    return { checked: 0, updated: 0 };
   }
 
   const octokit = await getInstallationOctokit(
@@ -369,6 +376,7 @@ export async function recheckOpenPRs(agreementId: number): Promise<void> {
 
   logger.info(`Rechecking ${pulls.length} open PR(s) for ${owner}/${repo}`, { action: "cla-check.recheck" });
 
+  let updated = 0;
   for (const pr of pulls) {
     const start = Date.now();
     try {
@@ -382,6 +390,7 @@ export async function recheckOpenPRs(agreementId: number): Promise<void> {
           result, owner, agreement.repoName,
         ),
       );
+      updated++;
       const duration = Date.now() - start;
       logger.info(
         `PR #${pr.number}: ${result.allSigned ? "success" : "action_required"} (${duration}ms)`,
@@ -396,4 +405,6 @@ export async function recheckOpenPRs(agreementId: number): Promise<void> {
       );
     }
   }
+
+  return { checked: pulls.length, updated };
 }
