@@ -371,6 +371,118 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /agreements/{owner}/export/csv:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+    get:
+      summary: Export org-wide signatures as CSV
+      tags: [Exports]
+      parameters:
+        - name: revoked
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include revoked signatures
+      responses:
+        "200":
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /agreements/{owner}/{repo}/export/csv:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+      - $ref: "#/components/parameters/repo"
+    get:
+      summary: Export repo signatures as CSV
+      tags: [Exports]
+      parameters:
+        - name: revoked
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include revoked signatures
+      responses:
+        "200":
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /agreements/{owner}/export/pdf:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+    get:
+      summary: Export org-wide agreement as PDF
+      tags: [Exports]
+      parameters:
+        - name: signatures
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include signatory list in PDF
+      responses:
+        "200":
+          description: PDF file download
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /agreements/{owner}/{repo}/export/pdf:
+    parameters:
+      - $ref: "#/components/parameters/owner"
+      - $ref: "#/components/parameters/repo"
+    get:
+      summary: Export repo agreement as PDF
+      tags: [Exports]
+      parameters:
+        - name: signatures
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include signatory list in PDF
+      responses:
+        "200":
+          description: PDF file download
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
   /{owner}:
     servers:
       - url: /api/badge
