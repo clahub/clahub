@@ -26,10 +26,10 @@ export default function GlobalError({
           padding: "1rem",
         }}
       >
-        <div style={{ maxWidth: "28rem", textAlign: "center" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+        <main role="alert" style={{ maxWidth: "28rem", textAlign: "center" }}>
+          <h1 style={{ fontSize: "1.25rem", fontWeight: 600 }}>
             Something went wrong
-          </h2>
+          </h1>
           <p style={{ color: "#6b7280", marginTop: "0.5rem" }}>
             {error.message || "An unexpected error occurred."}
           </p>
@@ -45,7 +45,7 @@ export default function GlobalError({
           >
             Try again
           </button>
-        </div>
+        </main>
       </body>
     </html>
   );

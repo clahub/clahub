@@ -8,7 +8,7 @@ export default function SettingsLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <div className="container px-4 py-8 md:px-6">{children}</div>
       </main>
     </div>

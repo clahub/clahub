@@ -45,6 +45,8 @@ export function SiteHeader() {
             className="md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav"
           >
             {mobileOpen ? (
               <X className="size-5" />
@@ -57,7 +59,7 @@ export function SiteHeader() {
 
       {/* Mobile nav */}
       {mobileOpen && (
-        <nav className="border-t px-4 pb-4 md:hidden">
+        <nav id="mobile-nav" className="border-t px-4 pb-4 md:hidden">
           <div className="flex flex-col gap-2 pt-2">
             {navLinks.map((link) => (
               <Link
