@@ -6,6 +6,7 @@ import { SignatoriesList } from "@/components/agreements/signatories-list";
 import { NotificationToggle } from "@/components/agreements/notification-toggle";
 import { SignatureManager } from "@/components/agreements/signature-manager";
 import { TransferOwnershipSection } from "@/components/agreements/transfer-ownership-section";
+import { ContributingMdSection } from "@/components/agreements/contributing-md-section";
 import { getAgreementAccessLevel } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import type { AgreementFieldInput } from "@/lib/schemas/agreement";
@@ -119,6 +120,14 @@ export default async function EditAgreementPage({
 				agreementId={agreement.id}
 				initialEnabled={agreement.notifyOnSign}
 			/>
+
+			{agreement.scope === "repo" && agreement.repoName && (
+				<ContributingMdSection
+					ownerName={agreement.ownerName}
+					repoName={agreement.repoName}
+					installationId={agreement.installationId}
+				/>
+			)}
 
 			<TransferOwnershipSection
 				agreementId={agreement.id}
