@@ -46,38 +46,83 @@ export function getInstallationOctokit(installationId: number) {
 
 function registerWebhookHandlers(app: App) {
   app.webhooks.on("installation.created", async ({ payload }) => {
-    const installationId = String(payload.installation.id);
-    const repos = payload.repositories ?? [];
+    const start = Date.now();
+    const action = "webhook.installation.created";
+    try {
+      const installationId = String(payload.installation.id);
+      const repos = payload.repositories ?? [];
 
-    for (const repo of repos) {
-      await prisma.agreement.updateMany({
-        where: { githubRepoId: String(repo.id) },
-        data: { installationId },
+      for (const repo of repos) {
+        await prisma.agreement.updateMany({
+          where: { githubRepoId: String(repo.id) },
+          data: { installationId },
+        });
+      }
+      logger.info("Webhook handler completed", {
+        action,
+        durationMs: Date.now() - start,
+        result: "success",
       });
+    } catch (err) {
+      logger.error(
+        "Error handling installation.created event",
+        { action, durationMs: Date.now() - start },
+        err,
+      );
     }
   });
 
   app.webhooks.on("installation.deleted", async ({ payload }) => {
-    const repos = payload.repositories ?? [];
+    const start = Date.now();
+    const action = "webhook.installation.deleted";
+    try {
+      const repos = payload.repositories ?? [];
 
-    for (const repo of repos) {
-      await prisma.agreement.updateMany({
-        where: { githubRepoId: String(repo.id) },
-        data: { installationId: null },
+      for (const repo of repos) {
+        await prisma.agreement.updateMany({
+          where: { githubRepoId: String(repo.id) },
+          data: { installationId: null },
+        });
+      }
+      logger.info("Webhook handler completed", {
+        action,
+        durationMs: Date.now() - start,
+        result: "success",
       });
+    } catch (err) {
+      logger.error(
+        "Error handling installation.deleted event",
+        { action, durationMs: Date.now() - start },
+        err,
+      );
     }
   });
 
   app.webhooks.on(
     "installation_repositories.added",
     async ({ payload }) => {
-      const installationId = String(payload.installation.id);
+      const start = Date.now();
+      const action = "webhook.installation_repositories.added";
+      try {
+        const installationId = String(payload.installation.id);
 
-      for (const repo of payload.repositories_added) {
-        await prisma.agreement.updateMany({
-          where: { githubRepoId: String(repo.id) },
-          data: { installationId },
+        for (const repo of payload.repositories_added) {
+          await prisma.agreement.updateMany({
+            where: { githubRepoId: String(repo.id) },
+            data: { installationId },
+          });
+        }
+        logger.info("Webhook handler completed", {
+          action,
+          durationMs: Date.now() - start,
+          result: "success",
         });
+      } catch (err) {
+        logger.error(
+          "Error handling installation_repositories.added event",
+          { action, durationMs: Date.now() - start },
+          err,
+        );
       }
     },
   );
@@ -85,11 +130,26 @@ function registerWebhookHandlers(app: App) {
   app.webhooks.on(
     "installation_repositories.removed",
     async ({ payload }) => {
-      for (const repo of payload.repositories_removed) {
-        await prisma.agreement.updateMany({
-          where: { githubRepoId: String(repo.id) },
-          data: { installationId: null },
+      const start = Date.now();
+      const action = "webhook.installation_repositories.removed";
+      try {
+        for (const repo of payload.repositories_removed) {
+          await prisma.agreement.updateMany({
+            where: { githubRepoId: String(repo.id) },
+            data: { installationId: null },
+          });
+        }
+        logger.info("Webhook handler completed", {
+          action,
+          durationMs: Date.now() - start,
+          result: "success",
         });
+      } catch (err) {
+        logger.error(
+          "Error handling installation_repositories.removed event",
+          { action, durationMs: Date.now() - start },
+          err,
+        );
       }
     },
   );
@@ -101,6 +161,8 @@ function registerWebhookHandlers(app: App) {
   app.webhooks.on(
     ["pull_request.opened", "pull_request.synchronize", "pull_request.reopened"],
     async ({ payload }) => {
+      const start = Date.now();
+      const action = "webhook.pull_request";
       try {
         const repoId = String(payload.repository.id);
         const agreement = await prisma.agreement.findUnique({
@@ -134,8 +196,17 @@ function registerWebhookHandlers(app: App) {
           agreement.ownerName,
           agreement.repoName,
         );
+        logger.info("Webhook handler completed", {
+          action,
+          durationMs: Date.now() - start,
+          result: "success",
+        });
       } catch (err) {
-        logger.error("Error handling pull_request event", { action: "webhook.pull_request" }, err);
+        logger.error(
+          "Error handling pull_request event",
+          { action, durationMs: Date.now() - start },
+          err,
+        );
       }
     },
   );
@@ -145,6 +216,8 @@ function registerWebhookHandlers(app: App) {
   // -------------------------------------------------------------------------
 
   app.webhooks.on("push", async ({ payload }) => {
+    const start = Date.now();
+    const action = "webhook.push";
     try {
       if (payload.commits.length === 0) return;
 
@@ -174,8 +247,17 @@ function registerWebhookHandlers(app: App) {
         agreement.ownerName,
         agreement.repoName,
       );
+      logger.info("Webhook handler completed", {
+        action,
+        durationMs: Date.now() - start,
+        result: "success",
+      });
     } catch (err) {
-      logger.error("Error handling push event", { action: "webhook.push" }, err);
+      logger.error(
+        "Error handling push event",
+        { action, durationMs: Date.now() - start },
+        err,
+      );
     }
   });
 
@@ -184,6 +266,8 @@ function registerWebhookHandlers(app: App) {
   // -------------------------------------------------------------------------
 
   app.webhooks.on("repository.renamed", async ({ payload }) => {
+    const start = Date.now();
+    const action = "webhook.repository.renamed";
     try {
       await prisma.agreement.updateMany({
         where: { githubRepoId: String(payload.repository.id) },
@@ -192,12 +276,23 @@ function registerWebhookHandlers(app: App) {
           repoName: payload.repository.name,
         },
       });
+      logger.info("Webhook handler completed", {
+        action,
+        durationMs: Date.now() - start,
+        result: "success",
+      });
     } catch (err) {
-      logger.error("Error handling repository.renamed event", { action: "webhook.repository.renamed" }, err);
+      logger.error(
+        "Error handling repository.renamed event",
+        { action, durationMs: Date.now() - start },
+        err,
+      );
     }
   });
 
   app.webhooks.on("repository.transferred", async ({ payload }) => {
+    const start = Date.now();
+    const action = "webhook.repository.transferred";
     try {
       await prisma.agreement.updateMany({
         where: { githubRepoId: String(payload.repository.id) },
@@ -206,8 +301,17 @@ function registerWebhookHandlers(app: App) {
           repoName: payload.repository.name,
         },
       });
+      logger.info("Webhook handler completed", {
+        action,
+        durationMs: Date.now() - start,
+        result: "success",
+      });
     } catch (err) {
-      logger.error("Error handling repository.transferred event", { action: "webhook.repository.transferred" }, err);
+      logger.error(
+        "Error handling repository.transferred event",
+        { action, durationMs: Date.now() - start },
+        err,
+      );
     }
   });
 }
