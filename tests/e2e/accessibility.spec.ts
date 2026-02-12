@@ -8,9 +8,10 @@ async function expectNoA11yViolations(page: import("@playwright/test").Page) {
     .withTags(["wcag2a", "wcag2aa"])
     .analyze();
 
-  const violations = results.violations.map(
-    (v) => `${v.id}: ${v.description} (${v.nodes.length} instances)`,
-  );
+  const violations = results.violations.map((v) => {
+    const targets = v.nodes.map((n) => `    - ${n.target.join(" > ")} [${n.html.slice(0, 120)}]`).join("\n");
+    return `${v.id}: ${v.description} (${v.nodes.length} instances)\n${targets}`;
+  });
 
   expect(violations, `Accessibility violations:\n${violations.join("\n")}`).toHaveLength(0);
 }
