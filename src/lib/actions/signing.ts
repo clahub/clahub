@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { logAudit, getClientIp } from "@/lib/audit";
 import { buildSigningSchema, type SerializedField } from "@/lib/schemas/signing";
 import { recheckOpenPRs } from "@/lib/cla-check";
+import { notifyNewSignature } from "@/lib/email";
 import { type ActionResult, validationError } from "./result";
 
 export async function signAgreement(input: {
@@ -23,6 +24,7 @@ export async function signAgreement(input: {
     include: {
       versions: { orderBy: { version: "desc" }, take: 1 },
       fields: { where: { enabled: true }, orderBy: { sortOrder: "asc" } },
+      owner: { select: { email: true } },
     },
   });
 
@@ -118,6 +120,21 @@ export async function signAgreement(input: {
 
   // Trigger async re-check of open PRs (fire-and-forget)
   recheckOpenPRs(agreement.id).catch(() => {});
+
+  // Send email notification (fire-and-forget)
+  if (agreement.notifyOnSign && agreement.owner.email) {
+    const agreementLabel =
+      agreement.scope === "org"
+        ? `${agreement.ownerName} (Org-wide)`
+        : `${agreement.ownerName}/${agreement.repoName}`;
+    notifyNewSignature({
+      agreementId: agreement.id,
+      signerName: session.user.nickname,
+      signerLogin: session.user.nickname,
+      ownerEmail: agreement.owner.email,
+      agreementLabel,
+    }).catch(() => {});
+  }
 
   return { success: true };
 }

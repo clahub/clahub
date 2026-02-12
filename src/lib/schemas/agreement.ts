@@ -69,8 +69,14 @@ export const transferAgreementSchema = z.object({
 	newOwnerLogin: z.string().min(1, "GitHub username is required"),
 });
 
+export const updateNotificationSchema = z.object({
+	agreementId: z.number().int().positive(),
+	notifyOnSign: z.boolean(),
+});
+
 export type CreateAgreementInput = z.infer<typeof createAgreementSchema>;
 export type UpdateAgreementInput = z.infer<typeof updateAgreementSchema>;
 export type DeleteAgreementInput = z.infer<typeof deleteAgreementSchema>;
 export type TransferAgreementInput = z.infer<typeof transferAgreementSchema>;
+export type UpdateNotificationInput = z.infer<typeof updateNotificationSchema>;
 export type AgreementFieldInput = z.infer<typeof agreementFieldSchema>;
