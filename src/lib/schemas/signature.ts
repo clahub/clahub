@@ -36,3 +36,17 @@ export const importCsvSignaturesSchema = z.object({
 export type ImportCsvSignaturesInput = z.infer<
   typeof importCsvSignaturesSchema
 >;
+
+export const revokeSignatureSchema = z.object({
+  signatureId: z.number().int().positive(),
+  agreementId: z.number().int().positive(),
+});
+
+export type RevokeSignatureInput = z.infer<typeof revokeSignatureSchema>;
+
+export const unrevokeSignatureSchema = z.object({
+  signatureId: z.number().int().positive(),
+  agreementId: z.number().int().positive(),
+});
+
+export type UnrevokeSignatureInput = z.infer<typeof unrevokeSignatureSchema>;

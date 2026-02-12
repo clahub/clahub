@@ -67,7 +67,7 @@ export default async function EditAgreementPage({
 				</div>
 
 				<ReadOnlyAgreementView text={latestText} />
-				<SignatoriesList signatures={agreement.signatures} />
+				<SignatoriesList signatures={agreement.signatures} agreementId={agreement.id} />
 			</div>
 		);
 	}
@@ -110,7 +110,7 @@ export default async function EditAgreementPage({
 				initialExclusions={exclusions}
 			/>
 
-			<SignatoriesList signatures={agreement.signatures} />
+			<SignatoriesList signatures={agreement.signatures} agreementId={agreement.id} isOwner />
 
 			<SignatureManager agreementId={agreement.id} />
 
