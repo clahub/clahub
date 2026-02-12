@@ -3,6 +3,7 @@ import { AgreementForm } from "@/components/agreements/agreement-form";
 import { ExclusionManager } from "@/components/agreements/exclusion-manager";
 import { ReadOnlyAgreementView } from "@/components/agreements/read-only-agreement-view";
 import { SignatoriesList } from "@/components/agreements/signatories-list";
+import { NotificationToggle } from "@/components/agreements/notification-toggle";
 import { SignatureManager } from "@/components/agreements/signature-manager";
 import { TransferOwnershipSection } from "@/components/agreements/transfer-ownership-section";
 import { getAgreementAccessLevel } from "@/lib/access";
@@ -113,6 +114,11 @@ export default async function EditAgreementPage({
 			<SignatoriesList signatures={agreement.signatures} agreementId={agreement.id} isOwner />
 
 			<SignatureManager agreementId={agreement.id} />
+
+			<NotificationToggle
+				agreementId={agreement.id}
+				initialEnabled={agreement.notifyOnSign}
+			/>
 
 			<TransferOwnershipSection
 				agreementId={agreement.id}
