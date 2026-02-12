@@ -22,6 +22,7 @@ import { DeleteAgreementDialog } from "./delete-agreement-dialog";
 
 interface AgreementCardProps {
   id: number;
+  scope: string;
   ownerName: string;
   repoName: string | null;
   signatureCount: number;
@@ -31,6 +32,7 @@ interface AgreementCardProps {
 
 export function AgreementCard({
   id,
+  scope,
   ownerName,
   repoName,
   signatureCount,
@@ -72,6 +74,7 @@ export function AgreementCard({
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-2">
+            {scope === "org" && <Badge>Org-wide</Badge>}
             <Badge variant="secondary">v{version}</Badge>
             <Badge variant="outline">
               {signatureCount} {signatureCount === 1 ? "signature" : "signatures"}

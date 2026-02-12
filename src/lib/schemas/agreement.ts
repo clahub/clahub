@@ -20,14 +20,41 @@ export const agreementFieldSchema = z.object({
   enabled: z.boolean().default(true),
 });
 
-export const createAgreementSchema = z.object({
-  githubRepoId: z.string().min(1, "Repository is required"),
+const sharedFields = {
   ownerName: z.string().min(1),
-  repoName: z.string().min(1),
   installationId: z.string().optional(),
   text: z.string().min(10, "Agreement text must be at least 10 characters"),
   fields: z.array(agreementFieldSchema).default([]),
+};
+
+const repoScopeSchema = z.object({
+  scope: z.literal("repo"),
+  githubRepoId: z.string().min(1, "Repository is required"),
+  repoName: z.string().min(1),
+  ...sharedFields,
 });
+
+const orgScopeSchema = z.object({
+  scope: z.literal("org"),
+  githubOrgId: z.string().min(1, "Organization is required"),
+  ...sharedFields,
+});
+
+const discriminatedSchema = z.discriminatedUnion("scope", [
+  repoScopeSchema,
+  orgScopeSchema,
+]);
+
+/** Defaults `scope` to `"repo"` when omitted for backward compatibility. */
+export const createAgreementSchema = z.preprocess(
+  (val) => {
+    if (val && typeof val === "object" && !("scope" in val)) {
+      return { ...val, scope: "repo" };
+    }
+    return val;
+  },
+  discriminatedSchema,
+) as z.ZodType<z.infer<typeof discriminatedSchema>>;
 
 export const updateAgreementSchema = z.object({
   id: z.number().int().positive(),

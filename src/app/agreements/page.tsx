@@ -63,6 +63,7 @@ export default async function AgreementsPage() {
             <AgreementCard
               key={agreement.id}
               id={agreement.id}
+              scope={agreement.scope}
               ownerName={agreement.ownerName}
               repoName={agreement.repoName}
               signatureCount={agreement._count.signatures}

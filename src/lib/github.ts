@@ -1,6 +1,7 @@
 import { App } from "@octokit/app";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
+import { findAgreementForRepo } from "@/lib/agreement-resolver";
 import {
   checkClaForCommitAuthors,
   createCheckRun,
@@ -165,17 +166,18 @@ function registerWebhookHandlers(app: App) {
       const action = "webhook.pull_request";
       try {
         const repoId = String(payload.repository.id);
-        const agreement = await prisma.agreement.findUnique({
-          where: { githubRepoId: repoId },
-        });
+        const ownerId = String(payload.repository.owner.id);
+        const agreement = await findAgreementForRepo(repoId, ownerId);
 
-        if (!agreement || agreement.deletedAt || !agreement.installationId) {
+        if (!agreement || agreement.deletedAt) {
           return;
         }
 
-        const octokit = await getInstallationOctokit(
-          Number(agreement.installationId),
-        );
+        const installationId =
+          agreement.installationId ?? String(payload.installation?.id ?? "");
+        if (!installationId) return;
+
+        const octokit = await getInstallationOctokit(Number(installationId));
         const owner = payload.repository.owner.login;
         const repo = payload.repository.name;
         const headSha = payload.pull_request.head.sha;
@@ -222,17 +224,18 @@ function registerWebhookHandlers(app: App) {
       if (payload.commits.length === 0) return;
 
       const repoId = String(payload.repository.id);
-      const agreement = await prisma.agreement.findUnique({
-        where: { githubRepoId: repoId },
-      });
+      const ownerId = String(payload.repository.owner?.id ?? "");
+      const agreement = await findAgreementForRepo(repoId, ownerId);
 
-      if (!agreement || agreement.deletedAt || !agreement.installationId) {
+      if (!agreement || agreement.deletedAt) {
         return;
       }
 
-      const octokit = await getInstallationOctokit(
-        Number(agreement.installationId),
-      );
+      const installationId =
+        agreement.installationId ?? String(payload.installation?.id ?? "");
+      if (!installationId) return;
+
+      const octokit = await getInstallationOctokit(Number(installationId));
       const owner = payload.repository.owner?.login ?? payload.repository.owner?.name ?? agreement.ownerName;
       const repo = payload.repository.name;
 

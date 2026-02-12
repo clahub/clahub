@@ -24,6 +24,8 @@ interface InstallationRepo {
 export interface Installation {
   id: number;
   account: string;
+  accountId: number;
+  accountType: string;
   repos: InstallationRepo[];
 }
 
@@ -48,7 +50,10 @@ export async function fetchInstallationRepos(): Promise<Installation[]> {
   }
 
   const { installations } = (await installationsRes.json()) as {
-    installations: { id: number; account: { login: string } }[];
+    installations: {
+      id: number;
+      account: { login: string; id: number; type: string };
+    }[];
   };
 
   const results: Installation[] = [];
@@ -78,6 +83,8 @@ export async function fetchInstallationRepos(): Promise<Installation[]> {
     results.push({
       id: inst.id,
       account: inst.account.login,
+      accountId: inst.account.id,
+      accountType: inst.account.type,
       repos: repositories.map((r) => ({
         id: r.id,
         name: r.name,
@@ -102,31 +109,56 @@ export async function createAgreement(
 
   const data = parsed.data;
 
-  const existing = await prisma.agreement.findUnique({
-    where: { githubRepoId: data.githubRepoId },
-  });
-
-  if (existing && !existing.deletedAt) {
-    return {
-      success: false,
-      error: "An agreement already exists for this repository",
-      code: "CONFLICT",
-    };
+  // Uniqueness check: repo-specific or org-wide
+  if (data.scope === "org") {
+    const existing = await prisma.agreement.findFirst({
+      where: { githubOrgId: data.githubOrgId, scope: "org", deletedAt: null },
+    });
+    if (existing) {
+      return {
+        success: false,
+        error: "An org-wide agreement already exists for this organization",
+        code: "CONFLICT",
+      };
+    }
+  } else {
+    const existing = await prisma.agreement.findUnique({
+      where: { githubRepoId: data.githubRepoId },
+    });
+    if (existing && !existing.deletedAt) {
+      return {
+        success: false,
+        error: "An agreement already exists for this repository",
+        code: "CONFLICT",
+      };
+    }
   }
 
   const userId = parseInt(user.id, 10);
   const ipAddress = await getClientIp();
 
   await prisma.$transaction(async (tx) => {
-    const agreement = await tx.agreement.create({
-      data: {
-        githubRepoId: data.githubRepoId,
-        ownerName: data.ownerName,
-        repoName: data.repoName,
-        installationId: data.installationId ?? null,
-        ownerId: userId,
-      },
-    });
+    const agreementData =
+      data.scope === "org"
+        ? {
+            scope: "org" as const,
+            githubOrgId: data.githubOrgId,
+            githubRepoId: null,
+            ownerName: data.ownerName,
+            repoName: null,
+            installationId: data.installationId ?? null,
+            ownerId: userId,
+          }
+        : {
+            scope: "repo" as const,
+            githubRepoId: data.githubRepoId,
+            ownerName: data.ownerName,
+            repoName: data.repoName,
+            installationId: data.installationId ?? null,
+            ownerId: userId,
+          };
+
+    const agreement = await tx.agreement.create({ data: agreementData });
 
     await tx.agreementVersion.create({
       data: {
@@ -150,17 +182,28 @@ export async function createAgreement(
       });
     }
 
+    const auditAfter =
+      data.scope === "org"
+        ? {
+            scope: "org",
+            githubOrgId: data.githubOrgId,
+            ownerName: data.ownerName,
+            fieldsCount: data.fields.length,
+          }
+        : {
+            scope: "repo",
+            githubRepoId: data.githubRepoId,
+            ownerName: data.ownerName,
+            repoName: data.repoName,
+            fieldsCount: data.fields.length,
+          };
+
     await logAudit(tx, {
       userId,
       action: "agreement.create",
       entityType: "Agreement",
       entityId: agreement.id,
-      after: {
-        githubRepoId: data.githubRepoId,
-        ownerName: data.ownerName,
-        repoName: data.repoName,
-        fieldsCount: data.fields.length,
-      },
+      after: auditAfter,
       ipAddress,
     });
   });
