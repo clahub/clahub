@@ -21,14 +21,13 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { RepoSelector } from "./repo-selector";
+import { RepoSelector, type RepoSelection } from "./repo-selector";
 import { MarkdownEditor } from "./markdown-editor";
 import { FieldBuilder } from "./field-builder";
 import type { Installation } from "@/lib/actions/agreement";
 import { createAgreement, updateAgreement } from "@/lib/actions/agreement";
 import { templates } from "@/lib/templates";
 import type {
-  CreateAgreementInput,
   UpdateAgreementInput,
   AgreementFieldInput,
 } from "@/lib/schemas/agreement";
@@ -64,6 +63,9 @@ interface SharedTransitionProps {
   setServerError: (err: string | null) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CreateFormValues = Record<string, any>;
+
 function CreateForm({
   installations,
   isPending,
@@ -71,9 +73,11 @@ function CreateForm({
   serverError,
   setServerError,
 }: CreateFormProps & SharedTransitionProps) {
-  const form = useForm<CreateAgreementInput>({
+  const form = useForm<CreateFormValues>({
     defaultValues: {
+      scope: "repo",
       githubRepoId: "",
+      githubOrgId: "",
       ownerName: "",
       repoName: "",
       installationId: "",
@@ -82,7 +86,7 @@ function CreateForm({
     },
   });
 
-  function onSubmit(values: CreateAgreementInput) {
+  function onSubmit(values: CreateFormValues) {
     setServerError(null);
     startTransition(async () => {
       const result = await createAgreement(values);
@@ -100,6 +104,24 @@ function CreateForm({
     });
   }
 
+  function handleSelect(selection: RepoSelection) {
+    if (selection.scope === "org") {
+      form.setValue("scope", "org");
+      form.setValue("githubOrgId", selection.githubOrgId);
+      form.setValue("githubRepoId", "");
+      form.setValue("ownerName", selection.ownerName);
+      form.setValue("repoName", "");
+      form.setValue("installationId", selection.installationId);
+    } else {
+      form.setValue("scope", "repo");
+      form.setValue("githubRepoId", selection.githubRepoId);
+      form.setValue("githubOrgId", "");
+      form.setValue("ownerName", selection.ownerName);
+      form.setValue("repoName", selection.repoName);
+      form.setValue("installationId", selection.installationId);
+    }
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -110,22 +132,12 @@ function CreateForm({
         )}
 
         <div className="space-y-2">
-          <Label>Repository</Label>
+          <Label>Repository or Organization</Label>
           <RepoSelector
             installations={installations}
             disabled={isPending}
-            onSelect={(repo) => {
-              form.setValue("githubRepoId", repo.githubRepoId);
-              form.setValue("ownerName", repo.ownerName);
-              form.setValue("repoName", repo.repoName);
-              form.setValue("installationId", repo.installationId);
-            }}
+            onSelect={handleSelect}
           />
-          {form.formState.errors.githubRepoId && (
-            <p className="text-destructive text-sm">
-              {form.formState.errors.githubRepoId.message}
-            </p>
-          )}
         </div>
 
         <div className="space-y-2">
