@@ -12,7 +12,7 @@ export default function HomePage() {
         <Image src="/cla-logo.png" alt="CLAHub" width={64} height={64} priority />
         <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
           Contributor License Agreements,{" "}
-          <span className="text-primary">simplified</span>
+          <span className="text-primary-accent">simplified</span>
         </h1>
         <p className="text-muted-foreground max-w-2xl text-lg md:text-xl">
           CLAHub automates CLA management for your GitHub projects.

@@ -83,7 +83,7 @@ export default function TermsPage() {
       {/* Hero */}
       <section className="container flex flex-col items-center gap-4 px-4 py-16 text-center md:py-24">
         <h1 className="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-          Terms of <span className="text-primary">Service</span>
+          Terms of <span className="text-primary-accent">Service</span>
         </h1>
         <p className="text-muted-foreground">Last updated: February 2026</p>
       </section>
