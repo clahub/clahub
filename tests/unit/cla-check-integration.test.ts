@@ -6,7 +6,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     exclusion: { findMany: vi.fn() },
     user: { findUnique: vi.fn(), findFirst: vi.fn() },
-    signature: { findUnique: vi.fn() },
+    signature: { findUnique: vi.fn(), findMany: vi.fn() },
     agreement: { findUnique: vi.fn() },
   },
 }));
@@ -25,6 +25,8 @@ const mockPrisma = vi.mocked(prisma);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Default: no corporate signatures
+  mockPrisma.signature.findMany.mockResolvedValue([]);
 });
 
 // ---------------------------------------------------------------------------
@@ -287,6 +289,7 @@ describe("createCheckRun", () => {
       signed: [{ githubId: "1", login: "alice", email: null }],
       unsigned: [],
       excluded: [],
+      corporateCovered: [],
     };
 
     await createCheckRun(octokit, "owner", "repo", "abc123", result, "owner", "repo");
@@ -309,6 +312,7 @@ describe("createCheckRun", () => {
       signed: [],
       unsigned: [{ githubId: "2", login: "bob", email: null }],
       excluded: [],
+      corporateCovered: [],
     };
 
     await createCheckRun(octokit, "owner", "repo", "abc123", result, "owner", "repo");
@@ -331,6 +335,7 @@ describe("createCheckRun", () => {
       signed: [{ githubId: "1", login: "alice", email: null }],
       unsigned: [{ githubId: "2", login: "bob", email: null }],
       excluded: [],
+      corporateCovered: [],
     };
 
     await createCheckRun(octokit, "owner", "repo", "abc123", result, "owner", "repo");
@@ -348,6 +353,7 @@ describe("createCheckRun", () => {
       signed: [],
       unsigned: [],
       excluded: [{ githubId: null, login: "dependabot[bot]", email: null }],
+      corporateCovered: [],
     };
 
     await createCheckRun(octokit, "owner", "repo", "abc123", result, "owner", "repo");
@@ -367,6 +373,7 @@ describe("createCheckRun", () => {
         { githubId: null, login: null, email: null },
       ],
       excluded: [],
+      corporateCovered: [],
     };
 
     await createCheckRun(octokit, "owner", "repo", "abc123", result, "owner", "repo");
