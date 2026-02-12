@@ -19,6 +19,7 @@ model User {
   agreements Agreement[] @relation("AgreementOwner")
   signatures Signature[]
   auditLogs  AuditLog[]
+  apiKeys    ApiKey[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 }
@@ -115,6 +116,20 @@ model Exclusion {
   createdAt    DateTime  @default(now())
 
   @@index([agreementId])
+}
+
+model ApiKey {
+  id         Int       @id @default(autoincrement())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     Int
+  name       String
+  keyHash    String    @unique
+  keyPrefix  String
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+
+  @@index([userId])
 }
 
 model AuditLog {
