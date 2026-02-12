@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.2.0] - 2026-02-12
+
+Phase 3: API & Integrations. Adds a full REST API with key authentication,
+SVG badges, rate limiting, CSV/PDF export, and corporate CLA support.
+
+### Added
+
+- **REST API with API key authentication**: Full CRUD for agreements and signatures via `/api/v1/`, Bearer token auth with `clahub_`-prefixed API keys, paginated responses (#224)
+- **SVG badge/shield endpoint**: Embeddable shields.io-compatible badges at `/api/badge/{owner}` and `/api/badge/{owner}/{repo}` with `flat` and `flat-square` styles, custom labels, and 5-minute cache with ETag (#226)
+- **Rate limiting**: In-memory sliding window rate limiter on all API and badge endpoints — 100 req/min (API key), 60 req/min (session), 30 req/min (anonymous) with `X-RateLimit-*` and `Retry-After` headers (#233)
+- **CSV and PDF export**: Download signature data as CSV or agreement documents as PDF via `/api/v1/agreements/.../export/csv` and `.../export/pdf`, with optional revoked signatures and signatory lists (#225)
+- **Corporate CLA (CCLA) support**: Individual/corporate toggle on signing form with company name, email domain, and title fields; domain-based coverage so employees of a signing company pass CLA checks automatically (#227)
+- **OpenAPI 3.0 specification**: Full API documentation at `public/openapi.yaml` covering all endpoints, schemas, and error responses
+
+### Issues Closed
+
+- [#224](https://github.com/clahub/clahub/issues/224): REST API with API key authentication
+- [#225](https://github.com/clahub/clahub/issues/225): CSV and PDF export of signatures
+- [#226](https://github.com/clahub/clahub/issues/226): SVG badge/shield endpoint
+- [#227](https://github.com/clahub/clahub/issues/227): Corporate CLA (CCLA) support
+- [#233](https://github.com/clahub/clahub/issues/233): Rate limiting on API endpoints
+
 ## [2.1.0] - 2026-02-12
 
 Phase 2: Admin tools and agreement management. Adds org-wide agreements,
