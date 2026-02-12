@@ -1,112 +1,120 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// Mock dependencies before importing module under test
-vi.mock("@/lib/github", () => ({
-	getInstallationOctokit: vi.fn(),
-}));
 vi.mock("@/lib/logger", () => ({
 	logger: { warn: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
 import { checkContributingMd } from "@/lib/actions/contributing";
 import { buildContributingCreateUrl } from "@/lib/contributing";
-import { getInstallationOctokit } from "@/lib/github";
 
-const mockGetInstallationOctokit = vi.mocked(getInstallationOctokit);
-
-function mockOctokit(response: unknown) {
-	mockGetInstallationOctokit.mockResolvedValue({
-		request: vi.fn().mockResolvedValue({ data: response }),
-	} as any);
-}
-
-function mockOctokitError(status: number) {
-	const err = new Error("Not Found") as Error & { status: number };
-	err.status = status;
-	mockGetInstallationOctokit.mockResolvedValue({
-		request: vi.fn().mockRejectedValue(err),
-	} as any);
-}
+const fetchSpy = vi.spyOn(globalThis, "fetch");
 
 describe("checkContributingMd", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
-	it("returns exists: false when installationId is null", async () => {
-		const result = await checkContributingMd({
-			ownerName: "org",
-			repoName: "repo",
-			installationId: null,
-		});
-		expect(result).toEqual({ exists: false });
-		expect(mockGetInstallationOctokit).not.toHaveBeenCalled();
-	});
-
 	it("returns exists: true with htmlUrl when file exists", async () => {
-		mockOctokit({
-			html_url: "https://github.com/org/repo/blob/main/CONTRIBUTING.md",
-		});
+		fetchSpy.mockResolvedValue(
+			new Response(
+				JSON.stringify({
+					html_url:
+						"https://github.com/org/repo/blob/main/CONTRIBUTING.md",
+				}),
+				{ status: 200 },
+			),
+		);
 
 		const result = await checkContributingMd({
 			ownerName: "org",
 			repoName: "repo",
-			installationId: "123",
 		});
 
 		expect(result).toEqual({
 			exists: true,
 			htmlUrl: "https://github.com/org/repo/blob/main/CONTRIBUTING.md",
 		});
-		expect(mockGetInstallationOctokit).toHaveBeenCalledWith(123);
+		expect(fetchSpy).toHaveBeenCalledWith(
+			"https://api.github.com/repos/org/repo/contents/CONTRIBUTING.md",
+			expect.objectContaining({
+				headers: { Accept: "application/vnd.github.v3+json" },
+			}),
+		);
 	});
 
 	it("returns exists: false when file is not found (404)", async () => {
-		mockOctokitError(404);
+		fetchSpy.mockResolvedValue(new Response("Not Found", { status: 404 }));
 
 		const result = await checkContributingMd({
 			ownerName: "org",
 			repoName: "repo",
-			installationId: "123",
 		});
 
 		expect(result).toEqual({ exists: false });
 	});
 
 	it("returns exists: false when API returns array (directory)", async () => {
-		mockOctokit([{ name: "something" }]);
+		fetchSpy.mockResolvedValue(
+			new Response(JSON.stringify([{ name: "something" }]), { status: 200 }),
+		);
 
 		const result = await checkContributingMd({
 			ownerName: "org",
 			repoName: "repo",
-			installationId: "123",
 		});
 
 		expect(result).toEqual({ exists: false });
 	});
 
 	it("returns exists: false when html_url is null", async () => {
-		mockOctokit({ html_url: null });
+		fetchSpy.mockResolvedValue(
+			new Response(JSON.stringify({ html_url: null }), { status: 200 }),
+		);
 
 		const result = await checkContributingMd({
 			ownerName: "org",
 			repoName: "repo",
-			installationId: "123",
 		});
 
 		expect(result).toEqual({ exists: false });
 	});
 
-	it("returns exists: false on non-404 errors", async () => {
-		mockOctokitError(500);
+	it("returns exists: false on server errors", async () => {
+		fetchSpy.mockResolvedValue(
+			new Response("Internal Server Error", { status: 500 }),
+		);
 
 		const result = await checkContributingMd({
 			ownerName: "org",
 			repoName: "repo",
-			installationId: "123",
 		});
 
 		expect(result).toEqual({ exists: false });
+	});
+
+	it("returns exists: false on network errors", async () => {
+		fetchSpy.mockRejectedValue(new Error("network failure"));
+
+		const result = await checkContributingMd({
+			ownerName: "org",
+			repoName: "repo",
+		});
+
+		expect(result).toEqual({ exists: false });
+	});
+
+	it("URL-encodes owner and repo names", async () => {
+		fetchSpy.mockResolvedValue(new Response("Not Found", { status: 404 }));
+
+		await checkContributingMd({
+			ownerName: "my org",
+			repoName: "my repo",
+		});
+
+		expect(fetchSpy).toHaveBeenCalledWith(
+			"https://api.github.com/repos/my%20org/my%20repo/contents/CONTRIBUTING.md",
+			expect.anything(),
+		);
 	});
 });
 
@@ -133,7 +141,6 @@ describe("buildContributingCreateUrl", () => {
 
 	it("encodes the template value for URL safety", () => {
 		const url = buildContributingCreateUrl("org", "repo");
-		// The part after &value= should be URL-encoded (no raw newlines)
 		const valuePart = url.split("&value=")[1];
 		expect(valuePart).not.toContain("\n");
 	});

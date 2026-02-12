@@ -19,27 +19,21 @@ import { buildContributingCreateUrl } from "@/lib/contributing";
 interface ContributingMdSectionProps {
 	ownerName: string;
 	repoName: string;
-	installationId: string | null;
 }
 
 export function ContributingMdSection({
 	ownerName,
 	repoName,
-	installationId,
 }: ContributingMdSectionProps) {
 	const [result, setResult] = useState<ContributingMdResult | null>(null);
 	const [isPending, startTransition] = useTransition();
 
 	useEffect(() => {
 		startTransition(async () => {
-			const r = await checkContributingMd({
-				ownerName,
-				repoName,
-				installationId,
-			});
+			const r = await checkContributingMd({ ownerName, repoName });
 			setResult(r);
 		});
-	}, [ownerName, repoName, installationId]);
+	}, [ownerName, repoName]);
 
 	return (
 		<Card>

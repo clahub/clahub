@@ -125,7 +125,6 @@ export default async function EditAgreementPage({
 				<ContributingMdSection
 					ownerName={agreement.ownerName}
 					repoName={agreement.repoName}
-					installationId={agreement.installationId}
 				/>
 			)}
 
