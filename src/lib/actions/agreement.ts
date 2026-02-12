@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { logAudit, getClientIp } from "@/lib/audit";
 import {
   createAgreementSchema,
   updateAgreementSchema,
@@ -114,6 +115,7 @@ export async function createAgreement(
   }
 
   const userId = parseInt(user.id, 10);
+  const ipAddress = await getClientIp();
 
   await prisma.$transaction(async (tx) => {
     const agreement = await tx.agreement.create({
@@ -148,19 +150,18 @@ export async function createAgreement(
       });
     }
 
-    await tx.auditLog.create({
-      data: {
-        userId,
-        action: "agreement.create",
-        entityType: "Agreement",
-        entityId: agreement.id,
-        after: JSON.stringify({
-          githubRepoId: data.githubRepoId,
-          ownerName: data.ownerName,
-          repoName: data.repoName,
-          fieldsCount: data.fields.length,
-        }),
+    await logAudit(tx, {
+      userId,
+      action: "agreement.create",
+      entityType: "Agreement",
+      entityId: agreement.id,
+      after: {
+        githubRepoId: data.githubRepoId,
+        ownerName: data.ownerName,
+        repoName: data.repoName,
+        fieldsCount: data.fields.length,
       },
+      ipAddress,
     });
   });
 
@@ -179,6 +180,7 @@ export async function updateAgreement(
 
   const data = parsed.data;
   const userId = parseInt(user.id, 10);
+  const ipAddress = await getClientIp();
 
   const agreement = await prisma.agreement.findUnique({
     where: { id: data.id },
@@ -254,23 +256,22 @@ export async function updateAgreement(
       }
     }
 
-    await tx.auditLog.create({
-      data: {
-        userId,
-        action: "agreement.update",
-        entityType: "Agreement",
-        entityId: agreement.id,
-        before: JSON.stringify({
-          text: latestVersion?.text,
-          fieldsCount: agreement.fields.length,
-        }),
-        after: JSON.stringify({
-          text: data.text,
-          textChanged,
-          fieldsCount: data.fields.length,
-          changelog: data.changelog,
-        }),
+    await logAudit(tx, {
+      userId,
+      action: "agreement.update",
+      entityType: "Agreement",
+      entityId: agreement.id,
+      before: {
+        text: latestVersion?.text,
+        fieldsCount: agreement.fields.length,
       },
+      after: {
+        text: data.text,
+        textChanged,
+        fieldsCount: data.fields.length,
+        changelog: data.changelog,
+      },
+      ipAddress,
     });
   });
 
@@ -286,6 +287,7 @@ export async function deleteAgreement(input: unknown): Promise<ActionResult> {
   }
 
   const userId = parseInt(user.id, 10);
+  const ipAddress = await getClientIp();
 
   const agreement = await prisma.agreement.findUnique({
     where: { id: parsed.data.id },
@@ -301,18 +303,17 @@ export async function deleteAgreement(input: unknown): Promise<ActionResult> {
       data: { deletedAt: new Date() },
     });
 
-    await tx.auditLog.create({
-      data: {
-        userId,
-        action: "agreement.delete",
-        entityType: "Agreement",
-        entityId: agreement.id,
-        before: JSON.stringify({
-          githubRepoId: agreement.githubRepoId,
-          ownerName: agreement.ownerName,
-          repoName: agreement.repoName,
-        }),
+    await logAudit(tx, {
+      userId,
+      action: "agreement.delete",
+      entityType: "Agreement",
+      entityId: agreement.id,
+      before: {
+        githubRepoId: agreement.githubRepoId,
+        ownerName: agreement.ownerName,
+        repoName: agreement.repoName,
       },
+      ipAddress,
     });
   });
 

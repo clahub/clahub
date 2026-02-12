@@ -29,6 +29,14 @@ vi.mock("@/lib/github", () => ({
   getGitHubApp: vi.fn(),
 }));
 
+vi.mock("@/lib/audit", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/audit")>();
+  return {
+    ...actual,
+    getClientIp: vi.fn().mockResolvedValue(null),
+  };
+});
+
 vi.mock("next/headers", () => ({
   headers: vi.fn().mockResolvedValue({
     get: vi.fn().mockReturnValue(null),
