@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Plus, FileText } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAdminOrgs } from "@/lib/org-membership";
 import { Button } from "@/components/ui/button";
 import { AgreementCard } from "@/components/agreements/agreement-card";
 
@@ -16,11 +17,23 @@ export default async function AgreementsPage() {
 
   const userId = parseInt(session.user.id, 10);
 
+  const adminOrgLogins = session.user.accessToken
+    ? await getAdminOrgs(session.user.accessToken)
+    : [];
+
   const agreements = await prisma.agreement.findMany({
-    where: { ownerId: userId, deletedAt: null },
+    where: {
+      deletedAt: null,
+      OR: [
+        { ownerId: userId },
+        ...(adminOrgLogins.length > 0
+          ? [{ ownerName: { in: adminOrgLogins } }]
+          : []),
+      ],
+    },
     include: {
       _count: { select: { signatures: true } },
-      versions: { orderBy: { version: "desc" }, take: 1 },
+      versions: { orderBy: { version: "desc" as const }, take: 1 },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -69,6 +82,9 @@ export default async function AgreementsPage() {
               signatureCount={agreement._count.signatures}
               version={agreement.versions[0]?.version ?? 1}
               createdAt={agreement.createdAt}
+              accessLevel={
+                agreement.ownerId === userId ? "owner" : "org_admin"
+              }
             />
           ))}
         </div>

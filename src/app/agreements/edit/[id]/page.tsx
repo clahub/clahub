@@ -1,8 +1,10 @@
-import { notFound, redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getAgreementAccessLevel } from "@/lib/access";
 import { AgreementForm } from "@/components/agreements/agreement-form";
 import { ExclusionManager } from "@/components/agreements/exclusion-manager";
+import { SignatoriesList } from "@/components/agreements/signatories-list";
+import { ReadOnlyAgreementView } from "@/components/agreements/read-only-agreement-view";
 import type { AgreementFieldInput } from "@/lib/schemas/agreement";
 
 export const metadata = {
@@ -14,14 +16,9 @@ export default async function EditAgreementPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth();
-  if (!session?.user) redirect("/auth/signin");
-
   const { id } = await params;
   const agreementId = parseInt(id, 10);
   if (isNaN(agreementId)) notFound();
-
-  const userId = parseInt(session.user.id, 10);
 
   const agreement = await prisma.agreement.findUnique({
     where: { id: agreementId },
@@ -32,14 +29,48 @@ export default async function EditAgreementPage({
         orderBy: { sortOrder: "asc" },
       },
       exclusions: true,
+      signatures: {
+        include: {
+          user: { select: { nickname: true, email: true, avatarUrl: true } },
+          version: { select: { version: true } },
+        },
+        orderBy: { signedAt: "desc" },
+      },
     },
   });
 
-  if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
-    notFound();
-  }
+  if (!agreement || agreement.deletedAt) notFound();
+
+  const { level } = await getAgreementAccessLevel(
+    agreement.ownerId,
+    agreement.ownerName,
+  );
+
+  if (level === "none") notFound();
 
   const latestText = agreement.versions[0]?.text ?? "";
+  const scopeLabel =
+    agreement.scope === "org"
+      ? `${agreement.ownerName} (Org-wide)`
+      : `${agreement.ownerName}/${agreement.repoName}`;
+
+  if (level === "org_admin") {
+    return (
+      <div className="mx-auto max-w-2xl space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Agreement Details
+          </h1>
+          <p className="text-muted-foreground">{scopeLabel}</p>
+        </div>
+
+        <ReadOnlyAgreementView text={latestText} />
+        <SignatoriesList signatures={agreement.signatures} />
+      </div>
+    );
+  }
+
+  // level === "owner"
   const fields: AgreementFieldInput[] = agreement.fields.map((f) => ({
     id: f.id,
     label: f.label,
@@ -60,11 +91,7 @@ export default async function EditAgreementPage({
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Edit Agreement</h1>
-        <p className="text-muted-foreground">
-          {agreement.scope === "org"
-            ? `${agreement.ownerName} (Org-wide)`
-            : `${agreement.ownerName}/${agreement.repoName}`}
-        </p>
+        <p className="text-muted-foreground">{scopeLabel}</p>
       </div>
 
       <AgreementForm
@@ -78,6 +105,8 @@ export default async function EditAgreementPage({
         agreementId={agreement.id}
         initialExclusions={exclusions}
       />
+
+      <SignatoriesList signatures={agreement.signatures} />
     </div>
   );
 }
