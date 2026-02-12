@@ -2,12 +2,16 @@ import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { apiError, ErrorCode } from "@/lib/api-error";
+import { applyRateLimit } from "@/lib/api-rate-limit";
 import { apiUpdateAgreementSchema } from "@/lib/schemas/api";
 import { getClientIp, logAudit } from "@/lib/audit";
 
 type RouteParams = { params: Promise<{ owner: string; repo: string }> };
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const rl = applyRateLimit(request, null);
+  if (rl.response) return rl.response;
+
   const { owner, repo } = await params;
 
   const agreement = await prisma.agreement.findFirst({
@@ -50,6 +54,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   if (!user) {
     return apiError(ErrorCode.UNAUTHORIZED, "Authentication required", 401);
   }
+
+  const rlPut = applyRateLimit(request, user);
+  if (rlPut.response) return rlPut.response;
+
   if (user.role !== "owner") {
     return apiError(ErrorCode.FORBIDDEN, "Owner role required", 403);
   }
@@ -205,6 +213,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   if (!user) {
     return apiError(ErrorCode.UNAUTHORIZED, "Authentication required", 401);
   }
+
+  const rlDel = applyRateLimit(request, user);
+  if (rlDel.response) return rlDel.response;
+
   if (user.role !== "owner") {
     return apiError(ErrorCode.FORBIDDEN, "Owner role required", 403);
   }

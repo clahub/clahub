@@ -1,12 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { apiError, ErrorCode } from "@/lib/api-error";
+import { applyRateLimit } from "@/lib/api-rate-limit";
 
 type RouteParams = {
   params: Promise<{ owner: string; repo: string; username: string }>;
 };
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const rl = applyRateLimit(request, null);
+  if (rl.response) return rl.response;
+
   const { owner, repo, username } = await params;
 
   const agreement = await prisma.agreement.findFirst({

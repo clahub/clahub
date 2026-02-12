@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { renderBadge, type BadgeStyle } from "@/lib/badge";
+import { applyRateLimit } from "@/lib/api-rate-limit";
 
 type RouteParams = { params: Promise<{ owner: string }> };
 
@@ -10,6 +11,9 @@ const BADGE_HEADERS = {
 } as const;
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const rl = applyRateLimit(request, null);
+  if (rl.response) return rl.response;
+
   const { owner } = await params;
   const { searchParams } = request.nextUrl;
 
