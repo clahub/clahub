@@ -6,6 +6,8 @@ import { logAudit, getClientIp } from "@/lib/audit";
 import {
   addManualSignatureSchema,
   importCsvSignaturesSchema,
+  revokeSignatureSchema,
+  unrevokeSignatureSchema,
 } from "@/lib/schemas/signature";
 import { recheckOpenPRs } from "@/lib/cla-check";
 import { type ActionResult, requireOwner } from "./result";
@@ -353,4 +355,146 @@ export async function importCsvSignatures(
   recheckOpenPRs(data.agreementId).catch(() => {});
 
   return { success: true, imported, skipped, errors };
+}
+
+// ---------------------------------------------------------------------------
+// Revoke a signature
+// ---------------------------------------------------------------------------
+
+export async function revokeSignature(
+  input: unknown,
+): Promise<ActionResult> {
+  const user = await requireOwner();
+  const parsed = revokeSignatureSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message ?? "Validation failed",
+      code: "VALIDATION_ERROR",
+    };
+  }
+
+  const data = parsed.data;
+  const userId = parseInt(user.id, 10);
+  const ipAddress = await getClientIp();
+
+  const agreement = await prisma.agreement.findUnique({
+    where: { id: data.agreementId },
+  });
+
+  if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
+    return { success: false, error: "Agreement not found", code: "NOT_FOUND" };
+  }
+
+  const signature = await prisma.signature.findFirst({
+    where: { id: data.signatureId, agreementId: data.agreementId },
+  });
+
+  if (!signature) {
+    return { success: false, error: "Signature not found", code: "NOT_FOUND" };
+  }
+
+  if (signature.revokedAt) {
+    return {
+      success: false,
+      error: "Signature is already revoked",
+      code: "CONFLICT",
+    };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.signature.update({
+      where: { id: signature.id },
+      data: { revokedAt: new Date() },
+    });
+
+    await logAudit(tx, {
+      userId,
+      action: "signature.revoke",
+      entityType: "Signature",
+      entityId: signature.id,
+      after: {
+        signatureId: signature.id,
+        targetUserId: signature.userId,
+        agreementId: data.agreementId,
+      },
+      ipAddress,
+    });
+  });
+
+  revalidatePath(`/agreements/edit/${data.agreementId}`);
+  recheckOpenPRs(data.agreementId).catch(() => {});
+  return { success: true };
+}
+
+// ---------------------------------------------------------------------------
+// Restore (un-revoke) a signature
+// ---------------------------------------------------------------------------
+
+export async function unrevokeSignature(
+  input: unknown,
+): Promise<ActionResult> {
+  const user = await requireOwner();
+  const parsed = unrevokeSignatureSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message ?? "Validation failed",
+      code: "VALIDATION_ERROR",
+    };
+  }
+
+  const data = parsed.data;
+  const userId = parseInt(user.id, 10);
+  const ipAddress = await getClientIp();
+
+  const agreement = await prisma.agreement.findUnique({
+    where: { id: data.agreementId },
+  });
+
+  if (!agreement || agreement.ownerId !== userId || agreement.deletedAt) {
+    return { success: false, error: "Agreement not found", code: "NOT_FOUND" };
+  }
+
+  const signature = await prisma.signature.findFirst({
+    where: { id: data.signatureId, agreementId: data.agreementId },
+  });
+
+  if (!signature) {
+    return { success: false, error: "Signature not found", code: "NOT_FOUND" };
+  }
+
+  if (!signature.revokedAt) {
+    return {
+      success: false,
+      error: "Signature is not revoked",
+      code: "CONFLICT",
+    };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.signature.update({
+      where: { id: signature.id },
+      data: { revokedAt: null },
+    });
+
+    await logAudit(tx, {
+      userId,
+      action: "signature.unrevoke",
+      entityType: "Signature",
+      entityId: signature.id,
+      after: {
+        signatureId: signature.id,
+        targetUserId: signature.userId,
+        agreementId: data.agreementId,
+      },
+      ipAddress,
+    });
+  });
+
+  revalidatePath(`/agreements/edit/${data.agreementId}`);
+  recheckOpenPRs(data.agreementId).catch(() => {});
+  return { success: true };
 }
