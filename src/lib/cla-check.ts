@@ -26,11 +26,16 @@ export type CheckResult = {
 // Exclusion helpers
 // ---------------------------------------------------------------------------
 
-function isExcluded(author: AuthorInfo, exclusions: Exclusion[]): boolean {
+function isExcluded(
+  author: AuthorInfo,
+  exclusions: Exclusion[],
+  teamExcludedLogins: Set<string>,
+): boolean {
   return exclusions.some((ex) => {
     if (ex.type === "bot_auto") return author.login?.endsWith("[bot]") ?? false;
     if (ex.type === "user" && ex.githubLogin)
       return author.login === ex.githubLogin;
+    if (ex.type === "team") return !!author.login && teamExcludedLogins.has(author.login);
     return false;
   });
 }
@@ -47,12 +52,47 @@ export async function checkClaForCommitAuthors(
     where: { agreementId },
   });
 
+  // Resolve team exclusion members
+  const teamExcludedLogins = new Set<string>();
+  const teamExclusions = exclusions.filter((ex) => ex.type === "team" && ex.githubTeamId);
+  if (teamExclusions.length > 0) {
+    try {
+      const agreement = await prisma.agreement.findUnique({
+        where: { id: agreementId },
+      });
+      if (agreement?.installationId) {
+        const octokit = await getInstallationOctokit(Number(agreement.installationId));
+        for (const ex of teamExclusions) {
+          try {
+            const { data: members } = await octokit.request(
+              "GET /orgs/{org}/teams/{team_slug}/members",
+              { org: agreement.ownerName, team_slug: ex.githubTeamId!, per_page: 100 },
+            );
+            for (const m of members) {
+              if (m.login) teamExcludedLogins.add(m.login);
+            }
+          } catch {
+            logger.warn(`Failed to fetch members for team ${ex.githubTeamId}`, {
+              action: "cla-check.team-resolve",
+              agreementId,
+            });
+          }
+        }
+      }
+    } catch {
+      logger.warn("Failed to resolve team exclusions", {
+        action: "cla-check.team-resolve",
+        agreementId,
+      });
+    }
+  }
+
   const signed: AuthorInfo[] = [];
   const unsigned: AuthorInfo[] = [];
   const excluded: AuthorInfo[] = [];
 
   for (const author of authors) {
-    if (isExcluded(author, exclusions)) {
+    if (isExcluded(author, exclusions, teamExcludedLogins)) {
       excluded.push(author);
       continue;
     }
