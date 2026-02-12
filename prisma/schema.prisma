@@ -78,21 +78,26 @@ model AgreementField {
 }
 
 model Signature {
-  id          Int              @id @default(autoincrement())
-  user        User             @relation(fields: [userId], references: [id])
-  userId      Int
-  agreement   Agreement        @relation(fields: [agreementId], references: [id])
-  agreementId Int
-  version     AgreementVersion @relation(fields: [versionId], references: [id])
-  versionId   Int
-  source      String           @default("online")
-  ipAddress   String?
-  signedAt    DateTime         @default(now())
-  revokedAt   DateTime?
-  entries     FieldEntry[]
+  id            Int              @id @default(autoincrement())
+  user          User             @relation(fields: [userId], references: [id])
+  userId        Int
+  agreement     Agreement        @relation(fields: [agreementId], references: [id])
+  agreementId   Int
+  version       AgreementVersion @relation(fields: [versionId], references: [id])
+  versionId     Int
+  signatureType String           @default("individual")
+  source        String           @default("online")
+  ipAddress     String?
+  companyName   String?
+  companyDomain String?
+  companyTitle  String?
+  signedAt      DateTime         @default(now())
+  revokedAt     DateTime?
+  entries       FieldEntry[]
 
   @@unique([userId, agreementId])
   @@index([agreementId])
+  @@index([companyDomain])
 }
 
 model FieldEntry {
