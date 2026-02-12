@@ -20,6 +20,11 @@ Running at [clahub.com](https://www.clahub.com)
 - **Signature revocation** — revoke and restore signatures with automatic PR status re-check
 - **Ownership transfer** — transfer agreement ownership to another registered owner
 - **Email notifications** — opt-in email when contributors sign, powered by Resend
+- **REST API** — full CRUD for agreements and signatures with API key authentication (`clahub_`-prefixed Bearer tokens)
+- **SVG badges** — embeddable shields.io-compatible status badges for READMEs (`/api/badge/{owner}/{repo}`)
+- **Rate limiting** — tiered rate limits (100/60/30 req/min) with `X-RateLimit-*` headers
+- **CSV/PDF export** — download signatures as CSV or agreement documents as PDF
+- **Corporate CLA (CCLA)** — a company representative signs once, covering all contributors with a matching email domain
 - Dashboard with signature tracking
 - Full audit log of all changes
 
@@ -29,6 +34,35 @@ Running at [clahub.com](https://www.clahub.com)
 - View rendered CLA, fill required fields, sign digitally
 - Automatic PR re-check after signing — no need to re-push
 
+## REST API
+
+CLAHub provides a REST API at `/api/v1/` for programmatic access. Authenticate with a Bearer token (generate one under Settings > API Keys).
+
+```bash
+# List signatures for a repo agreement
+curl -H "Authorization: Bearer clahub_xxxx" \
+  https://clahub.com/api/v1/agreements/my-org/my-repo/signatures
+
+# Check if a user has signed
+curl https://clahub.com/api/v1/agreements/my-org/my-repo/check/username
+
+# Export signatures as CSV
+curl -H "Authorization: Bearer clahub_xxxx" \
+  https://clahub.com/api/v1/agreements/my-org/my-repo/export/csv
+```
+
+Full API documentation is available in the [OpenAPI spec](public/openapi.yaml).
+
+## Badges
+
+Add a CLA status badge to your README:
+
+```markdown
+[![CLA](https://clahub.com/api/badge/my-org/my-repo)](https://clahub.com/agreements/my-org/my-repo)
+```
+
+Options: `?style=flat-square`, `?label=License`, `?color=4c1`.
+
 ## How it works
 
 1. Owner installs the CLAHub GitHub App on a repository (or organization)
@@ -36,7 +70,8 @@ Running at [clahub.com](https://www.clahub.com)
 3. When a pull request is opened, CLAHub receives a webhook
 4. CLAHub extracts commit authors and checks each one:
    - **Excluded** (bot pattern or manual exclusion) — skipped
-   - **Signed** — has a valid, non-revoked signature on file
+   - **Signed** — has a valid, non-revoked individual signature on file
+   - **Corporate-covered** — email domain matches an active corporate CLA signature
    - **Unsigned** — needs to sign the CLA
 5. A GitHub Check Run is posted with the result and a link to the signing page
 6. After a contributor signs, all open PRs for that repo are re-checked
@@ -51,6 +86,8 @@ Running at [clahub.com](https://www.clahub.com)
 - [Zod](https://zod.dev) v4 + [React Hook Form](https://react-hook-form.com) for validation
 - [Resend](https://resend.com) for transactional email (optional)
 - [Sentry](https://sentry.io) via `@sentry/nextjs` for error tracking (optional)
+- [@react-pdf/renderer](https://react-pdf.org) for PDF export
+- [PapaParse](https://www.papaparse.com) for CSV export
 - [Vitest](https://vitest.dev) + [Playwright](https://playwright.dev) for testing
 
 ## Getting started
@@ -154,9 +191,11 @@ Tests are organized by layer:
 | Directory | What's tested |
 |---|---|
 | `tests/unit/schemas/` | Zod schemas — agreement, signing, exclusion |
-| `tests/unit/lib/` | Utility modules — api-error, audit, logger, result, sentry scrubbing |
+| `tests/unit/lib/` | Utility modules — api-error, audit, logger, result, sentry, badge, rate-limit, export-csv, export-pdf |
 | `tests/unit/cla-check.test.ts` | `extractPushAuthors()` pure function |
 | `tests/unit/cla-check-integration.test.ts` | `checkClaForCommitAuthors`, `createCheckRun`, `extractPRAuthors` with mocked Prisma/Octokit |
+| `tests/unit/lib/cla-check-corporate.test.ts` | Corporate CLA domain-based coverage with mocked Prisma |
+| `tests/unit/lib/api-sign-corporate.test.ts` | Corporate signing schema validation |
 | `tests/unit/actions/signing.test.ts` | `signAgreement` server action with mocked auth, Prisma, and cla-check |
 
 ### E2E tests (Playwright)
@@ -187,6 +226,8 @@ src/
     (marketing)/        Landing, privacy, terms, why-cla pages
     agreements/         Dashboard, create, edit, public signing page
     api/auth/           NextAuth endpoints
+    api/badge/          SVG badge endpoints (public, no auth)
+    api/v1/             REST API (agreements, signatures, check, export)
     api/webhooks/       GitHub App webhook handler
     auth/signin/        Sign-in page
     error.tsx           Error boundary with Sentry reporting
@@ -198,21 +239,27 @@ src/
   lib/
     actions/            Server actions (agreement, exclusion, signing, signature)
     schemas/            Zod validation schemas
+    api-auth.ts         API key + session authentication
     api-error.ts        Structured API error responses with error codes
+    api-rate-limit.ts   Tiered rate limiting (API key / session / anon)
     audit.ts            Shared audit logging utility
     auth.ts             NextAuth configuration (dual providers)
     access.ts           Role-based access control (owner, org_admin)
-    cla-check.ts        Core CLA verification + exclusion logic
+    badge.ts            SVG badge rendering (shields.io-compatible)
+    cla-check.ts        Core CLA verification + exclusion + corporate coverage
     email.ts            Resend email wrapper + notification templates
+    export-csv.ts       CSV export with papaparse
+    export-pdf.ts       PDF export with @react-pdf/renderer
     github.ts           GitHub App / Octokit setup + webhook handlers
     logger.ts           Structured JSON logger with level filtering
     prisma.ts           Prisma client singleton
+    rate-limit.ts       In-memory sliding window rate limiter
     sentry.ts           Sensitive data scrubbing utility
     templates.ts        CLA templates (Apache ICLA, DCO)
   instrumentation.ts    Server-side Sentry init (conditional on SENTRY_DSN)
   instrumentation-client.ts  Client-side Sentry init
 prisma/
-  schema.prisma         Database schema (8 models)
+  schema.prisma         Database schema (9 models)
   seed.ts               Sample data
 tests/
   unit/                 Vitest unit tests (schemas, lib, cla-check, actions)
@@ -228,9 +275,10 @@ tests/
 | `Agreement` | CLA definitions linked to a GitHub repo or org |
 | `AgreementVersion` | Versioned CLA text with changelogs |
 | `AgreementField` | Custom form fields on a CLA |
-| `Signature` | User signatures (soft-deletable via `revokedAt`) |
+| `Signature` | Individual or corporate signatures (with optional company name/domain/title) |
 | `FieldEntry` | Field values submitted with a signature |
-| `Exclusion` | Bot/user exclusions per agreement |
+| `Exclusion` | Bot/user/team exclusions per agreement |
+| `ApiKey` | API keys for REST API authentication |
 | `AuditLog` | Complete change history |
 
 ## What's a CLA?
