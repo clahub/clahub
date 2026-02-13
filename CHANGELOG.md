@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.3.0] - 2026-02-12
+
+Phase 4: Production Readiness. Adds Docker self-hosting, WCAG 2.1 AA
+accessibility, health endpoint, custom branding, admin dashboard tools,
+CONTRIBUTING.md generation, and comprehensive deployment documentation.
+
+### Added
+
+- **Docker self-hosting**: Multi-stage `Dockerfile`, `docker-compose.yml` with named volume for SQLite persistence, auto-migration entrypoint, and health checks (#229)
+- **Custom branding**: `APP_NAME`, `APP_LOGO_URL`, and `APP_PRIMARY_COLOR` environment variables to white-label a CLAHub instance (#229)
+- **Health endpoint**: `GET /api/health` returns application status and database connectivity for monitoring and container health checks (#229)
+- **WCAG 2.1 AA accessibility**: Color contrast fixes, ARIA labels, keyboard navigation, skip-to-content link, focus rings, and Playwright axe-core tests (#230)
+- **Admin dashboard**: Audit log viewer and manual PR re-check on the agreement edit page (#228)
+- **CONTRIBUTING.md generation**: Auto-generate a `CONTRIBUTING.md` snippet with CLA signing instructions and badge for any agreement (#228)
+- **Deployment documentation**: Getting started, configuration reference, deployment guides (Docker, Vercel, Railway, Fly.io, PM2/systemd), and upgrading guide (#231)
+
+### Fixed
+
+- Color contrast violations for muted text and accent headings (#230)
+- User menu button missing accessible label (#230)
+- PR re-check feedback using `useTransition` replaced with `useState` for reliability (#228)
+- CONTRIBUTING.md badge URL uses public GitHub API instead of installation token (#228)
+
+### Issues Closed
+
+- [#228](https://github.com/clahub/clahub/issues/228): Admin dashboard: audit log, re-check, CONTRIBUTING.md
+- [#229](https://github.com/clahub/clahub/issues/229): Docker self-hosting with Dockerfile and Compose
+- [#230](https://github.com/clahub/clahub/issues/230): WCAG 2.1 AA accessibility improvements
+- [#231](https://github.com/clahub/clahub/issues/231): Deployment documentation
+
 ## [2.2.0] - 2026-02-12
 
 Phase 3: API & Integrations. Adds a full REST API with key authentication,
