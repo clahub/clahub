@@ -55,7 +55,7 @@ Customize the look of your CLAHub instance.
 | Variable | Default | Description |
 |---|---|---|
 | `RESEND_API_KEY` | — | API key for Resend email service. |
-| `EMAIL_FROM` | `noreply@clahub.com` | Sender address for outgoing emails. |
+| `EMAIL_FROM` | `noreply@cla-hub.io` | Sender address for outgoing emails. |
 
 ### Monitoring (optional)
 

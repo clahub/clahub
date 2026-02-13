@@ -11,7 +11,7 @@ function getResend(): Resend | null {
   return resend;
 }
 
-const EMAIL_FROM = process.env.EMAIL_FROM ?? "CLAHub <noreply@clahub.com>";
+const EMAIL_FROM = process.env.EMAIL_FROM ?? "CLAHub <noreply@cla-hub.io>";
 
 async function sendEmail({
   to,
@@ -62,7 +62,7 @@ export async function notifyNewSignature({
   ownerEmail: string;
   agreementLabel: string;
 }) {
-  const appUrl = process.env.NEXTAUTH_URL ?? "https://clahub.com";
+  const appUrl = process.env.NEXTAUTH_URL ?? "https://cla-hub.io";
   const editUrl = `${appUrl}/agreements/edit/${agreementId}`;
   const date = new Date().toLocaleDateString("en-US", {
     year: "numeric",
@@ -121,7 +121,7 @@ export async function notifyImportComplete({
   agreementLabel: string;
   importedCount: number;
 }) {
-  const appUrl = process.env.NEXTAUTH_URL ?? "https://clahub.com";
+  const appUrl = process.env.NEXTAUTH_URL ?? "https://cla-hub.io";
   const editUrl = `${appUrl}/agreements/edit/${agreementId}`;
 
   await sendEmail({

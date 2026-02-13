@@ -10,7 +10,7 @@
 
 CLAHub provides a low-friction way to have a Contributor License Agreement for your open source project on GitHub. Contributors digitally sign your CLA by signing in with GitHub, and pull requests are automatically marked with a status check based on whether all commit authors have signed.
 
-Running at [clahub.com](https://www.clahub.com)
+Running at [cla-hub.io](https://www.cla-hub.io)
 
 ## Features
 
@@ -55,14 +55,14 @@ CLAHub provides a REST API at `/api/v1/` for programmatic access. Authenticate w
 ```bash
 # List signatures for a repo agreement
 curl -H "Authorization: Bearer clahub_xxxx" \
-  https://clahub.com/api/v1/agreements/my-org/my-repo/signatures
+  https://cla-hub.io/api/v1/agreements/my-org/my-repo/signatures
 
 # Check if a user has signed
-curl https://clahub.com/api/v1/agreements/my-org/my-repo/check/username
+curl https://cla-hub.io/api/v1/agreements/my-org/my-repo/check/username
 
 # Export signatures as CSV
 curl -H "Authorization: Bearer clahub_xxxx" \
-  https://clahub.com/api/v1/agreements/my-org/my-repo/export/csv
+  https://cla-hub.io/api/v1/agreements/my-org/my-repo/export/csv
 ```
 
 Full API documentation is available in the [OpenAPI spec](public/openapi.yaml).
@@ -72,7 +72,7 @@ Full API documentation is available in the [OpenAPI spec](public/openapi.yaml).
 Add a CLA status badge to your README:
 
 ```markdown
-[![CLA](https://clahub.com/api/badge/my-org/my-repo)](https://clahub.com/agreements/my-org/my-repo)
+[![CLA](https://cla-hub.io/api/badge/my-org/my-repo)](https://cla-hub.io/agreements/my-org/my-repo)
 ```
 
 Options: `?style=flat-square`, `?label=License`, `?color=4c1`.
