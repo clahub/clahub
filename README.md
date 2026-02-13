@@ -33,6 +33,12 @@ Running at [clahub.com](https://www.clahub.com)
 - **Rate limiting** — tiered rate limits (100/60/30 req/min) with `X-RateLimit-*` headers
 - **CSV/PDF export** — download signatures as CSV or agreement documents as PDF
 - **Corporate CLA (CCLA)** — a company representative signs once, covering all contributors with a matching email domain
+- **Docker self-hosting** — `docker compose up -d` with auto-migration, health checks, and SQLite volume persistence
+- **Custom branding** — white-label with `APP_NAME`, `APP_LOGO_URL`, `APP_PRIMARY_COLOR`
+- **CONTRIBUTING.md generation** — auto-generate a CONTRIBUTING snippet with CLA signing link and badge
+- **Admin dashboard** — audit log viewer and manual PR re-check on the agreement edit page
+- **Health endpoint** — `GET /api/health` for uptime monitoring and container health checks
+- **WCAG 2.1 AA accessible** — color contrast, ARIA labels, keyboard navigation, skip links
 - Dashboard with signature tracking
 - Full audit log of all changes
 
@@ -96,76 +102,39 @@ Options: `?style=flat-square`, `?label=License`, `?color=4c1`.
 - [Sentry](https://sentry.io) via `@sentry/nextjs` for error tracking (optional)
 - [@react-pdf/renderer](https://react-pdf.org) for PDF export
 - [PapaParse](https://www.papaparse.com) for CSV export
+- [Docker](https://www.docker.com) for self-hosted deployment
 - [Vitest](https://vitest.dev) + [Playwright](https://playwright.dev) for testing
 
 ## Getting started
 
+> **Full walkthrough:** [docs/getting-started.md](docs/getting-started.md)
+
 ### Prerequisites
 
-You need **Node.js 18+** and **npm**. You also need to set up three things on GitHub:
+You need **Node.js 20+** and **npm**. You also need a GitHub App and two OAuth Apps (owner + contributor). See the [Getting Started guide](docs/getting-started.md) for step-by-step setup.
 
-1. **GitHub App** — for webhook events and Check Runs
-2. **GitHub OAuth App (owner)** — full scope for project owners
-3. **GitHub OAuth App (contributor)** — minimal scope for CLA signers
-
-### 1. Clone and install
+### Quick start
 
 ```bash
 git clone https://github.com/clahub/clahub.git
 cd clahub
-npm install
-```
-
-### 2. Configure environment
-
-```bash
-cp .env.local.example .env.local
-```
-
-Fill in the values:
-
-| Variable | Required | Description |
-|---|---|---|
-| `DATABASE_URL` | Yes | SQLite path, e.g. `file:./clahub.db` |
-| `NEXTAUTH_SECRET` | Yes | Generate with `openssl rand -base64 32` |
-| `GITHUB_APP_ID` | Yes | GitHub App ID |
-| `GITHUB_APP_PRIVATE_KEY` | Yes | GitHub App private key (PEM) |
-| `GITHUB_WEBHOOK_SECRET` | Yes | Webhook secret configured on the GitHub App |
-| `GITHUB_OWNER_CLIENT_ID` | Yes | OAuth App for owners — Client ID |
-| `GITHUB_OWNER_CLIENT_SECRET` | Yes | OAuth App for owners — Client secret |
-| `GITHUB_CONTRIBUTOR_CLIENT_ID` | Yes | OAuth App for contributors — Client ID |
-| `GITHUB_CONTRIBUTOR_CLIENT_SECRET` | Yes | OAuth App for contributors — Client secret |
-| `APP_URL` | Yes | Public URL, e.g. `http://localhost:3000` |
-| `SENTRY_DSN` | No | Sentry error tracking (server-side) |
-| `NEXT_PUBLIC_SENTRY_DSN` | No | Sentry error tracking (client-side) |
-| `LOG_LEVEL` | No | Log level: `debug`, `info` (default), `warn`, `error` |
-| `RESEND_API_KEY` | No | Email via Resend |
-| `EMAIL_FROM` | No | Sender address for emails |
-
-### 3. Set up the database
-
-```bash
+npm ci
+cp .env.local.example .env.local   # fill in your values
 npm run db:push
-npm run db:seed    # optional — creates sample data
-```
-
-### 4. Run the dev server
-
-```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
+**Required env vars:** `DATABASE_URL`, `NEXTAUTH_SECRET`, `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`, `GITHUB_OWNER_CLIENT_ID/SECRET`, `GITHUB_CONTRIBUTOR_CLIENT_ID/SECRET`, `APP_URL`.
+
+**Optional:** `SENTRY_DSN`, `RESEND_API_KEY`, `LOG_LEVEL`, branding vars (`APP_NAME`, `APP_LOGO_URL`, `APP_PRIMARY_COLOR`).
+
+See [docs/configuration.md](docs/configuration.md) for the full environment variable reference.
+
 ### Webhooks in development
 
-GitHub can't reach `localhost`, so use a tunnelling service like [ngrok](https://ngrok.com):
-
-```bash
-ngrok http 3000
-```
-
-Set the forwarding URL as your GitHub App's webhook URL and update `APP_URL` in `.env.local`.
+GitHub can't reach `localhost`, so use [ngrok](https://ngrok.com) (`ngrok http 3000`) and update `APP_URL` in `.env.local`.
 
 ## Scripts
 
@@ -182,6 +151,20 @@ Set the forwarding URL as your GitHub App's webhook URL and update `APP_URL` in 
 | `npm run db:push` | Push Prisma schema to database |
 | `npm run db:seed` | Seed database with sample data |
 | `npm run db:studio` | Open Prisma Studio |
+
+## Self-hosting
+
+The fastest way to self-host CLAHub is with Docker:
+
+```bash
+cp .env.docker.example .env   # fill in your values
+docker compose up -d
+```
+
+Also supports Vercel, Railway, Fly.io, and bare-metal Node.js (PM2 / systemd).
+
+See [Deployment Guide](docs/deployment.md) for all options and
+[Upgrading Guide](docs/upgrading.md) for version updates.
 
 ## Testing
 
@@ -235,6 +218,7 @@ src/
     agreements/         Dashboard, create, edit, public signing page
     api/auth/           NextAuth endpoints
     api/badge/          SVG badge endpoints (public, no auth)
+    api/health/         Health check endpoint
     api/v1/             REST API (agreements, signatures, check, export)
     api/webhooks/       GitHub App webhook handler
     auth/signin/        Sign-in page
@@ -243,7 +227,7 @@ src/
     not-found.tsx       Custom 404 page
   components/
     ui/                 shadcn/ui primitives
-    agreements/         Agreement form, signing form, exclusion manager, signature manager, notification toggle, etc.
+    agreements/         Agreement form, signing form, exclusion manager, signature manager, notification toggle, audit log viewer, recheck button, CONTRIBUTING.md section
   lib/
     actions/            Server actions (agreement, exclusion, signing, signature)
     schemas/            Zod validation schemas
@@ -254,6 +238,8 @@ src/
     auth.ts             NextAuth configuration (dual providers)
     access.ts           Role-based access control (owner, org_admin)
     badge.ts            SVG badge rendering (shields.io-compatible)
+    branding.ts         Custom instance branding from env vars
+    contributing.ts     CONTRIBUTING.md snippet generation
     cla-check.ts        Core CLA verification + exclusion + corporate coverage
     email.ts            Resend email wrapper + notification templates
     export-csv.ts       CSV export with papaparse
@@ -273,6 +259,10 @@ tests/
   unit/                 Vitest unit tests (schemas, lib, cla-check, actions)
   e2e/                  Playwright E2E tests (signing flow, dashboard, webhook)
   setup.ts              Vitest setup (jest-dom matchers)
+Dockerfile              Multi-stage production image (node:20-alpine)
+docker-compose.yml      Self-hosted deployment with SQLite volume
+docker-entrypoint.sh    Auto-migration entrypoint script
+docs/                   Deployment and operations documentation
 ```
 
 ## Database models
