@@ -44,7 +44,7 @@ docker compose up -d
 
 ---
 
-## Node.js (PM2 / systemd)
+## Node.js (PM2 / systemd / GCP Compute Engine)
 
 1. **Pull the latest code:**
 
