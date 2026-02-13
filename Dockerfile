@@ -32,8 +32,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# Copy Prisma CLI + schema for runtime migrations
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+# Copy Prisma CLI + schema for runtime migrations (prisma db push)
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/prisma ./prisma
