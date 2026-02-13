@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
+import { getBranding } from "@/lib/branding";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,10 +15,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const appName = process.env.APP_NAME || "CLAHub";
+
 export const metadata: Metadata = {
   title: {
-    default: "CLAHub",
-    template: "%s | CLAHub",
+    default: appName,
+    template: `%s | ${appName}`,
   },
   description:
     "Manage Contributor License Agreements for your GitHub projects. Automate CLA signing with GitHub Checks integration.",
@@ -25,10 +28,10 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
   openGraph: {
-    title: "CLAHub",
+    title: appName,
     description:
       "Manage Contributor License Agreements for your GitHub projects.",
-    siteName: "CLAHub",
+    siteName: appName,
     type: "website",
     images: [{ url: "/cla-logo.png" }],
   },
@@ -39,8 +42,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { primaryColor } = getBranding();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      style={
+        primaryColor
+          ? ({ "--primary": primaryColor } as React.CSSProperties)
+          : undefined
+      }
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

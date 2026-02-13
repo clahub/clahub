@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+tests
+playwright-report
+test-results
+*.db
+*.db-journal
+.env
+.env.*
+!.env.docker.example

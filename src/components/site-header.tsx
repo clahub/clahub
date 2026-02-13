@@ -13,15 +13,23 @@ const navLinks = [
   { href: "/privacy", label: "Privacy" },
 ];
 
-export function SiteHeader() {
+interface SiteHeaderProps {
+  appName?: string;
+  logoUrl?: string;
+}
+
+export function SiteHeader({
+  appName = "CLAHub",
+  logoUrl = "/cla-logo.png",
+}: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="container flex h-14 items-center px-4 md:px-6">
         <Link href="/" className="mr-6 flex items-center gap-2 font-bold">
-          <Image src="/cla-logo.png" alt="CLAHub" width={28} height={28} />
-          CLAHub
+          <Image src={logoUrl} alt={appName} width={28} height={28} />
+          {appName}
         </Link>
 
         {/* Desktop nav */}
