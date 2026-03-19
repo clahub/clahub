@@ -1,12 +1,12 @@
 # CLAHub
 
-[![CI](https://github.com/clahub/clahub/actions/workflows/ci.yml/badge.svg)](https://github.com/clahub/clahub/actions/workflows/ci.yml)
+[![CI](https://github.com/DamageLabs/clahub/actions/workflows/ci.yml/badge.svg)](https://github.com/DamageLabs/clahub/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma)](https://prisma.io)
-[![GitHub issues](https://img.shields.io/github/issues/clahub/clahub)](https://github.com/clahub/clahub/issues)
-[![GitHub stars](https://img.shields.io/github/stars/clahub/clahub)](https://github.com/clahub/clahub/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/DamageLabs/clahub)](https://github.com/DamageLabs/clahub/issues)
+[![GitHub stars](https://img.shields.io/github/stars/DamageLabs/clahub)](https://github.com/DamageLabs/clahub/stargazers)
 
 CLAHub provides a low-friction way to have a Contributor License Agreement for your open source project on GitHub. Contributors digitally sign your CLA by signing in with GitHub, and pull requests are automatically marked with a status check based on whether all commit authors have signed.
 
@@ -116,7 +116,7 @@ You need **Node.js 20+** and **npm**. You also need a GitHub App and two OAuth A
 ### Quick start
 
 ```bash
-git clone https://github.com/clahub/clahub.git
+git clone https://github.com/DamageLabs/clahub.git
 cd clahub
 npm ci
 cp .env.local.example .env.local   # fill in your values

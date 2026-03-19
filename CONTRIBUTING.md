@@ -198,7 +198,7 @@ After modifying `prisma/schema.prisma`, always run `npx prisma generate` to upda
 
 ## Reporting issues
 
-Open an issue at [github.com/clahub/clahub/issues](https://github.com/clahub/clahub/issues). Include:
+Open an issue at [github.com/DamageLabs/clahub/issues](https://github.com/DamageLabs/clahub/issues). Include:
 
 - Steps to reproduce
 - Expected vs actual behavior
