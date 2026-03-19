@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
@@ -66,6 +67,12 @@ export default function RootLayout({
           </a>
           {children}
           <Toaster />
+          <Script
+            defer
+            src="https://analytics.damagelabs.io/script.js"
+            data-website-id="9f298471-93d0-49b1-9c48-88b3237e048d"
+            strategy="afterInteractive"
+          />
         </Providers>
       </body>
     </html>
