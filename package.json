@@ -25,6 +25,7 @@
     "@prisma/client": "^7.3.0",
     "@react-pdf/renderer": "^4.3.2",
     "@sentry/nextjs": "^10.38.0",
+    "@tailwindcss/typography": "^0.5.19",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.563.0",
