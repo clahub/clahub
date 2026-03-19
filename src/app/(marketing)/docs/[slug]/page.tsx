@@ -15,26 +15,28 @@ const VALID_SLUGS: Record<string, string> = {
   "contributor-howto": "contributor-howto.md",
 };
 
+const TITLES: Record<string, string> = {
+  "user-guide": "User Guide",
+  "owner-howto": "Owner How-To Guide",
+  "contributor-howto": "Contributor How-To Guide",
+};
+
 export function generateStaticParams() {
   return Object.keys(VALID_SLUGS).map((slug) => ({ slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const titles: Record<string, string> = {
-    "user-guide": "User Guide",
-    "owner-howto": "Owner How-To Guide",
-    "contributor-howto": "Contributor How-To Guide",
-  };
-
-  const title = titles[params.slug] ?? "Documentation";
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const title = TITLES[slug] ?? "Documentation";
   return {
     title: `${title} — CLAHub`,
     description: `CLAHub ${title}`,
   };
 }
 
-export default function DocPage({ params }: { params: { slug: string } }) {
-  const filename = VALID_SLUGS[params.slug];
+export default async function DocPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const filename = VALID_SLUGS[slug];
   if (!filename) notFound();
 
   const filePath = path.join(DOCS_DIR, filename);
