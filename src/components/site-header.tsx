@@ -9,6 +9,7 @@ import { UserMenu } from "@/components/user-menu";
 
 const navLinks = [
   { href: "/why-cla", label: "Why CLA?" },
+  { href: "/docs", label: "Docs" },
   { href: "/terms", label: "Terms" },
   { href: "/privacy", label: "Privacy" },
 ];
