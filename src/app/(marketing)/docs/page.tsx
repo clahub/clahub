@@ -1,6 +1,12 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Users, Shield } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Documentation — CLAHub",
+  description: "Guides and reference documentation for CLAHub.",
+};
 
 const docs = [
   {
@@ -25,29 +31,34 @@ const docs = [
 
 export default function DocsIndexPage() {
   return (
-    <div className="container max-w-4xl py-16 px-4 md:px-6">
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold tracking-tight">Documentation</h1>
-        <p className="text-muted-foreground mt-3 text-lg">
-          Everything you need to know about using CLAHub.
-        </p>
-      </div>
+    <>
+      {/* Hero — matches terms/privacy page style */}
+      <section className="container flex flex-col items-center gap-4 px-4 py-16 text-center md:py-24">
+        <BookOpen className="text-primary size-10" />
+        <h1 className="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+          Documentation
+        </h1>
+        <p className="text-muted-foreground">Everything you need to know about using CLAHub.</p>
+      </section>
 
-      <div className="grid gap-6 md:grid-cols-1">
-        {docs.map((doc) => (
-          <Link key={doc.slug} href={`/docs/${doc.slug}`}>
-            <Card className="transition-colors hover:bg-muted/50">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <doc.icon className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{doc.title}</CardTitle>
-                  <CardDescription className="mt-1">{doc.description}</CardDescription>
-                </div>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
-      </div>
-    </div>
+      {/* Cards — muted background matching terms/privacy */}
+      <section className="bg-muted/50 border-y">
+        <div className="container px-4 py-16 md:py-20">
+          <div className="mx-auto grid max-w-2xl gap-6">
+            {docs.map((doc) => (
+              <Link key={doc.slug} href={`/docs/${doc.slug}`}>
+                <Card className="border-0 text-center shadow-none transition-colors hover:bg-muted">
+                  <CardContent className="flex flex-col items-center gap-3">
+                    <doc.icon className="text-primary size-6" />
+                    <h2 className="text-lg font-semibold">{doc.title}</h2>
+                    <p className="text-muted-foreground text-sm">{doc.description}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
